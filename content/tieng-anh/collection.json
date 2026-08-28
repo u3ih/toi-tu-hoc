@@ -1,0 +1,15 @@
+{
+  "title": "Tiếng Anh",
+  "shortTitle": "Tiếng Anh",
+  "description": "Tự học Tiếng Anh bằng immersion — nghe, đọc, từ vựng, công cụ và lộ trình cụ thể.",
+  "emoji": "🇬🇧",
+  "accent": "indigo",
+  "order": 1,
+  "status": "active",
+  "sections": [
+    { "title": "Bắt đầu", "emoji": "🚀" },
+    { "title": "Kỹ năng", "emoji": "🎯" },
+    { "title": "Công cụ", "emoji": "🛠️" },
+    { "title": "Tài nguyên", "emoji": "📚" }
+  ]
+}

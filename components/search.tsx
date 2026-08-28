@@ -2,9 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import type { Collection } from '@/lib/content'
 
 type IndexEntry = {
+  collection: string
+  collectionTitle: string
+  accent: string
   slug: string
+  href: string
   title: string
   description: string
   section: string
@@ -25,7 +30,7 @@ function fold(s: string): string {
     .toLowerCase()
 }
 
-function search(index: IndexEntry[], query: string): Hit[] {
+function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
   const q = fold(query.trim())
   if (q.length < 2) return []
   const terms = q.split(/\s+/)
@@ -45,6 +50,8 @@ function search(index: IndexEntry[], query: string): Hit[] {
       // Require every term to appear somewhere in the document.
       const all = terms.every((t) => title.includes(t) || headings.includes(t) || text.includes(t))
       if (!all) score = 0
+      // Nudge the collection the reader is already in to the top.
+      if (score > 0 && entry.collection === boost) score += 3
 
       const at = text.indexOf(terms[0])
       const snippet =
@@ -54,20 +61,34 @@ function search(index: IndexEntry[], query: string): Hit[] {
     })
     .filter((h) => h.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 8)
+    .slice(0, 10)
 }
 
-export function Search() {
+export function Search({
+  collections,
+  currentCollection,
+}: {
+  collections: Collection[]
+  currentCollection?: string
+}) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [index, setIndex] = useState<IndexEntry[]>([])
+  const [scope, setScope] = useState<string>('all')
   const [cursor, setCursor] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const hits = useMemo(() => search(index, query), [index, query])
+  const scoped = useMemo(
+    () => (scope === 'all' ? index : index.filter((e) => e.collection === scope)),
+    [index, scope],
+  )
+  const hits = useMemo(
+    () => search(scoped, query, scope === 'all' ? currentCollection : undefined),
+    [scoped, query, scope, currentCollection],
+  )
 
-  useEffect(() => setCursor(0), [query])
+  useEffect(() => setCursor(0), [query, scope])
 
   // Cmd/Ctrl+K opens, Escape closes.
   useEffect(() => {
@@ -92,13 +113,17 @@ export function Search() {
   }, [open, index.length])
 
   useEffect(() => {
-    if (open) inputRef.current?.focus()
-    else setQuery('')
-  }, [open])
+    if (open) {
+      inputRef.current?.focus()
+      setScope(currentCollection ?? 'all')
+    } else {
+      setQuery('')
+    }
+  }, [open, currentCollection])
 
   function go(hit: Hit) {
     setOpen(false)
-    router.push(`/guide/${hit.slug}/`)
+    router.push(hit.href)
   }
 
   return (
@@ -106,23 +131,11 @@ export function Search() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm muted transition-colors hover:bg-brand-500/8 sm:w-56"
+        className="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm muted transition-colors hover:bg-brand-500/8 sm:w-52"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="h-4 w-4 shrink-0"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" strokeLinecap="round" />
-        </svg>
+        <SearchIcon />
         <span className="hidden sm:inline">Tìm kiếm…</span>
-        <kbd className="ml-auto hidden rounded border px-1.5 py-0.5 font-sans text-[11px] sm:inline">
-          ⌘K
-        </kbd>
+        <kbd className="ml-auto hidden rounded border px-1.5 py-0.5 font-sans text-[11px] sm:inline">⌘K</kbd>
       </button>
 
       {open && (
@@ -137,17 +150,7 @@ export function Search() {
         >
           <div className="surface w-full max-w-xl overflow-hidden rounded-2xl shadow-2xl">
             <div className="flex items-center gap-3 border-b px-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-4 w-4 shrink-0 muted"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.5-3.5" strokeLinecap="round" />
-              </svg>
+              <SearchIcon className="muted" />
               <input
                 ref={inputRef}
                 value={query}
@@ -168,19 +171,35 @@ export function Search() {
               />
             </div>
 
+            {collections.length > 1 && (
+              <div className="flex flex-wrap gap-1.5 border-b px-3 py-2">
+                <ScopeChip active={scope === 'all'} onClick={() => setScope('all')}>
+                  Tất cả
+                </ScopeChip>
+                {collections.map((c) => (
+                  <ScopeChip key={c.slug} active={scope === c.slug} onClick={() => setScope(c.slug)}>
+                    <span aria-hidden>{c.emoji}</span> {c.shortTitle}
+                  </ScopeChip>
+                ))}
+              </div>
+            )}
+
             <ul className="max-h-[50vh] overflow-y-auto p-2">
               {hits.map((hit, i) => (
-                <li key={hit.slug}>
+                <li key={`${hit.collection}/${hit.slug}`}>
                   <button
                     type="button"
                     onMouseEnter={() => setCursor(i)}
                     onClick={() => go(hit)}
+                    data-accent={hit.accent}
                     className={[
                       'w-full rounded-lg px-3 py-2.5 text-left transition-colors',
                       i === cursor ? 'bg-brand-500/12' : '',
                     ].join(' ')}
                   >
-                    <p className="text-xs muted">{hit.section}</p>
+                    <p className="text-xs muted">
+                      {hit.collectionTitle} · {hit.section}
+                    </p>
                     <p className="text-sm font-medium">{hit.title}</p>
                     <p className="line-clamp-2 text-xs muted">{hit.snippet}</p>
                   </button>
@@ -199,5 +218,44 @@ export function Search() {
         </div>
       )}
     </>
+  )
+}
+
+function ScopeChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        'rounded-full px-2.5 py-1 text-xs transition-colors',
+        active ? 'bg-brand-500/15 font-medium text-brand-700 dark:text-brand-300' : 'muted hover:bg-brand-500/8',
+      ].join(' ')}
+    >
+      {children}
+    </button>
+  )
+}
+
+function SearchIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className={`h-4 w-4 shrink-0 ${className}`}
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" strokeLinecap="round" />
+    </svg>
   )
 }

@@ -1,7 +1,7 @@
-# Tôi Tự Học Tiếng Anh
+# Tôi Tự Học
 
-Trang hướng dẫn tự học Tiếng Anh theo phương pháp immersion. Next.js (App Router) + Tailwind CSS v4,
-xuất tĩnh và tự động deploy lên GitHub Pages.
+Trang tổng hợp các **bộ nội dung tự học** (tiếng Anh, lập trình, và bất cứ chủ đề nào bạn thêm sau
+này). Next.js App Router + Tailwind CSS v4, xuất tĩnh, tự động deploy lên GitHub Pages.
 
 ## Chạy local
 
@@ -10,25 +10,74 @@ npm install
 npm run dev      # http://localhost:3000
 ```
 
-`npm run dev` và `npm run build` đều tự chạy `scripts/build-search-index.mjs` trước để dựng lại
-`public/search-index.json` cho ô tìm kiếm.
+## Kiến trúc: mọi thứ là "collection"
 
-## Thêm / sửa nội dung
+Một collection = **một thư mục trong `content/`**. Không có file đăng ký tập trung, không phải sửa
+code khi thêm chủ đề mới.
 
-1. Tạo file `content/<slug>.mdx` với frontmatter:
+```
+content/
+  tieng-anh/
+    collection.json      ← tên, mô tả, emoji, màu, thứ tự các section
+    gioi-thieu.mdx
+    faq.mdx
+  lap-trinh/
+    collection.json
+    ...
+```
 
-   ```mdx
-   ---
-   title: Tiêu đề bài
-   description: Mô tả ngắn hiện dưới tiêu đề và trong kết quả tìm kiếm.
-   ---
+Từ đó tự sinh ra: route `/tieng-anh/`, `/tieng-anh/faq/`, sidebar, mục lục, prev/next, breadcrumb,
+thẻ trên trang chủ, dropdown chuyển chủ đề, và chỉ mục tìm kiếm.
 
-   Nội dung bằng Markdown / MDX.
-   ```
+### Thêm một chủ đề mới
 
-2. Thêm một dòng vào `lib/nav.ts` với đúng `slug` đó.
+```bash
+npm run new -- tieng-nhat              # tạo thư mục + collection.json
+npm run new -- tieng-nhat kana         # tạo bài đầu tiên
+npm run new -- tieng-nhat kanji "Ngữ pháp"
+```
 
-Route, sidebar, mục lục, prev/next và chỉ mục tìm kiếm đều tự sinh — không phải sửa gì thêm.
+Rồi sửa nội dung. Hết. Không đụng vào `app/` hay `components/`.
+
+### `collection.json`
+
+```json
+{
+  "title": "Tiếng Anh",
+  "shortTitle": "Tiếng Anh",
+  "description": "Mô tả hiện trên trang chủ và trang giới thiệu bộ.",
+  "emoji": "🇬🇧",
+  "accent": "indigo",
+  "order": 1,
+  "status": "active",
+  "sections": [
+    { "title": "Bắt đầu", "emoji": "🚀" },
+    { "title": "Kỹ năng", "emoji": "🎯" }
+  ]
+}
+```
+
+| Trường | Ý nghĩa |
+| --- | --- |
+| `accent` | Màu nhấn riêng cho cả bộ: `indigo`, `violet`, `sky`, `emerald`, `amber`, `rose` |
+| `order` | Thứ tự hiển thị giữa các bộ |
+| `status` | `active` · `wip` (gắn nhãn "đang viết") · `hidden` (ẩn khỏi mọi danh sách, link trực tiếp vẫn vào được) |
+| `sections` | Thứ tự các nhóm trong sidebar. Section nào dùng trong bài mà quên khai báo vẫn được render ở cuối. |
+
+File này **không bắt buộc** — một thư mục chỉ có `.mdx` vẫn chạy, chỉ là dùng giá trị mặc định.
+
+### Frontmatter của một bài
+
+```mdx
+---
+title: Câu hỏi thường gặp
+description: Mô tả ngắn, hiện dưới tiêu đề và trong kết quả tìm kiếm.
+section: Tài nguyên
+order: 3
+---
+```
+
+`section` quyết định bài nằm nhóm nào trong sidebar, `order` quyết định thứ tự trong nhóm đó.
 
 ### Component dùng được trong MDX
 
@@ -36,7 +85,7 @@ Route, sidebar, mục lục, prev/next và chỉ mục tìm kiếm đều tự s
 <Callout type="tip" title="Mẹo">Nội dung nhấn mạnh. type: tip | info | warning | danger</Callout>
 
 <Cards>
-  <Card title="Tiêu đề" href="/guide/slug/" emoji="🧭">Mô tả ngắn.</Card>
+  <Card title="Tiêu đề" href="/tieng-anh/faq/" emoji="🧭">Mô tả ngắn.</Card>
 </Cards>
 
 <Steps>
@@ -45,29 +94,44 @@ Route, sidebar, mục lục, prev/next và chỉ mục tìm kiếm đều tự s
 </Steps>
 ```
 
+## Màu nhấn hoạt động thế nào
+
+Tailwind biên dịch `bg-brand-600` thành `var(--color-brand-600)`. Layout của mỗi collection đặt
+`data-accent="<accent>"` lên phần tử bọc, và CSS trong [`app/globals.css`](app/globals.css) ghi đè
+đúng bộ biến đó. Nên đổi màu cả một bộ nội dung = sửa **một dòng JSON**, không đụng tới class nào.
+
+Thêm bảng màu mới: thêm một block `[data-accent='ten-mau']` trong `globals.css` và thêm tên vào
+`ACCENTS` trong [`lib/content.ts`](lib/content.ts).
+
+## Đổi tên / mô tả trang
+
+Sửa [`lib/site.ts`](lib/site.ts) — tên site, tagline, mô tả, link repo.
+
 ## Deploy lên GitHub Pages
 
 1. Push repo lên GitHub, nhánh `main`.
-2. Vào **Settings → Pages → Build and deployment → Source** và chọn **GitHub Actions**.
-3. Push tiếp một commit. Workflow `.github/workflows/deploy.yml` sẽ build và deploy.
+2. **Settings → Pages → Build and deployment → Source** → chọn **GitHub Actions**.
+3. Push một commit. [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) sẽ build và deploy.
 
-`basePath` được lấy tự động từ `actions/configure-pages` qua biến `NEXT_PUBLIC_BASE_PATH`, nên cả
-project page (`user.github.io/<repo>`) lẫn user page (`user.github.io`) đều chạy đúng mà không cần
-sửa config.
+`basePath` lấy tự động từ `actions/configure-pages` qua `NEXT_PUBLIC_BASE_PATH`, nên project page
+(`user.github.io/<repo>`) lẫn user page (`user.github.io`) đều chạy đúng, không cần sửa config.
 
-Muốn thử local với basePath:
+Thử local với basePath:
 
 ```bash
 NEXT_PUBLIC_BASE_PATH=/<repo> npm run build && npx serve out
 ```
 
-## Cấu trúc
+## Cấu trúc code
 
 | Đường dẫn | Vai trò |
 | --- | --- |
-| `content/*.mdx` | Toàn bộ nội dung bài viết |
-| `lib/nav.ts` | Cấu trúc sidebar và thứ tự bài |
-| `lib/content.ts` | Đọc MDX, tách heading, tính thời gian đọc |
-| `app/guide/[[...slug]]/` | Route render một bài |
+| `content/<collection>/` | Toàn bộ nội dung — chỗ duy nhất bạn cần đụng tới khi viết bài |
+| `lib/site.ts` | Tên site, tagline, link repo |
+| `lib/content.ts` | Khám phá collection, đọc MDX, dựng sidebar/TOC/pager |
+| `app/page.tsx` | Trang chủ — danh sách collection |
+| `app/[collection]/` | Trang giới thiệu bộ + layout đặt màu nhấn |
+| `app/[collection]/[slug]/` | Trang bài viết |
 | `components/` | Header, sidebar, tìm kiếm, mục lục, MDX components |
-| `scripts/build-search-index.mjs` | Sinh `public/search-index.json` |
+| `scripts/new.mjs` | Scaffold collection / bài viết |
+| `scripts/build-search-index.mjs` | Sinh `public/search-index.json` (chạy tự động trước dev/build) |

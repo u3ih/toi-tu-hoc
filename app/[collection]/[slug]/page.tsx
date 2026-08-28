@@ -1,46 +1,52 @@
-import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
-import { getDoc, getSlugs } from '@/lib/content'
-import { flatNav } from '@/lib/nav'
+import { getAllDocs, getCollection, getDoc, getFlatNav, getNav } from '@/lib/content'
 import { mdxComponents } from '@/components/mdx'
 import { Sidebar } from '@/components/sidebar'
 import { Toc } from '@/components/toc'
 import { Pager } from '@/components/pager'
 import { ReadingProgress } from '@/components/progress-bar'
 
-type Props = { params: Promise<{ slug?: string[] }> }
-
-const DEFAULT_SLUG = flatNav[0]?.slug ?? 'gioi-thieu'
+type Props = { params: Promise<{ collection: string; slug: string }> }
 
 export function generateStaticParams() {
-  // `/guide/` itself plus one route per MDX file.
-  return [{ slug: [] as string[] }, ...getSlugs().map((slug) => ({ slug: [slug] }))]
+  return getAllDocs().map((doc) => ({ collection: doc.collection, slug: doc.slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const doc = getDoc(slug?.[0] ?? DEFAULT_SLUG)
+  const { collection, slug } = await params
+  const doc = getDoc(collection, slug)
   if (!doc) return {}
   return { title: doc.title, description: doc.description }
 }
 
-export default async function GuidePage({ params }: Props) {
-  const { slug } = await params
-  const doc = getDoc(slug?.[0] ?? DEFAULT_SLUG)
-  if (!doc) notFound()
+export default async function DocPage({ params }: Props) {
+  const { collection: collectionSlug, slug } = await params
+  const collection = getCollection(collectionSlug)
+  const doc = getDoc(collectionSlug, slug)
+  if (!collection || !doc) notFound()
 
   return (
     <>
       <ReadingProgress />
       <div className="mx-auto flex max-w-[100rem] gap-8 px-4 sm:px-6">
-        <Sidebar />
+        <Sidebar nav={getNav(collectionSlug)} />
 
         <main className="min-w-0 flex-1 py-10">
           <article className="mx-auto max-w-3xl">
             <header className="mb-10 border-b pb-8">
-              <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+              <nav className="flex flex-wrap items-center gap-1.5 text-sm muted" aria-label="Breadcrumb">
+                <Link href={`/${collection.slug}/`} className="hover:text-brand-600">
+                  {collection.emoji} {collection.title}
+                </Link>
+                <span aria-hidden>/</span>
+                <span>{doc.section}</span>
+              </nav>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
                 {doc.title}
               </h1>
               {doc.description && <p className="mt-3 text-lg muted text-pretty">{doc.description}</p>}
@@ -66,7 +72,7 @@ export default async function GuidePage({ params }: Props) {
               />
             </div>
 
-            <Pager slug={doc.slug} />
+            <Pager flatNav={getFlatNav(collectionSlug)} slug={doc.slug} />
           </article>
         </main>
 

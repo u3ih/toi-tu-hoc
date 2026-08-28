@@ -1,37 +1,25 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { site } from '@/lib/site'
 import { ThemeProvider } from '@/components/theme-provider'
-import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Tôi Tự Học Tiếng Anh',
-    template: '%s · Tôi Tự Học Tiếng Anh',
+    default: `${site.name} — ${site.tagline}`,
+    template: `%s · ${site.name}`,
   },
-  description:
-    'Hướng dẫn tự học Tiếng Anh bằng phương pháp immersion: nghe, đọc, từ vựng, công cụ và lộ trình cụ thể.',
-  openGraph: {
-    type: 'website',
-    siteName: 'Tôi Tự Học Tiếng Anh',
-  },
+  description: site.description,
+  openGraph: { type: 'website', siteName: site.name },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" suppressHydrationWarning>
-      <body className="font-sans">
+    <html lang={site.locale} suppressHydrationWarning>
+      <body className="flex min-h-dvh flex-col font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <Header />
           {children}
-          <footer className="border-t py-10 text-center text-sm muted">
-            <p>
-              Nội dung mở — đóng góp trên{' '}
-              <a href="https://github.com" className="underline underline-offset-4 hover:text-brand-600">
-                GitHub
-              </a>
-              .
-            </p>
-          </footer>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

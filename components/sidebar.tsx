@@ -2,31 +2,28 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { nav } from '@/lib/nav'
+import type { NavGroup } from '@/lib/content'
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarNav({ nav, onNavigate }: { nav: NavGroup[]; onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
     <nav className="flex flex-col gap-7 text-sm">
-      {nav.map((section) => (
+      {nav.map(({ section, items }) => (
         <div key={section.title}>
           <p className="mb-2 flex items-center gap-2 px-3 text-xs font-semibold tracking-wide uppercase muted">
-            <span aria-hidden>{section.emoji}</span>
+            {section.emoji && <span aria-hidden>{section.emoji}</span>}
             {section.title}
           </p>
           <ul className="space-y-0.5">
-            {section.items.map((item) => {
-              const href = item.external ? item.slug : `/guide/${item.slug}/`
-              const active = !item.external && pathname === href
+            {items.map((item) => {
+              const active = pathname === item.href
 
               return (
                 <li key={item.slug}>
                   <Link
-                    href={href}
+                    href={item.href}
                     onClick={onNavigate}
-                    target={item.external ? '_blank' : undefined}
-                    rel={item.external ? 'noreferrer' : undefined}
                     aria-current={active ? 'page' : undefined}
                     className={[
                       'block rounded-lg px-3 py-1.5 transition-colors',
@@ -47,10 +44,10 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ nav }: { nav: NavGroup[] }) {
   return (
     <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 overflow-y-auto py-8 pr-4 lg:block">
-      <SidebarNav />
+      <SidebarNav nav={nav} />
     </aside>
   )
 }

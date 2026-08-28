@@ -18,6 +18,86 @@
   --color-brand-900: oklch(0.32 0.09 267);
 }
 
+/* Per-collection accent palettes. A collection sets data-accent on its wrapper and
+   every brand-* utility inside re-themes automatically. */
+[data-accent='indigo'] {
+  --color-brand-50: oklch(0.97 0.02 250);
+  --color-brand-100: oklch(0.93 0.05 250);
+  --color-brand-200: oklch(0.87 0.09 255);
+  --color-brand-300: oklch(0.79 0.13 258);
+  --color-brand-400: oklch(0.71 0.16 262);
+  --color-brand-500: oklch(0.64 0.17 264);
+  --color-brand-600: oklch(0.56 0.16 266);
+  --color-brand-700: oklch(0.47 0.13 267);
+  --color-brand-800: oklch(0.39 0.1 267);
+  --color-brand-900: oklch(0.32 0.07 267);
+}
+
+[data-accent='violet'] {
+  --color-brand-50: oklch(0.97 0.02 300);
+  --color-brand-100: oklch(0.93 0.05 300);
+  --color-brand-200: oklch(0.87 0.09 302);
+  --color-brand-300: oklch(0.79 0.13 303);
+  --color-brand-400: oklch(0.71 0.16 304);
+  --color-brand-500: oklch(0.64 0.17 305);
+  --color-brand-600: oklch(0.56 0.16 305);
+  --color-brand-700: oklch(0.47 0.13 305);
+  --color-brand-800: oklch(0.39 0.1 305);
+  --color-brand-900: oklch(0.32 0.07 305);
+}
+
+[data-accent='sky'] {
+  --color-brand-50: oklch(0.97 0.02 230);
+  --color-brand-100: oklch(0.93 0.05 230);
+  --color-brand-200: oklch(0.87 0.09 232);
+  --color-brand-300: oklch(0.79 0.13 234);
+  --color-brand-400: oklch(0.71 0.16 236);
+  --color-brand-500: oklch(0.64 0.17 237);
+  --color-brand-600: oklch(0.56 0.16 238);
+  --color-brand-700: oklch(0.47 0.13 240);
+  --color-brand-800: oklch(0.39 0.1 240);
+  --color-brand-900: oklch(0.32 0.07 240);
+}
+
+[data-accent='emerald'] {
+  --color-brand-50: oklch(0.97 0.02 160);
+  --color-brand-100: oklch(0.93 0.05 160);
+  --color-brand-200: oklch(0.87 0.09 162);
+  --color-brand-300: oklch(0.79 0.13 163);
+  --color-brand-400: oklch(0.71 0.16 164);
+  --color-brand-500: oklch(0.64 0.17 165);
+  --color-brand-600: oklch(0.56 0.16 166);
+  --color-brand-700: oklch(0.47 0.13 166);
+  --color-brand-800: oklch(0.39 0.1 166);
+  --color-brand-900: oklch(0.32 0.07 166);
+}
+
+[data-accent='amber'] {
+  --color-brand-50: oklch(0.97 0.02 85);
+  --color-brand-100: oklch(0.93 0.05 82);
+  --color-brand-200: oklch(0.87 0.09 80);
+  --color-brand-300: oklch(0.79 0.13 76);
+  --color-brand-400: oklch(0.71 0.16 72);
+  --color-brand-500: oklch(0.64 0.17 68);
+  --color-brand-600: oklch(0.56 0.16 62);
+  --color-brand-700: oklch(0.47 0.13 58);
+  --color-brand-800: oklch(0.39 0.1 55);
+  --color-brand-900: oklch(0.32 0.07 52);
+}
+
+[data-accent='rose'] {
+  --color-brand-50: oklch(0.97 0.02 10);
+  --color-brand-100: oklch(0.93 0.05 10);
+  --color-brand-200: oklch(0.87 0.09 12);
+  --color-brand-300: oklch(0.79 0.13 14);
+  --color-brand-400: oklch(0.71 0.16 16);
+  --color-brand-500: oklch(0.64 0.17 17);
+  --color-brand-600: oklch(0.56 0.16 18);
+  --color-brand-700: oklch(0.47 0.13 18);
+  --color-brand-800: oklch(0.39 0.1 18);
+  --color-brand-900: oklch(0.32 0.07 18);
+}
+
 :root {
   --bg: oklch(0.99 0.003 250);
   --bg-elevated: oklch(1 0 0);

@@ -1,0 +1,13 @@
+{
+  "title": "Lập trình",
+  "shortTitle": "Lập trình",
+  "description": "Học lập trình từ nền tảng tư duy đến thói quen làm việc hằng ngày.",
+  "emoji": "💻",
+  "accent": "emerald",
+  "order": 2,
+  "status": "wip",
+  "sections": [
+    { "title": "Nền tảng", "emoji": "🧱" },
+    { "title": "Thực hành", "emoji": "⚒️" }
+  ]
+}
