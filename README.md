@@ -6,8 +6,8 @@ này). Next.js App Router + Tailwind CSS v4, xuất tĩnh, tự động deploy l
 ## Chạy local
 
 ```bash
-npm install
-npm run dev      # http://localhost:3000
+pnpm install
+pnpm dev           # http://localhost:3000
 ```
 
 ## Kiến trúc: mọi thứ là "collection"
@@ -32,9 +32,9 @@ thẻ trên trang chủ, dropdown chuyển chủ đề, và chỉ mục tìm ki�
 ### Thêm một chủ đề mới
 
 ```bash
-npm run new -- tieng-nhat              # tạo thư mục + collection.json
-npm run new -- tieng-nhat kana         # tạo bài đầu tiên
-npm run new -- tieng-nhat kanji "Ngữ pháp"
+pnpm new tieng-nhat              # tạo thư mục + collection.json
+pnpm new tieng-nhat kana         # tạo bài đầu tiên
+pnpm new tieng-nhat kanji "Ngữ pháp"
 ```
 
 Rồi sửa nội dung. Hết. Không đụng vào `app/` hay `components/`.
@@ -127,7 +127,7 @@ Sửa [`lib/site.ts`](lib/site.ts) — tên site, tagline, mô tả, link repo.
 Thử local với basePath:
 
 ```bash
-NEXT_PUBLIC_BASE_PATH=/<repo> npm run build && npx serve out
+NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 ```
 
 ## Cấu trúc code

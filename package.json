@@ -2,6 +2,7 @@
   "name": "toi-tu-hoc-tieng-anh",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@11.10.0",
   "scripts": {
     "predev": "node scripts/build-search-index.mjs",
     "dev": "next dev",
