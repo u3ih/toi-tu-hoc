@@ -1,0 +1,31 @@
+{
+  "name": "toi-tu-hoc-tieng-anh",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/build-search-index.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/build-search-index.mjs",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^16.3.3",
+    "next-mdx-remote": "^6.0.0",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "gray-matter": "^4.0.3",
+    "remark-gfm": "^4.0.1",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.7.3"
+  }
+}

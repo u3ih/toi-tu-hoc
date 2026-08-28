@@ -1,0 +1,111 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-brand-50: oklch(0.97 0.02 250);
+  --color-brand-100: oklch(0.93 0.04 250);
+  --color-brand-200: oklch(0.87 0.07 255);
+  --color-brand-300: oklch(0.79 0.11 258);
+  --color-brand-400: oklch(0.7 0.15 262);
+  --color-brand-500: oklch(0.62 0.18 264);
+  --color-brand-600: oklch(0.55 0.19 266);
+  --color-brand-700: oklch(0.47 0.17 267);
+  --color-brand-800: oklch(0.39 0.13 267);
+  --color-brand-900: oklch(0.32 0.09 267);
+}
+
+:root {
+  --bg: oklch(0.99 0.003 250);
+  --bg-elevated: oklch(1 0 0);
+  --border: oklch(0.9 0.008 260);
+  --fg: oklch(0.25 0.02 265);
+  --fg-muted: oklch(0.52 0.02 265);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: oklch(0.17 0.015 265);
+  --bg-elevated: oklch(0.21 0.018 265);
+  --border: oklch(0.3 0.02 265);
+  --fg: oklch(0.93 0.01 260);
+  --fg-muted: oklch(0.68 0.015 262);
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Keep anchored headings clear of the sticky header. */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-500);
+    color: white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--fg-muted);
+    background-clip: content-box;
+  }
+}
+
+@utility surface {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+@utility muted {
+  color: var(--fg-muted);
+}
+
+/* Aurora blobs behind the landing hero. */
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) scale(1.06);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 12s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-float-slow {
+    animation: none;
+  }
+}
