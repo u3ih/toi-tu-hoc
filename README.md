@@ -144,3 +144,4 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `components/` | Header, sidebar, tìm kiếm, mục lục, MDX components |
 | `scripts/new.mjs` | Scaffold collection / bài viết |
 | `scripts/build-search-index.mjs` | Sinh `public/search-index.json` (chạy tự động trước dev/build) |
+# toi-tu-hoc
