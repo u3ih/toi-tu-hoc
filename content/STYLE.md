@@ -1,0 +1,62 @@
+# Giọng viết của trang này
+
+Áp dụng cho **mọi collection**, không riêng tiếng Anh. Viết bài mới thì bám theo file này.
+
+## Nguyên tắc gốc
+
+Đây là **ghi chép cá nhân**, không phải giáo trình. Người đọc tin bạn vì bạn đã tự đi qua đoạn đường
+đó, chứ không phải vì bạn tổng hợp được nhiều thông tin.
+
+## Xưng hô
+
+- Xưng **"mình"**. Không dùng "tôi", "chúng ta", "chúng tôi".
+- Gọi người đọc là **"bạn"**.
+- Không viết kiểu vô nhân xưng ("người học nên...", "cần phải..."). Viết "mình đã...", "mình khuyên...".
+
+## Cấu trúc một bài
+
+Bài nào cũng nên có ít nhất một trong ba thứ sau, nếu không nó chỉ là bài tổng hợp như mọi nơi khác:
+
+1. **Một chỗ mình từng mắc kẹt** — càng cụ thể càng tốt.
+2. **Thứ mình đã thử mà không hiệu quả** — và vì sao.
+3. **Thứ cuối cùng đã hiệu quả** — kèm con số hoặc mốc thời gian thật nếu nhớ được.
+
+Thứ tự hay dùng: *mình đã sai thế nào → vì sao sai → mình đổi sang cách gì → cách làm cụ thể.*
+
+## Callout `story`
+
+Dùng `<Callout type="story">` cho những đoạn kể lại một chuyện cụ thể đã xảy ra. Nó hiện ra như một
+lời tâm sự bên lề, không phải khung cảnh báo.
+
+```mdx
+<Callout type="story">
+Tháng đầu mình đặt mục tiêu hai tiếng mỗi ngày. Được bốn ngày thì bỏ.
+</Callout>
+```
+
+Mỗi bài nên có **một tới hai** cái. Nhiều hơn thì mất tác dụng.
+
+Đừng dùng `story` cho lời khuyên chung — cái đó là `tip`.
+
+## Viết cho dễ hiểu
+
+- **Câu ngắn.** Một ý một câu. Câu dài quá hai dòng thì tách ra.
+- **Giải thích thuật ngữ ngay lần đầu dùng.** Ví dụ: "immersion — tạm dịch là *ngâm mình* trong ngôn
+  ngữ".
+- **Ví dụ cụ thể thay cho khái niệm trừu tượng.** Thay vì "bản dịch làm mất sắc thái", hãy viết
+  "mình biết *concern* là 'mối quan tâm', nhưng gặp *To whom it may concern* thì mình chịu".
+- **Có con số thì đưa con số.** "sau khoảng 400 giờ nghe" tốt hơn "sau một thời gian dài".
+- **Bảng và danh sách** thay cho đoạn văn dài liệt kê nhiều thứ.
+- Tránh chữ Hán Việt nặng nề khi có từ thuần Việt tương đương.
+
+## Những gì cần tránh
+
+- Giọng khẳng định như chân lý ("phương pháp duy nhất đúng là...").
+- Hứa hẹn kết quả ("chỉ 30 ngày để thành thạo").
+- Nhồi mọi thứ mình biết vào một bài. Thà ngắn mà thật.
+
+## Trước khi publish: thay số liệu thật vào
+
+Các bài hiện có dùng mốc thời gian và con số mang tính minh họa. Trước khi đưa trang cho người khác
+đọc, hãy rà lại và thay bằng trải nghiệm thật của bạn — đó chính là thứ làm trang này khác với các
+trang tổng hợp khác.

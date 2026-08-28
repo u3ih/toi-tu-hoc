@@ -1,15 +1,27 @@
 {
   "title": "Tiếng Anh",
   "shortTitle": "Tiếng Anh",
-  "description": "Tự học Tiếng Anh bằng immersion — nghe, đọc, từ vựng, công cụ và lộ trình cụ thể.",
+  "description": "Mình học tiếng Anh 10 năm mà vẫn không xem nổi một tập phim. Đây là thứ cuối cùng đã hiệu quả.",
   "emoji": "🇬🇧",
   "accent": "indigo",
   "order": 1,
   "status": "active",
   "sections": [
-    { "title": "Bắt đầu", "emoji": "🚀" },
-    { "title": "Kỹ năng", "emoji": "🎯" },
-    { "title": "Công cụ", "emoji": "🛠️" },
-    { "title": "Tài nguyên", "emoji": "📚" }
+    {
+      "title": "Bắt đầu",
+      "emoji": "🚀"
+    },
+    {
+      "title": "Kỹ năng",
+      "emoji": "🎯"
+    },
+    {
+      "title": "Công cụ",
+      "emoji": "🛠️"
+    },
+    {
+      "title": "Tài nguyên",
+      "emoji": "📚"
+    }
   ]
 }

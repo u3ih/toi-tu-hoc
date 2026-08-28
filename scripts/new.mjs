@@ -67,10 +67,20 @@ section: ${targetSection}
 order: ${nextOrder}
 ---
 
-## Phần đầu tiên
+Mở bài bằng chỗ mình từng mắc kẹt, không mở bằng định nghĩa.
 
-Nội dung ở đây.
+## Mình đã làm sai thế nào
+
+<Callout type="story">
+Một chuyện cụ thể đã xảy ra với mình.
+</Callout>
+
+## Cách mình làm bây giờ
+
+Các bước cụ thể.
 `,
 )
+
+console.log('  → giọng viết: xưng "mình", kể chuyện thật. Xem content/STYLE.md')
 
 console.log(`created content/${collection}/${slug}.mdx (section "${targetSection}", order ${nextOrder})`)

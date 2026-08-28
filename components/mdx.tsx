@@ -18,6 +18,7 @@ const CALLOUTS = {
   warning: { label: 'Lưu ý', icon: '⚠️', ring: 'border-amber-500/40 bg-amber-500/8' },
   danger: { label: 'Cẩn thận', icon: '🛑', ring: 'border-rose-500/40 bg-rose-500/8' },
   info: { label: 'Thông tin', icon: 'ℹ️', ring: 'border-brand-500/40 bg-brand-500/8' },
+  story: { label: 'Chuyện của mình', icon: '📖', ring: 'border-brand-500/40 bg-brand-500/8' },
 } as const
 
 export function Callout({
@@ -30,6 +31,20 @@ export function Callout({
   children: ReactNode
 }) {
   const style = CALLOUTS[type] ?? CALLOUTS.info
+
+  // Personal asides read as a quiet aside rather than a boxed warning.
+  if (type === 'story') {
+    return (
+      <aside className="my-7 border-l-2 border-brand-500/50 pl-5">
+        <p className="mb-1 flex items-center gap-2 text-xs font-semibold tracking-wide uppercase not-prose muted">
+          <span aria-hidden>{style.icon}</span>
+          {title ?? style.label}
+        </p>
+        <div className="[&>:last-child]:mb-0 [&>p]:my-1.5">{children}</div>
+      </aside>
+    )
+  }
+
   return (
     <div className={`my-6 rounded-xl border p-4 ${style.ring}`}>
       <p className="mb-1 flex items-center gap-2 font-semibold not-prose">

@@ -79,10 +79,18 @@ order: 3
 
 `section` quyết định bài nằm nhóm nào trong sidebar, `order` quyết định thứ tự trong nhóm đó.
 
+### Giọng viết
+
+Toàn bộ nội dung viết theo giọng kể chuyện ngôi thứ nhất — xưng "mình", kể lại chỗ từng mắc kẹt và
+thứ đã hiệu quả. Quy ước đầy đủ ở [`content/STYLE.md`](content/STYLE.md); đọc file đó trước khi viết
+bài mới.
+
 ### Component dùng được trong MDX
 
 ```mdx
 <Callout type="tip" title="Mẹo">Nội dung nhấn mạnh. type: tip | info | warning | danger</Callout>
+
+<Callout type="story">Đoạn kể chuyện cá nhân — hiện ra như lời tâm sự bên lề.</Callout>
 
 <Cards>
   <Card title="Tiêu đề" href="/tieng-anh/faq/" emoji="🧭">Mô tả ngắn.</Card>
@@ -127,6 +135,7 @@ NEXT_PUBLIC_BASE_PATH=/<repo> npm run build && npx serve out
 | Đường dẫn | Vai trò |
 | --- | --- |
 | `content/<collection>/` | Toàn bộ nội dung — chỗ duy nhất bạn cần đụng tới khi viết bài |
+| `content/STYLE.md` | Quy ước giọng viết cho mọi bài |
 | `lib/site.ts` | Tên site, tagline, link repo |
 | `lib/content.ts` | Khám phá collection, đọc MDX, dựng sidebar/TOC/pager |
 | `app/page.tsx` | Trang chủ — danh sách collection |
