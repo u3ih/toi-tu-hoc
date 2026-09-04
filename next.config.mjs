@@ -9,6 +9,11 @@ const nextConfig = {
   basePath,
   trailingSlash: true,
   images: { unoptimized: true },
+  experimental: {
+    // Tailwind output is small (~13 KiB), so shipping it in a <style> tag beats
+    // a render-blocking <link> round trip. Production builds only.
+    inlineCss: true,
+  },
 }
 
 export default nextConfig
