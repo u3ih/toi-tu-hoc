@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getCollection, getDocs, getFlatNav, getNav } from '@/lib/content'
-import { barePath, t, type Locale } from '@/lib/i18n'
+import { barePath, path, t, type Locale } from '@/lib/i18n'
 import { pageMetadata } from '@/lib/metadata'
 import { collectionSchema } from '@/lib/schema'
 import { JsonLd } from '@/components/json-ld'
@@ -36,6 +36,12 @@ export function CollectionPage({ locale, slug }: { locale: Locale; slug: string 
         </div>
 
         <div className="mx-auto max-w-3xl px-6 py-20 text-center">
+          {/* Matches the BreadcrumbList in this page's JSON-LD. */}
+          <nav className="mb-6 label-retro muted" aria-label={t(locale, 'nav.breadcrumb')}>
+            <Link href={path(locale)} className="hover:text-brand-600 dark:hover:text-accent-400">
+              {t(locale, 'nav.home')}
+            </Link>
+          </nav>
           <span
             className="retro-shadow mx-auto grid h-16 w-16 place-items-center rounded-retro border-2 border-brand-900 bg-accent-400 text-3xl"
             aria-hidden

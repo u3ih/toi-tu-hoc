@@ -2,7 +2,9 @@
   "site": {
     "tagline": "Ghi lại những gì mình đã tự học",
     "description": "Mình tự học tiếng Anh, rồi tự học lập trình — sai rất nhiều trước khi tìm được cách hợp với mình. Đây là ghi chép của mình: đã mắc kẹt ở đâu, đã làm gì để thoát ra, và dùng công cụ nào.",
-    "keywords": "tự học tiếng Anh, học tiếng Anh, comprehensible input, immersion, Anki, tự học lập trình"
+    "keywords": "tự học tiếng Anh, học tiếng Anh, comprehensible input, immersion, Anki, tự học lập trình",
+    "authorRole": "Người tự học",
+    "authorBio": "Mình tự học tiếng Anh rồi tự học lập trình, và ghi lại từng chỗ mắc kẹt để người đi sau khỏi mất mười năm như mình."
   },
 
   "nav": {

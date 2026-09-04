@@ -70,6 +70,18 @@ export type Tag = { key: string; label: string; count: number }
 
 export type Heading = { id: string; text: string; level: 2 | 3 }
 
+/**
+ * Extra structured-data shape for a page, set with `schema:` in frontmatter.
+ *
+ * A page is a BlogPosting either way; this says whether it is *also* something
+ * more specific. An FAQ marked up as an FAQPage is quotable by an answer engine
+ * in a way the same prose in a plain article is not.
+ */
+export type SchemaType = 'faq' | 'howto'
+
+/** One `##` block of a page: its heading and the prose under it, as plain text. */
+export type Block = { heading: string; id: string; text: string }
+
 export type DocMeta = {
   collection: string
   slug: string
@@ -91,6 +103,8 @@ export type DocMeta = {
   updated?: string
   /** False when this locale has no translation and the default-locale text is shown. */
   translated: boolean
+  /** Structured-data shape beyond BlogPosting, when the author declared one. */
+  schemaType?: SchemaType
 }
 
 export type Doc = DocMeta & { headings: Heading[]; body: string }
@@ -129,6 +143,71 @@ function extractHeadings(body: string): Heading[] {
   return headings
 }
 
+/**
+ * MDX reduced to the prose a reader would hear read aloud.
+ *
+ * Structured data and the plain-text mirrors both need the words without the
+ * markup: JSON-LD answers must not contain `**bold**`, and an answer engine
+ * quoting a fenced code block as prose is worse than useless.
+ */
+export function plainText(mdx: string): string {
+  return mdx
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/^\s{0,3}>\s?/gm, '')
+    .replace(/^\s{0,3}[-*+]\s+/gm, '')
+    .replace(/[*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Split a page at its headings.
+ *
+ * `level` 2 gives the top-level blocks — the questions of an FAQ; level 3 gives
+ * the steps of a walkthrough. Text before the first heading is dropped, since it
+ * belongs to the page rather than to any block.
+ */
+export function blocksOf(body: string, level: 2 | 3 = 2): Block[] {
+  const blocks: Block[] = []
+  const marker = '#'.repeat(level)
+  let current: { heading: string; lines: string[] } | null = null
+  let inFence = false
+
+  for (const line of body.split('\n')) {
+    if (line.trimStart().startsWith('```')) inFence = !inFence
+
+    const match = inFence ? null : new RegExp(`^${marker}\\s+(.+?)\\s*$`).exec(line)
+    if (match) {
+      if (current) blocks.push(finish(current))
+      current = { heading: match[1].replace(/[*_`]/g, '').trim(), lines: [] }
+      continue
+    }
+    // A deeper heading belongs to the block it sits under; a shallower one ends it.
+    const other = inFence ? null : /^(#{1,6})\s/.exec(line)
+    if (other && other[1].length < level) {
+      if (current) blocks.push(finish(current))
+      current = null
+      continue
+    }
+    current?.lines.push(line)
+  }
+  if (current) blocks.push(finish(current))
+
+  return blocks.filter((block) => block.text.length > 0)
+}
+
+function finish(current: { heading: string; lines: string[] }): Block {
+  return {
+    heading: current.heading,
+    id: slugify(current.heading),
+    text: plainText(current.lines.join('\n')),
+  }
+}
+
 /* --- Discovery ------------------------------------------------------------ */
 
 type RawSection = { key?: string; title?: Localized; emoji?: string }
@@ -156,6 +235,7 @@ type RawDoc = {
   order: number
   readingTime: number
   tags: string[]
+  schemaType?: SchemaType
   date?: string
   updated?: string
   headings: Heading[]
@@ -215,6 +295,7 @@ function readDoc(file: string): RawDoc {
     order: typeof data.order === 'number' ? data.order : 999,
     readingTime: Math.max(1, Math.ceil(words / 200)),
     tags: toKeys(data.tags),
+    schemaType: data.schema === 'faq' || data.schema === 'howto' ? data.schema : undefined,
     date: toIsoDate(data.date),
     updated: toIsoDate(data.updated),
     headings: extractHeadings(content),
@@ -308,6 +389,7 @@ function toDoc(
     order: base.order,
     readingTime: text.readingTime,
     tags: base.tags,
+    schemaType: base.schemaType,
     date: base.date,
     updated: text.updated ?? base.updated ?? base.date,
     translated: translation !== undefined,

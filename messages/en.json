@@ -2,7 +2,9 @@
   "site": {
     "tagline": "Notes on everything I taught myself",
     "description": "I taught myself English, then taught myself to program — and got a lot wrong before finding what suited me. These are my notes: where I got stuck, what got me unstuck, and the tools I used.",
-    "keywords": "learn English on your own, self-study English, comprehensible input, immersion, Anki, self-taught programming"
+    "keywords": "learn English on your own, self-study English, comprehensible input, immersion, Anki, self-taught programming",
+    "authorRole": "Self-taught learner",
+    "authorBio": "I taught myself English, then taught myself to program, and I write down every place I got stuck so the next person does not lose ten years to it."
   },
 
   "nav": {

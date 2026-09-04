@@ -1,7 +1,8 @@
+import { blocksOf, getCollections, plainText } from './content'
 import type { CategoryGroup, Collection, Doc, DocMeta, Tag } from './content'
 import { LOCALE_META, localePrefix, path, t, type Locale } from './i18n'
 import { siteUrl } from './metadata'
-import { getSite } from './site'
+import { getSite, site } from './site'
 
 /**
  * JSON-LD builders. Every page emits one graph so search engines see the site,
@@ -16,6 +17,9 @@ const AUTHOR_ID = '#author'
 function baseNodes(locale: Locale): Node[] {
   const s = getSite(locale)
   const home = siteUrl(`${localePrefix(locale)}/`)
+  // What the site actually covers, straight from the content tree — so the claim
+  // stays true as topics are added rather than rotting in a hand-kept list.
+  const knowsAbout = getCollections(locale).map((c) => c.title)
 
   return [
     {
@@ -23,6 +27,10 @@ function baseNodes(locale: Locale): Node[] {
       '@id': siteUrl('/') + AUTHOR_ID,
       name: s.author,
       url: siteUrl('/'),
+      description: s.authorBio,
+      jobTitle: s.authorRole,
+      ...(site.authorProfiles.length ? { sameAs: site.authorProfiles } : {}),
+      ...(knowsAbout.length ? { knowsAbout } : {}),
     },
     {
       '@type': 'WebSite',
@@ -212,8 +220,65 @@ export function collectionSchema(locale: Locale, collection: Collection, docs: D
   ])
 }
 
+/**
+ * `## Question` + the prose under it, as an FAQPage.
+ *
+ * This is the one markup on the site that an answer engine can lift a complete
+ * answer out of without guessing where the answer ends, so a page that really is
+ * a list of questions should say so — `schema: faq` in its frontmatter.
+ */
+function faqNode(locale: Locale, doc: Doc): Node | null {
+  const blocks = blocksOf(doc.body, 2).filter((block) => block.text.length > 40)
+  if (blocks.length < 2) return null
+
+  return {
+    '@type': 'FAQPage',
+    '@id': siteUrl(doc.href) + '#faq',
+    url: siteUrl(doc.href),
+    name: doc.title,
+    inLanguage: LOCALE_META[locale].htmlLang,
+    mainEntity: blocks.map((block) => ({
+      '@type': 'Question',
+      name: block.heading,
+      url: siteUrl(doc.href) + `#${block.id}`,
+      acceptedAnswer: { '@type': 'Answer', text: block.text },
+    })),
+  }
+}
+
+/** `### Step` blocks as a HowTo, for pages that really are a sequence. */
+function howToNode(locale: Locale, doc: Doc): Node | null {
+  // Steps are the page's top-level structure, so h2 first — preferring h3 would
+  // silently reduce a guide to whichever section happened to have sub-steps.
+  const steps = [blocksOf(doc.body, 2), blocksOf(doc.body, 3)].find((set) => set.length >= 2)
+  if (!steps) return null
+
+  return {
+    '@type': 'HowTo',
+    '@id': siteUrl(doc.href) + '#howto',
+    url: siteUrl(doc.href),
+    name: doc.title,
+    description: doc.description,
+    inLanguage: LOCALE_META[locale].htmlLang,
+    totalTime: `PT${doc.readingTime}M`,
+    step: steps.map((block, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: block.heading,
+      url: siteUrl(doc.href) + `#${block.id}`,
+      text: block.text.slice(0, 1200),
+    })),
+  }
+}
+
 export function docSchema(locale: Locale, collection: Collection, doc: Doc, sectionTitle: string): Node {
   const s = getSite(locale)
+  const extra =
+    doc.schemaType === 'faq'
+      ? faqNode(locale, doc)
+      : doc.schemaType === 'howto'
+        ? howToNode(locale, doc)
+        : null
 
   return graph([
     ...baseNodes(locale),
@@ -231,14 +296,17 @@ export function docSchema(locale: Locale, collection: Collection, doc: Doc, sect
       description: doc.description,
       articleSection: sectionTitle,
       inLanguage: LOCALE_META[locale].htmlLang,
-      wordCount: doc.body.split(/\s+/).filter(Boolean).length,
+      wordCount: plainText(doc.body).split(/\s+/).filter(Boolean).length,
       timeRequired: `PT${doc.readingTime}M`,
       isPartOf: { '@id': siteUrl(collection.href) + '#blog' },
       author: { '@id': siteUrl('/') + AUTHOR_ID },
       publisher: { '@id': siteUrl('/') + AUTHOR_ID },
+      ...(doc.tags.length ? { keywords: doc.tags.join(', ') } : {}),
+      ...(extra ? { mainEntity: { '@id': extra['@id'] } } : {}),
       ...(doc.date ? { datePublished: doc.date } : {}),
       ...(doc.updated ? { dateModified: doc.updated } : {}),
     },
+    ...(extra ? [extra] : []),
   ])
 }
 

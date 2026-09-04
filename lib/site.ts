@@ -12,6 +12,14 @@ export const site = {
   author: 'Tôi Tự Học',
   /** Repository root; set to '' to hide every GitHub link. */
   repoUrl: 'https://github.com/u3ih/toi-tu-hoc',
+  /**
+   * Profiles that belong to the same author, emitted as `sameAs` on the Person
+   * node. Search and answer engines use these to decide that the author of this
+   * site is a real, findable person rather than a name in a byline — which is
+   * most of what "author authority" amounts to for a personal site. Add real
+   * profiles; drop the ones that do not exist.
+   */
+  authorProfiles: ['https://github.com/u3ih'] as string[],
   /** Branch the "edit this page" links open against. */
   repoBranch: 'main',
   /**
@@ -52,6 +60,8 @@ export function getSite(locale: Locale) {
       .split(',')
       .map((k) => k.trim())
       .filter(Boolean),
+    authorBio: t(locale, 'site.authorBio'),
+    authorRole: t(locale, 'site.authorRole'),
   }
 }
 

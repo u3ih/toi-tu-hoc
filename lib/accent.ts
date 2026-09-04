@@ -112,3 +112,51 @@ function shortestDelta(from: number, to: number): number {
   const delta = (to - from + 540) % 360 - 180
   return delta
 }
+
+/* --- sRGB conversion ------------------------------------------------------ */
+
+/**
+ * oklch → `#rrggbb`.
+ *
+ * The site itself never needs this — browsers read oklch directly. Generated
+ * social images do: they are rendered by satori, which understands neither
+ * oklch nor CSS variables, so the same palette has to be handed over as hex.
+ */
+export function oklchToHex(lightness: number, chroma: number, hueDeg: number): string {
+  const hue = (hueDeg * Math.PI) / 180
+  const a = chroma * Math.cos(hue)
+  const b = chroma * Math.sin(hue)
+
+  // Oklab → LMS (cube roots), then LMS → linear sRGB.
+  const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3
+  const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3
+  const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3
+
+  const linear = [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+  ]
+
+  return (
+    '#' +
+    linear
+      .map((channel) => {
+        // sRGB transfer function, then clamp — out-of-gamut colours clip rather
+        // than wrap, which is what a viewer would expect from a flat swatch.
+        const encoded =
+          channel <= 0.0031308 ? 12.92 * channel : 1.055 * channel ** (1 / 2.4) - 0.055
+        const byte = Math.round(Math.min(1, Math.max(0, encoded)) * 255)
+        return byte.toString(16).padStart(2, '0')
+      })
+      .join('')
+  )
+}
+
+/** One step of a palette, as hex. `step` is a Tailwind shade number. */
+export function paletteHex(palette: Palette, step: (typeof STEPS)[number]): string {
+  const i = STEPS.indexOf(step)
+  const ratio = i / (STEPS.length - 1)
+  const hue = palette.hue + shortestDelta(palette.hue, palette.hueEnd) * ratio
+  return oklchToHex(LIGHTNESS[i], CHROMA[i] * palette.chroma, wrap(hue))
+}

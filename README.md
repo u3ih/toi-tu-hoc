@@ -176,7 +176,8 @@ description: Mô tả ngắn, hiện dưới tiêu đề và trong kết quả t
 section: resources
 order: 3
 tags: [habit, mindset]  # tuỳ chọn — sinh ra /tags/<tag>/ và khối "Đọc tiếp"
-date: 2026-02-14        # tuỳ chọn — vào JSON-LD
+schema: faq             # tuỳ chọn — faq | howto, xem phần SEO
+date: 2026-02-14        # tuỳ chọn — vào JSON-LD và <pubDate> của RSS
 updated: 2026-08-01     # tuỳ chọn — vào JSON-LD và <lastmod> của sitemap
 ---
 ```
@@ -233,10 +234,42 @@ render, nên cùng một file dùng lại được cho mọi ngôn ngữ.
 | --- | --- |
 | `<title>`, description, keywords, OpenGraph, Twitter card | [`lib/metadata.ts`](lib/metadata.ts) |
 | canonical + `hreflang` (kèm `x-default`) | `alternatesFor()` — mọi trang |
-| JSON-LD: `WebSite`, `Person`, `Blog`, `BlogPosting`, `BreadcrumbList` | [`lib/schema.ts`](lib/schema.ts) |
-| `sitemap.xml` (có alternates từng ngôn ngữ) | [`app/sitemap.ts`](app/sitemap.ts) |
+| Ảnh social 1200×630, sinh sẵn cho **mọi** trang | [`lib/og.tsx`](lib/og.tsx) + các file `opengraph-image.tsx` |
+| JSON-LD: `WebSite`, `Person`, `Blog`, `BlogPosting`, `BreadcrumbList`, `ItemList` | [`lib/schema.ts`](lib/schema.ts) |
+| JSON-LD `FAQPage` / `HowTo` (bật bằng `schema:` trong frontmatter) | `faqNode()` / `howToNode()` |
+| RSS 2.0, mỗi ngôn ngữ một feed | [`lib/feed.ts`](lib/feed.ts) → `/feed.xml`, `/en/feed.xml` |
+| `sitemap.xml` (có alternates từng ngôn ngữ + `<lastmod>`) | [`app/sitemap.ts`](app/sitemap.ts) |
 | `robots.txt` | [`app/robots.ts`](app/robots.ts) |
 | Favicon | [`app/icon.svg`](app/icon.svg) |
+
+### `schema:` — khi một bài không chỉ là bài viết
+
+```mdx
+---
+title: Câu hỏi thường gặp
+schema: faq      # mỗi `##` thành một câu hỏi, phần dưới nó thành câu trả lời
+---
+```
+
+| Giá trị | Sinh ra | Dùng khi |
+| --- | --- | --- |
+| `faq` | `FAQPage` + `Question`/`Answer` | Bài thật sự là một danh sách câu hỏi (mỗi `##` là một câu) |
+| `howto` | `HowTo` + `HowToStep` | Bài là một chuỗi bước theo thứ tự (mỗi `##`, hoặc `###` nếu không có `##`) |
+
+Đây là điểm khác biệt lớn nhất với **GEO** (tối ưu cho máy trả lời — ChatGPT, Perplexity, AI
+Overviews): một câu trả lời nằm trong `acceptedAnswer` là câu trả lời máy trích ra được **nguyên
+vẹn**; cùng đoạn văn đó trong một bài viết thường thì máy phải tự đoán câu trả lời dừng ở đâu.
+
+Không khai `schema:` thì bài vẫn là `BlogPosting` như cũ — chỉ là không có phần thêm.
+
+### Ảnh social
+
+Mọi trang có một ảnh 1200×630 sinh sẵn lúc build: màu spine lấy theo collection, nên chia sẻ một
+bài tiếng Anh trông khác một bài lập trình. Không cần thiết kế gì thủ công.
+
+Font hiển thị tải từ Google Fonts lúc build; **build không có mạng vẫn chạy**, chỉ là card rơi về
+font mặc định của `next/og`. Emoji bị loại khỏi card có chủ ý: satori tải một SVG mỗi emoji từ CDN
+và lần tải đó không có đường lùi.
 
 URL tuyệt đối lấy từ `NEXT_PUBLIC_SITE_URL` (mặc định `http://localhost:3000`). Workflow deploy set
 biến này từ `actions/configure-pages`, nên khi deploy thật canonical sẽ trỏ đúng domain.
@@ -300,7 +333,9 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager, category, tag, "Đọc tiếp" |
 | `lib/accent.ts` | Sinh ramp `--color-brand-*` từ một góc màu |
 | `lib/metadata.ts` | canonical, hreflang, OpenGraph, Twitter |
-| `lib/schema.ts` | JSON-LD |
+| `lib/schema.ts` | JSON-LD (kèm `FAQPage`, `HowTo`) |
+| `lib/og.tsx` | Ảnh social sinh lúc build |
+| `lib/feed.ts` | RSS |
 | `app/(vi)/` | Route tiếng Việt (không tiền tố) + root layout `lang="vi"` |
 | `app/(en)/en/` | Route tiếng Anh + root layout `lang="en"` |
 | `app/(vi)/topics/`, `app/(vi)/tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ (mỗi ngôn ngữ một bản) |

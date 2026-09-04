@@ -24,7 +24,13 @@ export function alternatesFor(locale: Locale, bare: string): Metadata['alternate
   }
   languages['x-default'] = siteUrl(`${localePrefix(DEFAULT_LOCALE)}${bare}`)
 
-  return { canonical: siteUrl(`${localePrefix(locale)}${bare}`), languages }
+  return {
+    canonical: siteUrl(`${localePrefix(locale)}${bare}`),
+    languages,
+    // Advertised on every page, not only the home page — a reader who wants the
+    // feed is usually standing on an article when they decide that.
+    types: { 'application/rss+xml': siteUrl(`${localePrefix(locale)}/feed.xml`) },
+  }
 }
 
 /** Root metadata for a locale's route tree; per-page files override title/description. */
