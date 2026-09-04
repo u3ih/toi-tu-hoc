@@ -12,6 +12,14 @@ export const site = {
   author: 'Tôi Tự Học',
   /** Repository root; set to '' to hide every GitHub link. */
   repoUrl: 'https://github.com/u3ih/toi-tu-hoc',
+  /**
+   * Profiles that belong to the same author, emitted as `sameAs` on the Person
+   * node. Search and answer engines use these to decide that the author of this
+   * site is a real, findable person rather than a name in a byline — which is
+   * most of what "author authority" amounts to for a personal site. Add real
+   * profiles; drop the ones that do not exist.
+   */
+  authorProfiles: ['https://github.com/u3ih'] as string[],
   /** Branch the "edit this page" links open against. */
   repoBranch: 'main',
   /**
@@ -36,8 +44,7 @@ export function editUrl(collection: string, slug: string, locale: Locale, transl
   if (!site.repoUrl) return ''
 
   // An untranslated page renders the default-locale file, so that is the file to edit.
-  const file =
-    translated && locale !== DEFAULT_LOCALE ? `${slug}.${locale}.mdx` : `${slug}.mdx`
+  const file = translated && locale !== DEFAULT_LOCALE ? `${slug}.${locale}.mdx` : `${slug}.mdx`
 
   return `${site.repoUrl}/edit/${site.repoBranch}/content/${collection}/${file}`
 }
@@ -52,6 +59,8 @@ export function getSite(locale: Locale) {
       .split(',')
       .map((k) => k.trim())
       .filter(Boolean),
+    authorBio: t(locale, 'site.authorBio'),
+    authorRole: t(locale, 'site.authorRole'),
   }
 }
 

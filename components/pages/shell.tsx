@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { LOCALE_META, type Locale } from '@/lib/i18n'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Footer } from '@/components/footer'
+import { ProgressProvider } from '@/components/progress/provider'
 
 /**
  * The document shell.
@@ -22,9 +23,16 @@ export function Shell({ locale, children }: { locale: Locale; children: ReactNod
         />
       </head>
       <body className="flex min-h-dvh flex-col font-sans">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
-          <Footer locale={locale} />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ProgressProvider>
+            {children}
+            <Footer locale={locale} />
+          </ProgressProvider>
         </ThemeProvider>
       </body>
     </html>

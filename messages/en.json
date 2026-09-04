@@ -2,7 +2,9 @@
   "site": {
     "tagline": "Notes on everything I taught myself",
     "description": "I taught myself English, then taught myself to program — and got a lot wrong before finding what suited me. These are my notes: where I got stuck, what got me unstuck, and the tools I used.",
-    "keywords": "learn English on your own, self-study English, comprehensible input, immersion, Anki, self-taught programming"
+    "keywords": "learn English on your own, self-study English, comprehensible input, immersion, Anki, self-taught programming",
+    "authorRole": "Self-taught learner",
+    "authorBio": "I taught myself English, then taught myself to program, and I write down every place I got stuck so the next person does not lose ten years to it."
   },
 
   "nav": {
@@ -10,6 +12,8 @@
     "close": "Close menu",
     "theme": "Toggle light and dark theme",
     "topics": "Topics",
+    "filterTopics": "Filter topics…",
+    "noTopics": "No topics match.",
     "language": "Change language",
     "breadcrumb": "Breadcrumb",
     "skip": "Skip to main content",
@@ -21,6 +25,7 @@
     "dialog": "Search the site",
     "placeholder": "Search articles, topics…",
     "all": "All",
+    "scope": "Limit to a topic",
     "empty": "No results found.",
     "hint": "Type at least 2 characters. Use ↑ ↓ to move, Enter to open."
   },
@@ -29,7 +34,31 @@
     "badge": "Free · Updated regularly",
     "collections": "Collections",
     "pick": "Pick a topic to start",
+    "startHere": "Start here",
+    "browseAll": "Browse every topic",
+    "categoryCount": "{count} collections",
+    "andMore": "{count} more",
+    "more": "More",
     "empty": "No collections yet. Create a folder under content/ to start."
+  },
+
+  "topics": {
+    "title": "Every topic",
+    "description": "Everything I am keeping notes on, grouped. Start with whatever has you stuck.",
+    "tags": "Tags",
+    "tagsHint": "Tags cut across collections — one problem, seen from several topics."
+  },
+
+  "tags": {
+    "title": "Tags",
+    "description": "The threads that connect articles living under different topics.",
+    "empty": "No tags yet. Add tags: to an article's frontmatter."
+  },
+
+  "tag": {
+    "title": "Tagged: {tag}",
+    "description": "Every article I tagged \"{tag}\", across all topics.",
+    "count": "{count} articles"
   },
 
   "collection": {
@@ -43,8 +72,31 @@
     "toc": "On this page",
     "prev": "← Previous",
     "next": "Next →",
+    "related": "Read next",
+    "takeaways": "Key points",
+    "sourcesHeading": "Sources for this page",
+    "tags": "Tags",
     "untranslated": "This page has no {language} version yet. You are reading the {fallback} original.",
     "edit": "Edit this page on GitHub"
+  },
+
+  "level": {
+    "label": "Level",
+    "beginner": "Starting out",
+    "intermediate": "Some way in",
+    "advanced": "Fairly solid"
+  },
+
+  "progress": {
+    "done": "Done",
+    "markDone": "Mark as done",
+    "count": "{done}/{total} read",
+    "complete": "All done",
+    "storedLocally": "Progress is kept in your browser and sent nowhere.",
+    "reset": "Clear saved progress",
+    "resetConfirm": "Clear {count} marked articles?",
+    "resetYes": "Clear",
+    "resetNo": "Cancel"
   },
 
   "callout": {

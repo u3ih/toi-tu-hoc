@@ -17,12 +17,18 @@ export default function NotFound() {
   return (
     <>
       <script
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-encoded locale code
         dangerouslySetInnerHTML={{
           __html: `document.documentElement.lang=${JSON.stringify(LOCALE_META[DEFAULT_LOCALE].htmlLang)}`,
         }}
       />
       <div className="flex min-h-dvh flex-col font-sans">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <NotFoundPage locale={DEFAULT_LOCALE} />
           <Footer locale={DEFAULT_LOCALE} />
         </ThemeProvider>

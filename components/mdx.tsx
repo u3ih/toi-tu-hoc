@@ -65,7 +65,9 @@ export function Callout({
 /** Wraps an ordered sequence of `###` steps in a vertical rail. */
 export function Steps({ children }: { children: ReactNode }) {
   return (
-    <div className="my-6 border-l-4 border-brand-500/50 pl-6 [&>h3:first-child]:mt-0">{children}</div>
+    <div className="my-6 border-l-4 border-brand-500/50 pl-6 [&>h3:first-child]:mt-0">
+      {children}
+    </div>
   )
 }
 
@@ -148,7 +150,12 @@ export function mdxComponents(locale: Locale, textLocale: Locale = locale): MDXC
           </a>
         )
       }
-      if (href.startsWith('#')) return <a href={href} {...props}>{children}</a>
+      if (href.startsWith('#'))
+        return (
+          <a href={href} {...props}>
+            {children}
+          </a>
+        )
 
       return <Link href={`${localePrefix(locale)}${href}`}>{children}</Link>
     },

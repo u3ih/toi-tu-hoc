@@ -10,6 +10,36 @@ pnpm install
 pnpm dev           # http://localhost:3000
 ```
 
+| Lệnh | Làm gì |
+| --- | --- |
+| `pnpm dev` | Chạy dev server |
+| `pnpm build` | Build tĩnh ra `out/` (kèm ảnh social, RSS, `llms.txt`) |
+| `pnpm lint` | Biome: format + lint, chỉ báo lỗi |
+| `pnpm lint:fix` | Biome: sửa được gì thì sửa |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm check:i18n` | So bộ key giữa các `messages/<locale>.json` |
+| `pnpm new` | Tạo collection / bài mới (xem [Thêm một chủ đề mới](#thêm-một-chủ-đề-mới)) |
+
+Lint và typecheck chạy trong CI trước khi build, nên một lỗi format không lọt lên production chỉ vì
+build vẫn thành công.
+
+### Biome
+
+Một công cụ làm cả format và lint, nên repo này **không** có Prettier hay ESLint. Cấu hình:
+[`biome.jsonc`](biome.jsonc) — file `.jsonc` để giải thích được từng lựa chọn ngay tại chỗ.
+
+Hai điểm cần biết:
+
+- **`app/globals.css` bị loại khỏi Biome.** Các at-rule của Tailwind v4 (`@theme`, `@utility`,
+  `@custom-variant`, `@plugin`) chưa có trong parser CSS của Biome, nên nó đọc file thành lỗi cú pháp.
+- **`biome check --write --unsafe` có thể làm sai logic.** Nó từng xoá `[pathname]` khỏi một
+  `useEffect` (drawer thôi không tự đóng khi chuyển trang), xoá `[query, scope]` khỏi một cái khác
+  (con trỏ kết quả tìm kiếm trỏ vào dòng cũ), và xoá `autoFocus` khỏi ô lọc chủ đề. Những chỗ đó giờ
+  có `biome-ignore` kèm lý do. Đọc diff trước khi commit `--unsafe`.
+
+Suppression phải nằm **ngay dòng trên** dòng bị báo — với thuộc tính JSX là bên trong danh sách
+thuộc tính, không phải trên thẻ.
+
 ## Kiến trúc: mọi thứ là "collection"
 
 Một collection = **một thư mục trong `content/`**. Không có file đăng ký tập trung, không phải sửa
@@ -17,8 +47,10 @@ code khi thêm chủ đề mới.
 
 ```
 content/
+  categories.json           ← nhóm chủ đề (Kỹ năng, Sức khỏe, Cuộc sống…) — tuỳ chọn
+  tags.json                 ← nhãn hiển thị cho thẻ — tuỳ chọn
   english/
-    collection.json         ← tên, mô tả, emoji, màu, các section (mỗi thứ một bản/ngôn ngữ)
+    collection.json         ← tên, mô tả, emoji, màu, nhóm, các section (mỗi thứ một bản/ngôn ngữ)
     introduction.mdx        ← bản tiếng Việt (locale mặc định)
     introduction.en.mdx     ← bản tiếng Anh
     faq.mdx
@@ -27,9 +59,20 @@ content/
     ...
 ```
 
-Từ đó tự sinh ra: route `/english/`, `/english/faq/`, `/en/english/faq/`, sidebar, mục lục,
-prev/next, breadcrumb, thẻ trên trang chủ, dropdown chuyển chủ đề, chỉ mục tìm kiếm, `sitemap.xml`,
-`robots.txt`, canonical + hreflang và JSON-LD.
+Từ đó tự sinh ra: route `/vi/english/`, `/vi/english/faq/`, `/en/english/faq/`, sidebar, mục lục,
+prev/next, breadcrumb, thẻ trên trang chủ, dropdown chuyển chủ đề, chỉ mục tìm kiếm, ảnh social,
+`sitemap.xml`, `robots.txt`, RSS, `llms.txt`, canonical + hreflang và JSON-LD.
+
+Có ba tầng, để site chịu được vài chục chủ đề chứ không chỉ hai:
+
+| Tầng | Là gì | Khai báo ở |
+| --- | --- | --- |
+| **Category** | Nhóm các collection lại (`Kỹ năng` gồm `english` + `programming`) | `content/categories.json` |
+| **Collection** | Một thư mục nội dung, một route gốc | `content/<slug>/collection.json` |
+| **Tag** | Sợi chỉ **xuyên** collection (`habit` có mặt ở cả `english` và `health`) | `tags:` trong frontmatter |
+
+Category quyết định trang chủ và `/topics/` xếp thế nào. Tag sinh ra `/tags/` và `/tags/<tag>/`, và
+là thứ tạo ra khối "Đọc tiếp" ở cuối mỗi bài — chỗ duy nhất người đọc nhảy được sang chủ đề khác.
 
 ## Đa ngôn ngữ
 
@@ -37,10 +80,19 @@ prev/next, breadcrumb, thẻ trên trang chủ, dropdown chuyển chủ đề, c
 section là định danh route — giống hệt nhau ở mọi ngôn ngữ. Nhờ vậy một trang chỉ có một hình dạng
 URL, và nút đổi ngôn ngữ chỉ cần đổi tiền tố, không cần bảng ánh xạ.
 
-| Ngôn ngữ | URL | Ghi chú |
-| --- | --- | --- |
-| `vi` (mặc định) | `/english/reading/` | Không có tiền tố |
-| `en` | `/en/english/reading/` | Có tiền tố |
+| Ngôn ngữ | URL |
+| --- | --- |
+| `vi` (mặc định) | `/vi/english/reading/` |
+| `en` | `/en/english/reading/` |
+
+**Mọi ngôn ngữ đều có tiền tố**, kể cả ngôn ngữ mặc định. Đó là điều kiện để cả site nằm trong **một**
+cây route `app/[locale]/` thay vì một cây chép tay cho mỗi ngôn ngữ — thêm ngôn ngữ mới không tạo ra
+một file route nào.
+
+`/` là trang chuyển ngôn ngữ: `canonical` trỏ về `/vi/`, `<meta refresh>` chuyển ngay, và một script
+nhỏ ưu tiên ngôn ngữ đã lưu rồi tới `navigator.languages`. Không có JavaScript thì vẫn là một danh
+sách link đọc được. Trang này **không** đặt `noindex`: `noindex` trên một trang có `canonical` có thể
+lan sang trang đích, tức là làm mất index của chính trang chủ.
 
 Bài chưa dịch **không 404**: trang hiện nội dung tiếng Việt kèm một dòng báo "bài này chưa có bản
 tiếng Anh". Phần khung (menu, sidebar, nút, nhãn callout) vẫn đúng ngôn ngữ đang xem.
@@ -78,12 +130,17 @@ nếu một ngôn ngữ thiếu key, thừa key, hoặc dùng sai `{placeholder}
 1. Thêm vào `i18n.config.json`.
 2. Mở rộng union `Locale` trong [`lib/i18n.ts`](lib/i18n.ts).
 3. Chép `messages/vi.json` sang `messages/<code>.json` rồi dịch.
-4. Chép thư mục `app/(en)/` thành `app/(<code>)/`, đổi `'en'` thành mã mới (5 file, mỗi file vài
-   dòng).
-5. Thêm `title` / `description` / `sections[].title` cho ngôn ngữ đó trong từng `collection.json`.
+4. Thêm `title` / `description` / `sections[].title` cho ngôn ngữ đó trong từng `collection.json`.
 
-Mỗi ngôn ngữ có root layout riêng để `<html lang>` đúng ngay trong HTML tĩnh, không phải sửa sau khi
-hydrate.
+**Không có bước nào trong `app/`.** `generateStaticParams` của `[locale]` đọc từ `i18n.config.json`,
+nên route, ảnh social, RSS và `llms.txt` của ngôn ngữ mới sinh ra ngay.
+
+`<html lang>` lấy từ chính route param trong [`app/(site)/[locale]/layout.tsx`](app/(site)/[locale]/layout.tsx),
+nên nó đúng ngay trong HTML tĩnh — không phải sửa sau khi hydrate.
+
+Site có **hai** root layout, chia bằng route group: `(router)` cho `/` và `(site)` cho mọi thứ còn
+lại. Đó là cách Next cho phép hai cây có `<html>` riêng, và là lý do trang chuyển ngôn ngữ không bị
+nhồi vào một locale mà nó không thuộc về.
 
 ### Thêm một chủ đề mới
 
@@ -98,6 +155,28 @@ Rồi sửa nội dung. Hết. Không đụng vào `app/` hay `components/`.
 Tên collection, slug và section key phải là **key tiếng Anh viết thường** (`a-z`, `0-9`, `-`);
 script từ chối nếu không đúng.
 
+### Nhóm chủ đề — `content/categories.json`
+
+```json
+{
+  "categories": [
+    {
+      "key": "health",
+      "emoji": "💪",
+      "order": 2,
+      "title": { "vi": "Sức khỏe", "en": "Health" },
+      "description": { "vi": "Mô tả nhóm.", "en": "Group description." }
+    }
+  ]
+}
+```
+
+Collection trỏ vào nhóm bằng `"category": "health"`. Nhóm nào chưa có collection nào thì không hiện
+ra — file này khai báo được trước hướng đi của site mà trang chủ không bày kệ trống. Collection
+không khai `category` rơi vào nhóm "Khác" ở cuối.
+
+File này **không bắt buộc**: bỏ nó đi thì trang chủ về lại một lưới thẻ phẳng.
+
 ### `collection.json`
 
 Trường nào hiển thị ra màn hình thì nhận một chuỗi (dùng chung mọi ngôn ngữ) hoặc một object theo
@@ -107,6 +186,7 @@ ngôn ngữ.
 {
   "emoji": "🇬🇧",
   "accent": "indigo",
+  "category": "skills",
   "order": 1,
   "status": "active",
   "title": { "vi": "Tiếng Anh", "en": "English" },
@@ -121,7 +201,9 @@ ngôn ngữ.
 
 | Trường | Ý nghĩa |
 | --- | --- |
-| `accent` | Màu nhấn riêng cho cả bộ: `indigo`, `violet`, `sky`, `emerald`, `amber`, `rose` |
+| `accent` | Màu nhấn riêng cho cả bộ: `indigo`, `violet`, `sky`, `teal`, `emerald`, `lime`, `amber`, `clay`, `rose`, `plum` |
+| `hue` | Thay cho `accent` khi mười màu trên đã dùng hết: một số `0`–`359`, ramp tự sinh (xem [Màu nhấn](#màu-nhấn-hoạt-động-thế-nào)) |
+| `category` | Key của nhóm trong `content/categories.json` |
 | `order` | Thứ tự hiển thị giữa các bộ |
 | `status` | `active` · `wip` (gắn nhãn "đang viết") · `hidden` (ẩn khỏi mọi danh sách và sitemap, link trực tiếp vẫn vào được) |
 | `sections[].key` | Định danh dùng trong frontmatter `section:` — tiếng Anh, không đổi theo ngôn ngữ |
@@ -137,13 +219,33 @@ title: Câu hỏi thường gặp
 description: Mô tả ngắn, hiện dưới tiêu đề và trong kết quả tìm kiếm.
 section: resources
 order: 3
-date: 2026-02-14        # tuỳ chọn — vào JSON-LD
+tags: [habit, mindset]  # tuỳ chọn — sinh ra /tags/<tag>/ và khối "Đọc tiếp"
+level: beginner         # tuỳ chọn — beginner | intermediate | advanced
+schema: faq             # tuỳ chọn — faq | howto, xem phần SEO
+date: 2026-02-14        # tuỳ chọn — vào JSON-LD và <pubDate> của RSS
 updated: 2026-08-01     # tuỳ chọn — vào JSON-LD và <lastmod> của sitemap
 ---
 ```
 
 `section` (key tiếng Anh) quyết định bài nằm nhóm nào trong sidebar, `order` quyết định thứ tự trong
 nhóm đó.
+
+### Thẻ — `tags:`
+
+Thẻ là **key tiếng Anh viết thường**, giống `section` và slug, vì chúng nằm trong URL. Nhãn hiển thị
+là tuỳ chọn, khai trong `content/tags.json`:
+
+```json
+{
+  "labels": {
+    "habit": { "vi": "Thói quen", "en": "Habits" }
+  }
+}
+```
+
+Thẻ chưa có nhãn thì hiện chính key (gạch ngang đổi thành khoảng trắng). Thẻ chỉ khai trong file
+locale mặc định (`bai.mdx`) — bản dịch không cần lặp lại, để thứ tự và nhóm không bao giờ lệch nhau
+giữa các ngôn ngữ.
 
 ### Giọng viết
 
@@ -171,28 +273,167 @@ bài mới.
 Link nội bộ trong MDX viết **không kèm tiền tố ngôn ngữ** (`/english/faq/`). Tiền tố được thêm lúc
 render, nên cùng một file dùng lại được cho mọi ngôn ngữ.
 
+### `level:` — bài này giả định người đọc biết trước những gì
+
+```mdx
+---
+level: intermediate   # beginner | intermediate | advanced
+---
+```
+
+Hiện thành một badge ba vạch cạnh thời gian đọc, và đi vào `educationalLevel` trong JSON-LD. Lý do
+có nó: cách phổ biến nhất để một người bỏ trang tự học là mở đúng bài sai đầu tiên.
+
+## Mục lục trong bài
+
+Màn hình rộng (`xl` trở lên) có thanh anchor bên phải. Màn hình hẹp hơn — tức là điện thoại và phần
+lớn tablet — trước đây **không có gì**; giờ có một thanh dính ngay dưới header: lúc gập lại nó hiện
+tên mục đang đọc (kiêm luôn chỉ báo vị trí), bấm vào thì mở ra cả danh sách.
+
+Cả hai dùng chung hook `useActiveHeading` trong [`components/toc.tsx`](components/toc.tsx). Nó đo
+theo scroll chứ không dùng `IntersectionObserver`, vì câu hỏi không phải "cái gì đang hiện" mà là
+"mình vừa đi qua mục nào" — một mục dài đã trôi tiêu đề khỏi màn hình thì vẫn là mục đang đọc.
+
+## Tiến độ đọc
+
+Mỗi bài có nút **Đánh dấu đã học xong**. Sidebar và trang collection hiện dấu ✓, kèm thanh tiến độ
+`x/y` cho cả bộ. Xoá được ở footer.
+
+Hiện tiến độ lưu trong `localStorage` của người đọc — không có tài khoản, không gửi đi đâu. Nhưng
+**không có component nào biết điều đó**: tất cả nói chuyện qua một interface.
+
+```ts
+// lib/progress/types.ts
+export interface ProgressStore {
+  load(): Promise<ProgressData>
+  write(key: ProgressKey, entry: ProgressEntry | null): Promise<void>
+  clear(): Promise<void>
+  subscribe(listener: () => void): () => void
+}
+```
+
+| File | Vai trò |
+| --- | --- |
+| [`lib/progress/types.ts`](lib/progress/types.ts) | Interface + kiểu dữ liệu |
+| [`lib/progress/local-store.ts`](lib/progress/local-store.ts) | Bản `localStorage` |
+| [`lib/progress/store.ts`](lib/progress/store.ts) | **Chỗ duy nhất** quyết định dùng store nào |
+| [`components/progress/provider.tsx`](components/progress/provider.tsx) | Context + hook `useProgress()` |
+
+Đổi sang lưu ở database: viết một `ProgressStore` mới, rồi chọn nó trong `createProgressStore()` —
+ví dụ dùng store server cho người đã đăng nhập, còn lại rơi về store local. Không component nào phải
+sửa. Các method để `async` sẵn dù bản local trả về ngay, chính là để bước này không phải đổi API.
+
+Vài điểm đã tính trước:
+
+- **`ready`.** Server không thể biết tiến độ, nên mọi component giữ trạng thái trung tính tới khi
+  store trả lời. Nhờ vậy lần paint đầu giống nhau ở server và client, không có hydration mismatch.
+- **`localStorage` có thể ném lỗi** (chế độ riêng tư). Mọi lần đọc/ghi đều bọc `try/catch`; đọc lỗi
+  nghĩa là "chưa học bài nào", không phải màn hình lỗi.
+- **Dữ liệu hỏng bị loại từng dòng**, để một blob sai định dạng không làm sập render.
+- **`subscribe`** đồng bộ giữa các tab qua sự kiện `storage`; sau này là chỗ để server push xuống.
+- **Key là `collection/slug`**, không kèm locale — đọc bản tiếng Việt rồi mở bản tiếng Anh thì vẫn là
+  một bài đã học.
+
 ## SEO
 
 | Thứ | Ở đâu |
 | --- | --- |
 | `<title>`, description, keywords, OpenGraph, Twitter card | [`lib/metadata.ts`](lib/metadata.ts) |
 | canonical + `hreflang` (kèm `x-default`) | `alternatesFor()` — mọi trang |
-| JSON-LD: `WebSite`, `Person`, `Blog`, `BlogPosting`, `BreadcrumbList` | [`lib/schema.ts`](lib/schema.ts) |
-| `sitemap.xml` (có alternates từng ngôn ngữ) | [`app/sitemap.ts`](app/sitemap.ts) |
+| Ảnh social 1200×630, sinh sẵn cho **mọi** trang | [`lib/og.tsx`](lib/og.tsx) + các file `opengraph-image.tsx` |
+| JSON-LD: `WebSite`, `Person`, `Blog`, `BlogPosting`, `BreadcrumbList`, `ItemList` | [`lib/schema.ts`](lib/schema.ts) |
+| JSON-LD `FAQPage` / `HowTo` (bật bằng `schema:` trong frontmatter) | `faqNode()` / `howToNode()` |
+| RSS 2.0, mỗi ngôn ngữ một feed | [`lib/feed.ts`](lib/feed.ts) → `/feed.xml`, `/en/feed.xml` |
+| `sitemap.xml` (có alternates từng ngôn ngữ + `<lastmod>`) | [`app/sitemap.ts`](app/sitemap.ts) |
 | `robots.txt` | [`app/robots.ts`](app/robots.ts) |
 | Favicon | [`app/icon.svg`](app/icon.svg) |
+
+### `schema:` — khi một bài không chỉ là bài viết
+
+```mdx
+---
+title: Câu hỏi thường gặp
+schema: faq      # mỗi `##` thành một câu hỏi, phần dưới nó thành câu trả lời
+---
+```
+
+| Giá trị | Sinh ra | Dùng khi |
+| --- | --- | --- |
+| `faq` | `FAQPage` + `Question`/`Answer` | Bài thật sự là một danh sách câu hỏi (mỗi `##` là một câu) |
+| `howto` | `HowTo` + `HowToStep` | Bài là một chuỗi bước theo thứ tự (mỗi `##`, hoặc `###` nếu không có `##`) |
+
+Đây là điểm khác biệt lớn nhất với **GEO** (tối ưu cho máy trả lời — ChatGPT, Perplexity, AI
+Overviews): một câu trả lời nằm trong `acceptedAnswer` là câu trả lời máy trích ra được **nguyên
+vẹn**; cùng đoạn văn đó trong một bài viết thường thì máy phải tự đoán câu trả lời dừng ở đâu.
+
+Không khai `schema:` thì bài vẫn là `BlogPosting` như cũ — chỉ là không có phần thêm.
+
+### GEO — tối ưu cho máy trả lời
+
+SEO là để người ta tìm ra trang. GEO là để máy trả lời (ChatGPT, Perplexity, AI Overviews) **trích
+đúng** thứ trang này nói. Bốn thứ dưới đây làm việc đó, và ba trong bốn là tự động.
+
+| Thứ | Ở đâu | Cần tay không |
+| --- | --- | --- |
+| `/llms.txt` — mục lục toàn site, mỗi bài một dòng kèm URL | [`scripts/build-llms.mjs`](scripts/build-llms.mjs) | Không |
+| `/llms-full.txt` — toàn bộ nội dung trong một file | cùng script | Không |
+| `/<đường-dẫn>/index.md` — bản markdown của **từng** bài | cùng script | Không |
+| `citation` trong JSON-LD | lấy từ mục `## Nguồn cho bài này` sẵn có | Không |
+| `abstract` + `speakable` | `takeaways:` trong frontmatter | **Có** |
+| `about` — nối chủ đề tới Wikipedia/Wikidata | `about:` trong frontmatter | **Có** |
+
+```mdx
+---
+takeaways:
+  - Mục tiêu tháng đầu không phải giỏi lên, mà là dựng được thói quen.
+  - Chọn một nguồn nghe và một nguồn đọc rồi thôi không tìm nữa.
+about:
+  - name: Comprehensible input
+    sameAs: https://en.wikipedia.org/wiki/Input_hypothesis
+  - name: Stephen Krashen        # chỉ có name cũng được
+---
+```
+
+`takeaways` hiện thành hộp **Ý chính** ở đầu bài — cùng một thứ vừa giúp người đọc quyết định có đọc
+tiếp không, vừa cho máy một đoạn ngắn tự đứng được để trích. Quy ước viết nằm ở
+[`content/STYLE.md`](content/STYLE.md).
+
+`citation` **không** cần khai thêm: script tìm mục `## Nguồn cho bài này` (tiếng Anh:
+`## Sources for this page`) và lấy link trong đó. Tên mục lấy từ `doc.sourcesHeading` trong
+`messages/<locale>.json`, nên đổi cách gọi mục thì sửa ở đó.
+
+Bản mirror `.md` sinh ra sau `next build`, ghi thẳng vào `out/`. Chạy `pnpm build` là có; `pnpm dev`
+thì không, vì chúng là thứ dành cho crawler chứ không phải cho người.
+
+### Ảnh social
+
+Mọi trang có một ảnh 1200×630 sinh sẵn lúc build: màu spine lấy theo collection, nên chia sẻ một
+bài tiếng Anh trông khác một bài lập trình. Không cần thiết kế gì thủ công.
+
+Font hiển thị tải từ Google Fonts lúc build; **build không có mạng vẫn chạy**, chỉ là card rơi về
+font mặc định của `next/og`. Emoji bị loại khỏi card có chủ ý: satori tải một SVG mỗi emoji từ CDN
+và lần tải đó không có đường lùi.
 
 URL tuyệt đối lấy từ `NEXT_PUBLIC_SITE_URL` (mặc định `http://localhost:3000`). Workflow deploy set
 biến này từ `actions/configure-pages`, nên khi deploy thật canonical sẽ trỏ đúng domain.
 
 ## Màu nhấn hoạt động thế nào
 
-Tailwind biên dịch `bg-brand-600` thành `var(--color-brand-600)`. Layout của mỗi collection đặt
-`data-accent="<accent>"` lên phần tử bọc, và CSS trong [`app/globals.css`](app/globals.css) ghi đè
-đúng bộ biến đó. Nên đổi màu cả một bộ nội dung = sửa **một dòng JSON**, không đụng tới class nào.
+Tailwind biên dịch `bg-brand-600` thành `var(--color-brand-600)`. Layout của mỗi collection đặt cả
+bộ biến `--color-brand-*` làm inline style lên phần tử bọc, nên mọi class `brand-*` bên dưới đổi màu
+theo. Đổi màu cả một bộ nội dung = sửa **một dòng JSON**, không đụng tới class nào.
 
-Thêm bảng màu mới: thêm một block `[data-accent='ten-mau']` trong `globals.css` và thêm tên vào
-`ACCENTS` trong [`lib/content.ts`](lib/content.ts).
+Ramp được **sinh ra**, không viết tay: [`lib/accent.ts`](lib/accent.ts) giữ cố định đường cong độ
+sáng và độ bão hoà — đó là thứ làm mọi collection trông như in cùng một máy — nên một bảng màu chỉ
+còn là một góc màu.
+
+```json
+{ "accent": "teal" }                      // một trong mười tên có sẵn
+{ "hue": 320 }                            // góc màu bất kỳ, 0-359
+{ "hue": 82, "hueEnd": 45, "chroma": 0.9 } // ramp trôi màu khi tối dần, như mustard sang cam cháy
+```
+
+Nên thêm chủ đề thứ hai mươi tốn **một con số**, không tốn một block CSS.
 
 ## Đổi tên / mô tả trang
 
@@ -232,11 +473,20 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `i18n.config.json` | Danh sách ngôn ngữ + ngôn ngữ mặc định (dùng chung cho code và script) |
 | `lib/i18n.ts` | Locale, URL theo locale, tra chuỗi (`t`) |
 | `lib/site.ts` | Tên site, tác giả, link repo, domain |
-| `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager |
+| `biome.jsonc` | Format + lint (thay cho Prettier và ESLint) |
+| `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager, category, tag, "Đọc tiếp" |
+| `lib/accent.ts` | Sinh ramp `--color-brand-*` từ một góc màu |
 | `lib/metadata.ts` | canonical, hreflang, OpenGraph, Twitter |
-| `lib/schema.ts` | JSON-LD |
-| `app/(vi)/` | Route tiếng Việt (không tiền tố) + root layout `lang="vi"` |
-| `app/(en)/en/` | Route tiếng Anh + root layout `lang="en"` |
+| `lib/progress/` | Tiến độ đọc: interface, bản `localStorage`, chỗ chọn store |
+| `lib/schema.ts` | JSON-LD (kèm `FAQPage`, `HowTo`) |
+| `lib/og.tsx` | Ảnh social sinh lúc build |
+| `lib/feed.ts` | RSS |
+| `scripts/lib/content.mjs` | Bản đọc content tree dùng chung cho mọi build script |
+| `scripts/build-llms.mjs` | `llms.txt`, `llms-full.txt`, mirror `.md` từng bài |
+| `app/(router)/` | Trang chuyển ngôn ngữ ở `/` + `/feed.xml` — root layout riêng |
+| `app/(site)/[locale]/` | Toàn bộ site, một cây cho mọi ngôn ngữ; root layout đặt `<html lang>` |
+| `app/(site)/[locale]/topics/`, `.../tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ |
+| `lib/route.ts` | Đọc + kiểm tra `locale` từ route param |
 | `app/sitemap.ts`, `app/robots.ts`, `app/icon.svg` | Sitemap, robots, favicon |
 | `components/pages/` | Thân trang dùng chung cho mọi ngôn ngữ |
 | `components/` | Header, sidebar, tìm kiếm, mục lục, đổi ngôn ngữ, MDX components |

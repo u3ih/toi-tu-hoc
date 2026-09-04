@@ -23,6 +23,50 @@ Bài nào cũng nên có ít nhất một trong ba thứ sau, nếu không nó c
 
 Thứ tự hay dùng: *mình đã sai thế nào → vì sao sai → mình đổi sang cách gì → cách làm cụ thể.*
 
+## Mở bài bằng `takeaways`
+
+Mỗi bài nên có **ba tới bốn** dòng `takeaways` trong frontmatter — bài này nói gì, gọn tới mức đọc
+xong bốn dòng là biết có nên đọc tiếp hay không.
+
+```mdx
+---
+title: 30 ngày đầu tiên
+takeaways:
+  - Mục tiêu tháng đầu không phải giỏi lên, mà là dựng được thói quen.
+  - Chọn một nguồn nghe và một nguồn đọc rồi thôi không tìm nữa.
+---
+```
+
+- **Mỗi dòng phải đứng một mình được.** Người đọc chỉ đọc bốn dòng này vẫn hiểu; máy trả lời chỉ
+  trích một dòng vẫn không sai nghĩa.
+- **Viết như kết luận, không như tiêu đề.** "Nghe 30 phút mỗi ngày ăn 3 tiếng cuối tuần" tốt hơn
+  "Về tần suất nghe".
+- **Không hứa hẹn.** Đây là chỗ dễ trượt sang giọng quảng cáo nhất trong cả bài.
+- Bản dịch có `takeaways` riêng; chưa dịch thì bài tiếng Anh dùng lại bản tiếng Việt.
+
+Bốn dòng này hiện thành hộp **Ý chính** ở đầu bài, và đi vào `abstract` + `speakable` trong JSON-LD —
+tức là đúng đoạn mà ChatGPT, Perplexity hay AI Overviews sẽ trích khi trả lời câu hỏi của người ta.
+
+## Khai `level:`
+
+Mỗi bài khai `level: beginner | intermediate | advanced`. Tiêu chí là **bài này giả định người đọc đã
+biết gì**, không phải bài khó hay dễ:
+
+- `beginner` — không giả định gì ngoài việc người đọc quan tâm chủ đề.
+- `intermediate` — giả định người đọc đã làm theo mấy bài `beginner` và đang mắc ở tầng sau.
+- `advanced` — giả định người đọc đã đi được một đoạn dài và đang tinh chỉnh.
+
+## Đặt tiêu đề `##` thành câu hỏi
+
+Chỗ nào một mục thật sự trả lời một câu hỏi thì viết heading thành câu hỏi đó, đúng cách người ta gõ
+vào ô tìm kiếm.
+
+- Nên: `## Mình cần biết bao nhiêu từ thì đọc được sách?`
+- Tránh: `## Về số lượng từ vựng`
+
+Không phải mọi heading — bài toàn câu hỏi đọc rất mệt. Nhưng mỗi bài nên có vài cái, và bài nào là
+danh sách câu hỏi thì khai `schema: faq` trong frontmatter để nó thành `FAQPage`.
+
 ## Callout `story`
 
 Dùng `<Callout type="story">` cho những đoạn kể lại một chuyện cụ thể đã xảy ra. Nó hiện ra như một

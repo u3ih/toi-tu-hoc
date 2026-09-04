@@ -4,20 +4,43 @@ import matter from 'gray-matter'
 import {
   DEFAULT_LOCALE,
   isLocale,
+  LOCALES,
   path as localePath,
   pick,
+  t,
   type Locale,
   type Localized,
 } from './i18n'
+import { DEFAULT_ACCENT, isAccent, resolvePalette, type Accent, type Palette } from './accent'
 
 const CONTENT_DIR = nodePath.join(process.cwd(), 'content')
 
-/** Accent palettes defined in app/globals.css under [data-accent='…']. */
-export const ACCENTS = ['indigo', 'violet', 'sky', 'emerald', 'amber', 'rose'] as const
-export type Accent = (typeof ACCENTS)[number]
+export { ACCENTS, type Accent } from './accent'
+
+/**
+ * Top-level route segments the site owns. A content folder with one of these
+ * names would be shadowed by the static route of the same name, so it is skipped
+ * loudly at build time rather than silently 404ing in production.
+ */
+const RESERVED_COLLECTIONS = new Set(['topics', 'tags', 'search', 'feed', 'api', 'sitemap'])
 
 /** A resolved section: `key` is the stable id used in frontmatter, `title` is display text. */
 export type Section = { key: string; title: string; emoji?: string }
+
+/**
+ * A group of collections, one level above them.
+ *
+ * Collections alone stop scaling past about eight — the home grid becomes a wall
+ * and the switcher becomes a scroll. Categories give the site somewhere to put
+ * the tenth and twentieth topic without redesigning anything.
+ */
+export type Category = {
+  key: string
+  title: string
+  description: string
+  emoji: string
+  order: number
+}
 
 export type Collection = {
   slug: string
@@ -27,7 +50,12 @@ export type Collection = {
   shortTitle: string
   description: string
   emoji: string
+  /** Named palette, kept for the search index and as a debugging attribute. */
   accent: Accent
+  /** The resolved colour ramp; `paletteVars` turns this into inline CSS variables. */
+  palette: Palette
+  /** Category key, matched against `content/categories.json`. */
+  category?: string
   order: number
   /** 'wip' renders a "đang viết" badge; 'hidden' keeps it out of listings. */
   status: 'active' | 'wip' | 'hidden'
@@ -35,7 +63,44 @@ export type Collection = {
   docCount: number
 }
 
+/** A category with the collections that belong to it, for the home and /topics/ pages. */
+export type CategoryGroup = { category: Category; collections: Collection[] }
+
+/** A tag, resolved for one locale. `key` is the routing key, `label` is display text. */
+export type Tag = { key: string; label: string; count: number }
+
 export type Heading = { id: string; text: string; level: 2 | 3 }
+
+/**
+ * Extra structured-data shape for a page, set with `schema:` in frontmatter.
+ *
+ * A page is a BlogPosting either way; this says whether it is *also* something
+ * more specific. An FAQ marked up as an FAQPage is quotable by an answer engine
+ * in a way the same prose in a plain article is not.
+ */
+export type SchemaType = 'faq' | 'howto'
+
+/**
+ * How much a page assumes, set with `level:` in frontmatter.
+ *
+ * Shown as a badge because the commonest way to bounce off a self-study site is
+ * to open the wrong article first; also emitted as `educationalLevel`.
+ */
+export const LEVELS = ['beginner', 'intermediate', 'advanced'] as const
+export type Level = (typeof LEVELS)[number]
+
+function toLevel(value: unknown): Level | undefined {
+  return (LEVELS as readonly string[]).includes(value as string) ? (value as Level) : undefined
+}
+
+/**
+ * One `##` block of a page. `text` is the prose with markup removed; `raw` keeps
+ * the markdown, which is what link extraction needs.
+ */
+export type Block = { heading: string; id: string; text: string; raw: string }
+
+/** An entity a page is about, linked to a public identifier so engines can ground it. */
+export type About = { name: string; sameAs?: string }
 
 export type DocMeta = {
   collection: string
@@ -48,11 +113,31 @@ export type DocMeta = {
   section: string
   order: number
   readingTime: number
+  /**
+   * Cross-collection tags. Like section keys these are routing keys — lowercase
+   * English — because they appear in URLs; display labels live in tags.json.
+   */
+  tags: string[]
   /** ISO dates from frontmatter, when the author set them. Used for SEO and sitemaps. */
   date?: string
   updated?: string
   /** False when this locale has no translation and the default-locale text is shown. */
   translated: boolean
+  /** Structured-data shape beyond BlogPosting, when the author declared one. */
+  schemaType?: SchemaType
+  /**
+   * The page in three or four lines, from the `takeaways:` frontmatter.
+   *
+   * Shown as a box above the article and emitted as `abstract` + `speakable`.
+   * An answer engine quotes a short, self-contained claim far more readily than
+   * it paraphrases six paragraphs, and a reader deciding whether to read at all
+   * wants the same thing.
+   */
+  takeaways: string[]
+  /** Entities the page is about, linked to Wikipedia/Wikidata where given. */
+  about: About[]
+  /** How much the page assumes, when the author said. */
+  level?: Level
 }
 
 export type Doc = DocMeta & { headings: Heading[]; body: string }
@@ -91,6 +176,86 @@ function extractHeadings(body: string): Heading[] {
   return headings
 }
 
+/**
+ * MDX reduced to the prose a reader would hear read aloud.
+ *
+ * Structured data and the plain-text mirrors both need the words without the
+ * markup: JSON-LD answers must not contain `**bold**`, and an answer engine
+ * quoting a fenced code block as prose is worse than useless.
+ */
+export function plainText(mdx: string): string {
+  return mdx
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/^\s{0,3}>\s?/gm, '')
+    .replace(/^\s{0,3}[-*+]\s+/gm, '')
+    .replace(/[*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Split a page at its headings.
+ *
+ * `level` 2 gives the top-level blocks — the questions of an FAQ; level 3 gives
+ * the steps of a walkthrough. Text before the first heading is dropped, since it
+ * belongs to the page rather than to any block.
+ */
+export function blocksOf(body: string, level: 2 | 3 = 2): Block[] {
+  const blocks: Block[] = []
+  const marker = '#'.repeat(level)
+  let current: { heading: string; lines: string[] } | null = null
+  let inFence = false
+
+  for (const line of body.split('\n')) {
+    if (line.trimStart().startsWith('```')) inFence = !inFence
+
+    const match = inFence ? null : new RegExp(`^${marker}\\s+(.+?)\\s*$`).exec(line)
+    if (match) {
+      if (current) blocks.push(finish(current))
+      current = { heading: match[1].replace(/[*_`]/g, '').trim(), lines: [] }
+      continue
+    }
+    // A deeper heading belongs to the block it sits under; a shallower one ends it.
+    const other = inFence ? null : /^(#{1,6})\s/.exec(line)
+    if (other && other[1].length < level) {
+      if (current) blocks.push(finish(current))
+      current = null
+      continue
+    }
+    current?.lines.push(line)
+  }
+  if (current) blocks.push(finish(current))
+
+  return blocks.filter((block) => block.text.length > 0)
+}
+
+function finish(current: { heading: string; lines: string[] }): Block {
+  const raw = current.lines.join('\n')
+
+  return {
+    heading: current.heading,
+    id: slugify(current.heading),
+    text: plainText(raw),
+    raw,
+  }
+}
+
+/** External links in some markdown, in order, deduplicated. */
+export function linksIn(markdown: string): { text: string; url: string }[] {
+  const found = new Map<string, string>()
+
+  for (const match of markdown.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g)) {
+    const [, text, url] = match
+    if (!found.has(url)) found.set(url, plainText(text))
+  }
+
+  return [...found.entries()].map(([url, text]) => ({ text, url }))
+}
+
 /* --- Discovery ------------------------------------------------------------ */
 
 type RawSection = { key?: string; title?: Localized; emoji?: string }
@@ -101,6 +266,10 @@ type RawManifest = {
   description?: Localized
   emoji?: string
   accent?: string
+  hue?: number
+  hueEnd?: number
+  chroma?: number
+  category?: string
   order?: number
   status?: Collection['status']
   sections?: RawSection[]
@@ -113,6 +282,11 @@ type RawDoc = {
   section: string
   order: number
   readingTime: number
+  tags: string[]
+  schemaType?: SchemaType
+  takeaways: string[]
+  about: About[]
+  level?: Level
   date?: string
   updated?: string
   headings: Heading[]
@@ -150,6 +324,39 @@ function toIsoDate(value: unknown): string | undefined {
   return undefined
 }
 
+/** A YAML list of strings, tolerating a single string and dropping blanks. */
+function toLines(value: unknown): string[] {
+  const raw = Array.isArray(value) ? value : typeof value === 'string' ? [value] : []
+  return raw.map((item) => String(item).trim()).filter(Boolean)
+}
+
+/**
+ * `about:` accepts either a bare name or `{ name, sameAs }`, so a page can name
+ * its subject before anyone has looked up a Wikidata id for it.
+ */
+function toAbout(value: unknown): About[] {
+  return (Array.isArray(value) ? value : value ? [value] : [])
+    .map((item) => {
+      if (typeof item === 'string') return { name: item.trim() }
+      if (item && typeof item === 'object' && 'name' in item) {
+        const { name, sameAs } = item as { name?: unknown; sameAs?: unknown }
+        return {
+          name: String(name ?? '').trim(),
+          ...(typeof sameAs === 'string' && sameAs ? { sameAs } : {}),
+        }
+      }
+      return { name: '' }
+    })
+    .filter((entry) => entry.name.length > 0)
+}
+
+/** Frontmatter lists are hand-written, so accept a YAML list or a comma-separated string. */
+function toKeys(value: unknown): string[] {
+  const raw = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : []
+
+  return [...new Set(raw.map((item) => slugify(String(item))).filter(Boolean))]
+}
+
 function readDoc(file: string): RawDoc {
   const { data, content } = matter(fs.readFileSync(file, 'utf8'))
   const words = content.split(/\s+/).filter(Boolean).length
@@ -160,11 +367,22 @@ function readDoc(file: string): RawDoc {
     section: data.section ?? 'other',
     order: typeof data.order === 'number' ? data.order : 999,
     readingTime: Math.max(1, Math.ceil(words / 200)),
+    tags: toKeys(data.tags),
+    schemaType: data.schema === 'faq' || data.schema === 'howto' ? data.schema : undefined,
+    takeaways: toLines(data.takeaways),
+    about: toAbout(data.about),
+    level: toLevel(data.level),
     date: toIsoDate(data.date),
     updated: toIsoDate(data.updated),
     headings: extractHeadings(content),
     body: content,
   }
+}
+
+function readJson<T>(file: string, fallback: T): T {
+  const full = nodePath.join(CONTENT_DIR, file)
+  if (!fs.existsSync(full)) return fallback
+  return JSON.parse(fs.readFileSync(full, 'utf8')) as T
 }
 
 // Content never changes within a build, so read the tree once.
@@ -182,6 +400,13 @@ function load(): Map<string, Entry> {
     .map((e) => e.name)
 
   for (const slug of dirs) {
+    if (RESERVED_COLLECTIONS.has(slug)) {
+      console.warn(
+        `content: skipping content/${slug}/ — "${slug}" is a reserved route. Rename the folder.`,
+      )
+      continue
+    }
+
     const dir = nodePath.join(CONTENT_DIR, slug)
     const manifestPath = nodePath.join(dir, 'collection.json')
 
@@ -239,6 +464,11 @@ function toDoc(
     section: base.section,
     order: base.order,
     readingTime: text.readingTime,
+    tags: base.tags,
+    schemaType: base.schemaType,
+    takeaways: text.takeaways.length ? text.takeaways : base.takeaways,
+    about: base.about,
+    level: base.level,
     date: base.date,
     updated: text.updated ?? base.updated ?? base.date,
     translated: translation !== undefined,
@@ -263,10 +493,6 @@ function toCollection(slug: string, entry: Entry, locale: Locale): Collection {
     .sort((a, b) => a.localeCompare(b))
     .map((key) => ({ key, title: key }))
 
-  const accent = (ACCENTS as readonly string[]).includes(manifest.accent ?? '')
-    ? (manifest.accent as Accent)
-    : 'indigo'
-
   const title = pick(manifest.title, locale) ?? slug
 
   return {
@@ -277,12 +503,148 @@ function toCollection(slug: string, entry: Entry, locale: Locale): Collection {
     shortTitle: pick(manifest.shortTitle, locale) ?? title,
     description: pick(manifest.description, locale) ?? '',
     emoji: manifest.emoji ?? '📘',
-    accent,
+    accent: isAccent(manifest.accent) ? manifest.accent : DEFAULT_ACCENT,
+    palette: resolvePalette(manifest),
+    category: manifest.category,
     order: typeof manifest.order === 'number' ? manifest.order : 999,
     status: manifest.status ?? 'active',
     sections: [...declared, ...extra],
     docCount: docs.size,
   }
+}
+
+/* --- Categories ----------------------------------------------------------- */
+
+type RawCategory = {
+  key?: string
+  title?: Localized
+  description?: Localized
+  emoji?: string
+  order?: number
+}
+
+/** The category every collection without one falls into, so nothing goes missing. */
+const UNCATEGORISED = '__other'
+
+function loadCategories(locale: Locale): Category[] {
+  const raw = readJson<{ categories?: RawCategory[] }>('categories.json', {})
+
+  return (raw.categories ?? [])
+    .filter((c): c is RawCategory & { key: string } => typeof c.key === 'string')
+    .map((c, i) => ({
+      key: c.key,
+      title: pick(c.title, locale) ?? c.key,
+      description: pick(c.description, locale) ?? '',
+      emoji: c.emoji ?? '📂',
+      order: typeof c.order === 'number' ? c.order : i,
+    }))
+}
+
+/**
+ * Collections grouped by category, in category order.
+ *
+ * Categories with nothing in them are dropped — the file can declare where the
+ * site is going without the home page advertising empty shelves.
+ */
+export function getCategories(locale: Locale, { includeHidden = false } = {}): CategoryGroup[] {
+  const collections = getCollections(locale, { includeHidden })
+  const declared = loadCategories(locale)
+
+  const groups: CategoryGroup[] = declared.map((category) => ({
+    category,
+    collections: collections.filter((c) => c.category === category.key),
+  }))
+
+  const known = new Set(declared.map((c) => c.key))
+  const leftovers = collections.filter((c) => !c.category || !known.has(c.category))
+
+  if (leftovers.length > 0) {
+    groups.push({
+      category: {
+        key: UNCATEGORISED,
+        title: t(locale, 'home.more'),
+        description: '',
+        emoji: '📦',
+        order: Number.MAX_SAFE_INTEGER,
+      },
+      collections: leftovers,
+    })
+  }
+
+  return groups
+    .filter((group) => group.collections.length > 0)
+    .sort((a, b) => a.category.order - b.category.order)
+}
+
+/* --- Tags ----------------------------------------------------------------- */
+
+function loadTagLabels(locale: Locale): Record<string, string> {
+  const raw = readJson<{ labels?: Record<string, Localized> }>('tags.json', {})
+
+  return Object.fromEntries(
+    Object.entries(raw.labels ?? {}).map(([key, value]) => [key, pick(value, locale) ?? key]),
+  )
+}
+
+/** Turn a routing key into something readable when tags.json has no label for it. */
+function humanise(key: string): string {
+  return key.replace(/-/g, ' ')
+}
+
+export function tagLabel(locale: Locale, key: string): string {
+  return loadTagLabels(locale)[key] ?? humanise(key)
+}
+
+/** Every tag in use, most-used first, then alphabetical. */
+export function getTags(locale: Locale): Tag[] {
+  const labels = loadTagLabels(locale)
+  const counts = new Map<string, number>()
+
+  for (const collection of getCollections(locale)) {
+    for (const doc of docsOf(collection.slug, locale)) {
+      for (const tag of doc.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1)
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([key, count]) => ({ key, label: labels[key] ?? humanise(key), count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, locale))
+}
+
+/** Every doc carrying one tag, across every visible collection. */
+export function getDocsByTag(locale: Locale, tag: string): DocMeta[] {
+  return getCollections(locale)
+    .flatMap((collection) => docsOf(collection.slug, locale))
+    .filter((doc) => doc.tags.includes(tag))
+    .sort((a, b) => a.title.localeCompare(b.title, locale))
+    .map(toMeta)
+}
+
+/**
+ * Docs worth reading next.
+ *
+ * Shared tags weigh most, because a tag is the only signal that deliberately
+ * crosses collections — which is the whole point of showing this block. Section
+ * and collection matches break ties so a tagless doc still gets neighbours.
+ */
+export function getRelated(locale: Locale, doc: DocMeta, limit = 4): DocMeta[] {
+  const tags = new Set(doc.tags)
+
+  return getCollections(locale)
+    .flatMap((collection) => docsOf(collection.slug, locale))
+    .filter((other) => !(other.collection === doc.collection && other.slug === doc.slug))
+    .map((other) => {
+      const shared = other.tags.filter((tag) => tags.has(tag)).length
+      let score = shared * 4
+      if (other.collection === doc.collection) {
+        score += other.section === doc.section ? 2 : 1
+      }
+      return { doc: other, score, shared }
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || a.doc.order - b.doc.order)
+    .slice(0, limit)
+    .map((entry) => toMeta(entry.doc))
 }
 
 /* --- Public API ----------------------------------------------------------- */
@@ -351,17 +713,29 @@ export function getAllDocs(locale: Locale): Doc[] {
 }
 
 /**
- * Routing keys are locale-independent, so static params are generated once and
- * reused by every locale's route tree.
+ * Static params for the route tree.
+ *
+ * Routing keys never change per locale, so each of these is the same list of
+ * keys crossed with every locale — which is also why one `app/[locale]/` tree
+ * can serve every language.
  */
-export function getAllDocPaths(): { collection: string; slug: string }[] {
-  return [...load().entries()].flatMap(([collection, entry]) =>
-    [...entry.docs.keys()].map((slug) => ({ collection, slug })),
+export function collectionParams(): { locale: Locale; collection: string }[] {
+  return LOCALES.flatMap((locale) =>
+    [...load().keys()].map((collection) => ({ locale, collection })),
   )
 }
 
-export function getAllCollectionPaths(): { collection: string }[] {
-  return [...load().keys()].map((collection) => ({ collection }))
+export function docParams(): { locale: Locale; collection: string; slug: string }[] {
+  return LOCALES.flatMap((locale) =>
+    [...load().entries()].flatMap(([collection, entry]) =>
+      [...entry.docs.keys()].map((slug) => ({ locale, collection, slug })),
+    ),
+  )
+}
+
+export function tagParams(): { locale: Locale; tag: string }[] {
+  const tags = getTags(DEFAULT_LOCALE).map(({ key }) => key)
+  return LOCALES.flatMap((locale) => tags.map((tag) => ({ locale, tag })))
 }
 
 function toMeta(doc: Doc): DocMeta {

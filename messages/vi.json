@@ -2,7 +2,9 @@
   "site": {
     "tagline": "Ghi lại những gì mình đã tự học",
     "description": "Mình tự học tiếng Anh, rồi tự học lập trình — sai rất nhiều trước khi tìm được cách hợp với mình. Đây là ghi chép của mình: đã mắc kẹt ở đâu, đã làm gì để thoát ra, và dùng công cụ nào.",
-    "keywords": "tự học tiếng Anh, học tiếng Anh, comprehensible input, immersion, Anki, tự học lập trình"
+    "keywords": "tự học tiếng Anh, học tiếng Anh, comprehensible input, immersion, Anki, tự học lập trình",
+    "authorRole": "Người tự học",
+    "authorBio": "Mình tự học tiếng Anh rồi tự học lập trình, và ghi lại từng chỗ mắc kẹt để người đi sau khỏi mất mười năm như mình."
   },
 
   "nav": {
@@ -10,6 +12,8 @@
     "close": "Đóng menu",
     "theme": "Đổi giao diện sáng/tối",
     "topics": "Chủ đề",
+    "filterTopics": "Lọc chủ đề…",
+    "noTopics": "Không có chủ đề nào khớp.",
     "language": "Đổi ngôn ngữ",
     "breadcrumb": "Đường dẫn",
     "skip": "Tới nội dung chính",
@@ -21,6 +25,7 @@
     "dialog": "Tìm kiếm nội dung",
     "placeholder": "Tìm bài viết, chủ đề…",
     "all": "Tất cả",
+    "scope": "Giới hạn trong chủ đề",
     "empty": "Không tìm thấy kết quả nào.",
     "hint": "Nhập ít nhất 2 ký tự. Dùng ↑ ↓ để chọn, Enter để mở."
   },
@@ -29,7 +34,31 @@
     "badge": "Miễn phí · Cập nhật liên tục",
     "collections": "Các bộ nội dung",
     "pick": "Chọn một chủ đề để bắt đầu",
+    "startHere": "Bắt đầu từ đây",
+    "browseAll": "Xem tất cả chủ đề",
+    "categoryCount": "{count} bộ",
+    "andMore": "Còn {count} bộ nữa",
+    "more": "Khác",
     "empty": "Chưa có bộ nội dung nào. Tạo một thư mục trong content/ để bắt đầu."
+  },
+
+  "topics": {
+    "title": "Tất cả chủ đề",
+    "description": "Mọi thứ mình đang ghi lại, xếp theo nhóm. Chọn cái đang làm bạn mắc kẹt.",
+    "tags": "Thẻ",
+    "tagsHint": "Thẻ đi xuyên các bộ nội dung — cùng một vấn đề, nhìn từ nhiều chủ đề khác nhau."
+  },
+
+  "tags": {
+    "title": "Thẻ",
+    "description": "Những sợi chỉ nối các bài viết nằm ở nhiều chủ đề khác nhau.",
+    "empty": "Chưa có thẻ nào. Thêm tags: vào frontmatter của bài viết."
+  },
+
+  "tag": {
+    "title": "Thẻ: {tag}",
+    "description": "Mọi bài mình gắn thẻ \"{tag}\", ở tất cả các chủ đề.",
+    "count": "{count} bài"
   },
 
   "collection": {
@@ -43,8 +72,31 @@
     "toc": "Trong bài này",
     "prev": "← Bài trước",
     "next": "Bài tiếp →",
+    "related": "Đọc tiếp",
+    "takeaways": "Ý chính",
+    "sourcesHeading": "Nguồn cho bài này",
+    "tags": "Thẻ",
     "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}.",
     "edit": "Sửa bài này trên GitHub"
+  },
+
+  "level": {
+    "label": "Trình độ",
+    "beginner": "Mới bắt đầu",
+    "intermediate": "Đã đi được một đoạn",
+    "advanced": "Đã khá vững"
+  },
+
+  "progress": {
+    "done": "Đã học xong",
+    "markDone": "Đánh dấu đã học xong",
+    "count": "{done}/{total} bài",
+    "complete": "Xong cả bộ",
+    "storedLocally": "Tiến độ lưu trong máy bạn, không gửi đi đâu.",
+    "reset": "Xoá tiến độ đã lưu",
+    "resetConfirm": "Xoá {count} bài đã đánh dấu?",
+    "resetYes": "Xoá",
+    "resetNo": "Thôi"
   },
 
   "callout": {

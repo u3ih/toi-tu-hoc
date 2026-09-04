@@ -3,17 +3,22 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
-import { getCollection, getDoc, getFlatNav, getNav } from '@/lib/content'
-import { barePath, DEFAULT_LOCALE, LOCALE_META, t, type Locale } from '@/lib/i18n'
+import { getCollection, getDoc, getFlatNav, getNav, tagLabel } from '@/lib/content'
+import { barePath, DEFAULT_LOCALE, LOCALE_META, path, t, type Locale } from '@/lib/i18n'
 import { pageMetadata } from '@/lib/metadata'
 import { editUrl } from '@/lib/site'
 import { docSchema } from '@/lib/schema'
 import { mdxComponents } from '@/components/mdx'
 import { JsonLd } from '@/components/json-ld'
 import { Sidebar } from '@/components/sidebar'
-import { Toc } from '@/components/toc'
+import { Toc, TocMenu } from '@/components/toc'
 import { Pager } from '@/components/pager'
 import { ReadingProgress } from '@/components/progress-bar'
+import { Related } from '@/components/related'
+import { Takeaways } from '@/components/takeaways'
+import { DoneToggle } from '@/components/progress/done-toggle'
+import { TagPill } from '@/components/tag-pill'
+import { LevelBadge } from '@/components/level-badge'
 
 export function docMetadata(locale: Locale, collection: string, slug: string): Metadata {
   const doc = getDoc(locale, collection, slug)
@@ -53,15 +58,24 @@ export function DocPage({
       <ReadingProgress />
 
       <div className="mx-auto flex max-w-[100rem] gap-8 px-4 sm:px-6">
-        <Sidebar nav={getNav(locale, collectionSlug)} />
+        <Sidebar nav={getNav(locale, collectionSlug)} locale={locale} />
 
         <main id="main" className="min-w-0 flex-1 py-10">
           <article className="mx-auto max-w-3xl">
             <header className="mb-10 border-b-2 pb-8">
+              {/* Three levels, matching the BreadcrumbList in the JSON-LD graph —
+                  a crawler that renders the trail should see the same trail. */}
               <nav
                 className="flex flex-wrap items-center gap-1.5 label-retro muted"
                 aria-label={t(locale, 'nav.breadcrumb')}
               >
+                <Link
+                  href={path(locale)}
+                  className="hover:text-brand-600 dark:hover:text-accent-400"
+                >
+                  {t(locale, 'nav.home')}
+                </Link>
+                <span aria-hidden>/</span>
                 <Link
                   href={collection.href}
                   className="hover:text-brand-600 dark:hover:text-accent-400"
@@ -78,9 +92,20 @@ export function DocPage({
               {doc.description && (
                 <p className="mt-4 text-lg muted text-pretty">{doc.description}</p>
               )}
-              <p className="retro-shadow-sm mt-5 inline-block rounded-retro border-2 border-brand-900 bg-accent-400 px-2.5 py-1 label-retro text-brand-900">
-                {t(locale, 'doc.readingTime', { minutes: doc.readingTime })}
-              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <p className="retro-shadow-sm inline-block rounded-retro border-2 border-brand-900 bg-accent-400 px-2.5 py-1 label-retro text-brand-900">
+                  {t(locale, 'doc.readingTime', { minutes: doc.readingTime })}
+                </p>
+                <LevelBadge locale={locale} level={doc.level} />
+                {doc.tags.map((tag) => (
+                  <TagPill
+                    key={tag}
+                    locale={locale}
+                    tag={{ key: tag, label: tagLabel(locale, tag) }}
+                    showCount={false}
+                  />
+                ))}
+              </div>
 
               {/* The page falls back to the default locale rather than 404ing, so
                   say so instead of silently showing the wrong language. */}
@@ -96,6 +121,12 @@ export function DocPage({
                 </p>
               )}
             </header>
+
+            {/* On a narrow screen the anchor rail has nowhere to sit, so the
+                same anchors ride along under the header instead. */}
+            <TocMenu headings={doc.headings} locale={locale} />
+
+            <Takeaways locale={locale} items={doc.takeaways} />
 
             <div
               className="prose prose-neutral max-w-none dark:prose-invert
@@ -138,7 +169,11 @@ export function DocPage({
               </p>
             )}
 
+            <DoneToggle locale={locale} collection={collectionSlug} slug={doc.slug} />
+
             <Pager flatNav={getFlatNav(locale, collectionSlug)} slug={doc.slug} locale={locale} />
+
+            <Related locale={locale} doc={doc} />
           </article>
         </main>
 

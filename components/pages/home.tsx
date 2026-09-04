@@ -1,19 +1,39 @@
 import Link from 'next/link'
-import { getCollections } from '@/lib/content'
-import { t, type Locale } from '@/lib/i18n'
+import {
+  getCategories,
+  getCollections,
+  getDocs,
+  getFlatNav,
+  type CategoryGroup,
+} from '@/lib/content'
+import { path, t, type Locale } from '@/lib/i18n'
 import { homeSchema } from '@/lib/schema'
 import { getSite } from '@/lib/site'
-import { Header } from '@/components/header'
+import { SiteHeader } from '@/components/site-header'
 import { JsonLd } from '@/components/json-ld'
+import { CollectionCard } from '@/components/collection-card'
+
+/** Collections shown per category before the reader is sent to /topics/ instead. */
+const PER_CATEGORY = 4
 
 export function HomePage({ locale }: { locale: Locale }) {
   const site = getSite(locale)
   const collections = getCollections(locale)
+  const groups = getCategories(locale)
+
+  // The hero used to end on a paragraph, which left a reader who was already
+  // convinced with nothing to press. This is the first page of the first
+  // collection — the one answer to "so where do I start".
+  const start = collections.length ? getFlatNav(locale, collections[0].slug)[0] : undefined
+
+  // With one category there is nothing to distinguish, so the heading would be
+  // noise. Grouping only earns its keep once the site spans several areas.
+  const grouped = groups.length > 1
 
   return (
     <>
-      <JsonLd data={homeSchema(locale, collections)} />
-      <Header siteName={site.name} locale={locale} collections={collections} />
+      <JsonLd data={homeSchema(locale, collections, groups)} />
+      <SiteHeader locale={locale} />
 
       <main id="main">
         {/* Hero */}
@@ -37,58 +57,68 @@ export function HomePage({ locale }: { locale: Locale }) {
             </h1>
 
             {/* Barber-pole rule under the title. */}
-            <div aria-hidden className="retro-stripes mx-auto mt-8 h-3 w-40 rounded-retro border-2" />
+            <div
+              aria-hidden
+              className="retro-stripes mx-auto mt-8 h-3 w-40 rounded-retro border-2"
+            />
 
             <p className="mx-auto mt-8 max-w-2xl text-lg muted text-pretty">{site.description}</p>
+
+            {start && (
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                <Link
+                  href={start.href}
+                  className="retro-lift retro-shadow rounded-retro border-2 bg-brand-600 px-6 py-3 font-semibold text-white"
+                >
+                  {t(locale, 'home.startHere')} →
+                </Link>
+                <Link
+                  href={path(locale, 'topics')}
+                  className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+                >
+                  {t(locale, 'home.browseAll')}
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
         {/* Collections */}
         <section className="mx-auto max-w-5xl px-6 pb-24">
-          <h2 className="text-center font-display text-2xl sm:text-3xl">
-            {t(locale, 'home.collections')}
-          </h2>
-          <p className="mt-3 text-center label-retro muted">{t(locale, 'home.pick')}</p>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            {collections.map((c) => (
+          <div className="flex flex-wrap items-end justify-between gap-4 pt-16">
+            <div>
+              <h2 className="font-display text-2xl sm:text-3xl">{t(locale, 'home.collections')}</h2>
+              <p className="mt-2 label-retro muted">{t(locale, 'home.pick')}</p>
+            </div>
+            {collections.length > PER_CATEGORY && (
               <Link
-                key={c.slug}
-                href={c.href}
-                data-accent={c.accent}
-                className="surface retro-lift group relative overflow-hidden p-6"
+                href={path(locale, 'topics')}
+                className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
               >
-                {/* Colour block in the corner, hard-edged like a printed swatch. */}
-                <div
-                  aria-hidden
-                  className="absolute -top-9 -right-9 h-20 w-20 rotate-45 bg-brand-500/30 transition-colors group-hover:bg-accent-400/70"
-                />
-                <div className="relative">
-                  <span
-                    className="grid h-12 w-12 place-items-center rounded-retro border-2 bg-brand-500/15 text-2xl"
-                    aria-hidden
-                  >
-                    {c.emoji}
-                  </span>
-                  <h3 className="mt-4 flex items-center gap-2 font-display text-lg">
-                    {c.title}
-                    {c.status === 'wip' && (
-                      <span className="rounded-retro border-2 border-brand-900 bg-accent-400 px-1.5 py-0.5 label-retro text-brand-900">
-                        {t(locale, 'collection.wip')}
-                      </span>
-                    )}
-                  </h3>
-                  <p className="mt-2 text-sm muted">{c.description}</p>
-                  <p className="mt-4 border-t-2 pt-3 label-retro muted">
-                    {t(locale, 'collection.count', {
-                      docs: c.docCount,
-                      sections: c.sections.length,
-                    })}
-                  </p>
-                </div>
+                {t(locale, 'home.browseAll')} →
               </Link>
-            ))}
+            )}
           </div>
+
+          {grouped ? (
+            <div className="mt-12 space-y-14">
+              {groups.map((group) => (
+                <CategorySection key={group.category.key} group={group} locale={locale} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              {collections.map((c) => (
+                <CollectionCard
+                  key={c.slug}
+                  collection={c}
+                  locale={locale}
+                  preview={previewOf(locale, c.slug)}
+                  slugs={slugsOf(locale, c.slug)}
+                />
+              ))}
+            </div>
+          )}
 
           {collections.length === 0 && (
             <p className="mt-10 text-center muted">{t(locale, 'home.empty')}</p>
@@ -97,4 +127,59 @@ export function HomePage({ locale }: { locale: Locale }) {
       </main>
     </>
   )
+}
+
+function CategorySection({ group, locale }: { group: CategoryGroup; locale: Locale }) {
+  const shown = group.collections.slice(0, PER_CATEGORY)
+  const hidden = group.collections.length - shown.length
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 pb-3">
+        <h3 className="flex items-center gap-2 font-display text-xl">
+          <span aria-hidden>{group.category.emoji}</span>
+          {group.category.title}
+        </h3>
+        <p className="label-retro muted">
+          {t(locale, 'home.categoryCount', { count: group.collections.length })}
+        </p>
+      </div>
+      {group.category.description && (
+        <p className="mt-3 text-sm muted text-pretty">{group.category.description}</p>
+      )}
+
+      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+        {shown.map((c) => (
+          <CollectionCard
+            key={c.slug}
+            collection={c}
+            locale={locale}
+            preview={previewOf(locale, c.slug)}
+            slugs={slugsOf(locale, c.slug)}
+          />
+        ))}
+      </div>
+
+      {hidden > 0 && (
+        <p className="mt-4 text-sm">
+          <Link
+            href={path(locale, 'topics')}
+            className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+          >
+            {t(locale, 'home.andMore', { count: hidden })} →
+          </Link>
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** First three articles of a collection, so the card shows content, not just a count. */
+function previewOf(locale: Locale, slug: string) {
+  return getDocs(locale, slug).slice(0, 3)
+}
+
+/** Every article key in a collection — the denominator for its progress badge. */
+function slugsOf(locale: Locale, slug: string) {
+  return getDocs(locale, slug).map((doc) => doc.slug)
 }

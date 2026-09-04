@@ -2,19 +2,23 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Collection } from '@/lib/content'
+import { ACCENT_PALETTES, DEFAULT_ACCENT, paletteVars } from '@/lib/accent'
+import type { CategoryGroup, Collection } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
+
+/** Above this many collections the scope chips wrap into a wall; use a select. */
+const SCOPE_SELECT_THRESHOLD = 8
 
 type IndexEntry = {
   locale: Locale
   collection: string
   collectionTitle: string
-  accent: string
   slug: string
   href: string
   title: string
   description: string
   section: string
+  tags: string[]
   headings: string[]
   text: string
 }
@@ -22,6 +26,9 @@ type IndexEntry = {
 type Hit = IndexEntry & { score: number; snippet: string }
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+/** Used when a hit points at a collection the header does not know about. */
+const DEFAULT_PALETTE = ACCENT_PALETTES[DEFAULT_ACCENT]
 
 /** Strip Vietnamese diacritics so "tu vung" also matches "từ vựng". */
 function fold(s: string): string {
@@ -41,23 +48,30 @@ function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
     .map((entry) => {
       const title = fold(entry.title)
       const headings = fold(entry.headings.join(' '))
+      const tags = fold(entry.tags.join(' '))
       const text = fold(entry.text)
 
       let score = 0
       for (const term of terms) {
         if (title.includes(term)) score += 10
         if (headings.includes(term)) score += 4
+        // A tag is a deliberate label, so matching one beats matching prose.
+        if (tags.includes(term)) score += 3
         if (text.includes(term)) score += 1
       }
       // Require every term to appear somewhere in the document.
-      const all = terms.every((t) => title.includes(t) || headings.includes(t) || text.includes(t))
+      const all = terms.every(
+        (t) => title.includes(t) || headings.includes(t) || tags.includes(t) || text.includes(t),
+      )
       if (!all) score = 0
       // Nudge the collection the reader is already in to the top.
       if (score > 0 && entry.collection === boost) score += 3
 
       const at = text.indexOf(terms[0])
       const snippet =
-        at === -1 ? entry.description : `…${entry.text.slice(Math.max(0, at - 60), at + 100).trim()}…`
+        at === -1
+          ? entry.description
+          : `…${entry.text.slice(Math.max(0, at - 60), at + 100).trim()}…`
 
       return { ...entry, score, snippet }
     })
@@ -69,10 +83,12 @@ function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
 export function Search({
   locale,
   collections,
+  groups = [],
   currentCollection,
 }: {
   locale: Locale
   collections: Collection[]
+  groups?: CategoryGroup[]
   currentCollection?: string
 }) {
   const router = useRouter()
@@ -82,6 +98,13 @@ export function Search({
   const [scope, setScope] = useState<string>('all')
   const [cursor, setCursor] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // A hit is coloured by the collection it came from, which the index does not
+  // need to carry — the header already knows every collection's palette.
+  const palettes = useMemo(
+    () => new Map(collections.map((c) => [c.slug, c.palette])),
+    [collections],
+  )
 
   // One index file serves every locale, so drop the other locales' entries first.
   const localized = useMemo(() => index.filter((e) => e.locale === locale), [index, locale])
@@ -94,6 +117,9 @@ export function Search({
     [scoped, query, scope, currentCollection],
   )
 
+  // Reset the highlighted row whenever the result set changes underneath it,
+  // or Enter opens whatever now happens to sit at the old index.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run on input change
   useEffect(() => setCursor(0), [query, scope])
 
   // Cmd/Ctrl+K opens, Escape closes.
@@ -141,10 +167,15 @@ export function Search({
       >
         <SearchIcon />
         <span className="hidden sm:inline">{t(locale, 'search.open')}</span>
-        <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">⌘K</kbd>
+        <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">
+          ⌘K
+        </kbd>
       </button>
 
       {open && (
+        // The click is the backdrop shortcut; Escape closes the dialog from the
+        // keyboard, wired in the effect above.
+        // biome-ignore lint/a11y/useKeyWithClickEvents: Escape is the keyboard path
         <div
           role="dialog"
           aria-modal="true"
@@ -177,16 +208,48 @@ export function Search({
               />
             </div>
 
-            {collections.length > 1 && (
+            {collections.length > 1 && collections.length <= SCOPE_SELECT_THRESHOLD && (
               <div className="flex flex-wrap gap-1.5 border-b-2 px-3 py-2">
                 <ScopeChip active={scope === 'all'} onClick={() => setScope('all')}>
                   {t(locale, 'search.all')}
                 </ScopeChip>
                 {collections.map((c) => (
-                  <ScopeChip key={c.slug} active={scope === c.slug} onClick={() => setScope(c.slug)}>
+                  <ScopeChip
+                    key={c.slug}
+                    active={scope === c.slug}
+                    onClick={() => setScope(c.slug)}
+                  >
                     <span aria-hidden>{c.emoji}</span> {c.shortTitle}
                   </ScopeChip>
                 ))}
+              </div>
+            )}
+
+            {collections.length > SCOPE_SELECT_THRESHOLD && (
+              <div className="border-b-2 px-3 py-2">
+                <select
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                  aria-label={t(locale, 'search.scope')}
+                  className="w-full rounded-retro border-2 bg-transparent px-2 py-1.5 text-sm"
+                >
+                  <option value="all">{t(locale, 'search.all')}</option>
+                  {(groups.length > 0
+                    ? groups
+                    : [{ category: { key: 'all', title: '' }, collections }]
+                  ).map((group) => (
+                    <optgroup
+                      key={group.category.key}
+                      label={group.category.title || t(locale, 'nav.topics')}
+                    >
+                      {group.collections.map((c) => (
+                        <option key={c.slug} value={c.slug}>
+                          {c.emoji} {c.shortTitle}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
               </div>
             )}
 
@@ -197,10 +260,12 @@ export function Search({
                     type="button"
                     onMouseEnter={() => setCursor(i)}
                     onClick={() => go(hit)}
-                    data-accent={hit.accent}
+                    style={paletteVars(palettes.get(hit.collection) ?? DEFAULT_PALETTE)}
                     className={[
                       'w-full rounded-retro border-2 px-3 py-2.5 text-left transition-colors',
-                      i === cursor ? 'border-[var(--border)] bg-accent-400/30' : 'border-transparent',
+                      i === cursor
+                        ? 'border-[var(--border)] bg-accent-400/30'
+                        : 'border-transparent',
                     ].join(' ')}
                   >
                     <p className="label-retro muted">
@@ -215,9 +280,7 @@ export function Search({
                 <li className="px-3 py-6 text-center text-sm muted">{t(locale, 'search.empty')}</li>
               )}
               {query.trim().length < 2 && (
-                <li className="px-3 py-6 text-center text-sm muted">
-                  {t(locale, 'search.hint')}
-                </li>
+                <li className="px-3 py-6 text-center text-sm muted">{t(locale, 'search.hint')}</li>
               )}
             </ul>
           </div>
@@ -255,6 +318,7 @@ function ScopeChip({
 function SearchIcon({ className = '' }: { className?: string }) {
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"
