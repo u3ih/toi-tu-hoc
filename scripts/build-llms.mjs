@@ -137,6 +137,14 @@ for (const locale of LOCALES) {
   bytes += write(path.join(`.${prefix}`, 'llms.txt'), index.join('\n'))
   bytes += write(path.join(`.${prefix}`, 'llms-full.txt'), full.join('\n') + '\n')
   files += 2
+
+  // `/llms.txt` is the path an agent guesses first, so the default locale also
+  // answers at the root — the same courtesy `/feed.xml` gets.
+  if (locale === DEFAULT_LOCALE) {
+    bytes += write('llms.txt', index.join('\n'))
+    bytes += write('llms-full.txt', full.join('\n') + '\n')
+    files += 2
+  }
 }
 
 console.log(

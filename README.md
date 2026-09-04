@@ -29,9 +29,9 @@ content/
     ...
 ```
 
-Từ đó tự sinh ra: route `/english/`, `/english/faq/`, `/en/english/faq/`, sidebar, mục lục,
-prev/next, breadcrumb, thẻ trên trang chủ, dropdown chuyển chủ đề, chỉ mục tìm kiếm, `sitemap.xml`,
-`robots.txt`, canonical + hreflang và JSON-LD.
+Từ đó tự sinh ra: route `/vi/english/`, `/vi/english/faq/`, `/en/english/faq/`, sidebar, mục lục,
+prev/next, breadcrumb, thẻ trên trang chủ, dropdown chuyển chủ đề, chỉ mục tìm kiếm, ảnh social,
+`sitemap.xml`, `robots.txt`, RSS, `llms.txt`, canonical + hreflang và JSON-LD.
 
 Có ba tầng, để site chịu được vài chục chủ đề chứ không chỉ hai:
 
@@ -50,10 +50,19 @@ là thứ tạo ra khối "Đọc tiếp" ở cuối mỗi bài — chỗ duy nh
 section là định danh route — giống hệt nhau ở mọi ngôn ngữ. Nhờ vậy một trang chỉ có một hình dạng
 URL, và nút đổi ngôn ngữ chỉ cần đổi tiền tố, không cần bảng ánh xạ.
 
-| Ngôn ngữ | URL | Ghi chú |
-| --- | --- | --- |
-| `vi` (mặc định) | `/english/reading/` | Không có tiền tố |
-| `en` | `/en/english/reading/` | Có tiền tố |
+| Ngôn ngữ | URL |
+| --- | --- |
+| `vi` (mặc định) | `/vi/english/reading/` |
+| `en` | `/en/english/reading/` |
+
+**Mọi ngôn ngữ đều có tiền tố**, kể cả ngôn ngữ mặc định. Đó là điều kiện để cả site nằm trong **một**
+cây route `app/[locale]/` thay vì một cây chép tay cho mỗi ngôn ngữ — thêm ngôn ngữ mới không tạo ra
+một file route nào.
+
+`/` là trang chuyển ngôn ngữ: `canonical` trỏ về `/vi/`, `<meta refresh>` chuyển ngay, và một script
+nhỏ ưu tiên ngôn ngữ đã lưu rồi tới `navigator.languages`. Không có JavaScript thì vẫn là một danh
+sách link đọc được. Trang này **không** đặt `noindex`: `noindex` trên một trang có `canonical` có thể
+lan sang trang đích, tức là làm mất index của chính trang chủ.
 
 Bài chưa dịch **không 404**: trang hiện nội dung tiếng Việt kèm một dòng báo "bài này chưa có bản
 tiếng Anh". Phần khung (menu, sidebar, nút, nhãn callout) vẫn đúng ngôn ngữ đang xem.
@@ -91,12 +100,17 @@ nếu một ngôn ngữ thiếu key, thừa key, hoặc dùng sai `{placeholder}
 1. Thêm vào `i18n.config.json`.
 2. Mở rộng union `Locale` trong [`lib/i18n.ts`](lib/i18n.ts).
 3. Chép `messages/vi.json` sang `messages/<code>.json` rồi dịch.
-4. Chép thư mục `app/(en)/` thành `app/(<code>)/`, đổi `'en'` thành mã mới (5 file, mỗi file vài
-   dòng).
-5. Thêm `title` / `description` / `sections[].title` cho ngôn ngữ đó trong từng `collection.json`.
+4. Thêm `title` / `description` / `sections[].title` cho ngôn ngữ đó trong từng `collection.json`.
 
-Mỗi ngôn ngữ có root layout riêng để `<html lang>` đúng ngay trong HTML tĩnh, không phải sửa sau khi
-hydrate.
+**Không có bước nào trong `app/`.** `generateStaticParams` của `[locale]` đọc từ `i18n.config.json`,
+nên route, ảnh social, RSS và `llms.txt` của ngôn ngữ mới sinh ra ngay.
+
+`<html lang>` lấy từ chính route param trong [`app/(site)/[locale]/layout.tsx`](app/(site)/[locale]/layout.tsx),
+nên nó đúng ngay trong HTML tĩnh — không phải sửa sau khi hydrate.
+
+Site có **hai** root layout, chia bằng route group: `(router)` cho `/` và `(site)` cho mọi thứ còn
+lại. Đó là cách Next cho phép hai cây có `<html>` riêng, và là lý do trang chuyển ngôn ngữ không bị
+nhồi vào một locale mà nó không thuộc về.
 
 ### Thêm một chủ đề mới
 
@@ -375,9 +389,10 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `lib/feed.ts` | RSS |
 | `scripts/lib/content.mjs` | Bản đọc content tree dùng chung cho mọi build script |
 | `scripts/build-llms.mjs` | `llms.txt`, `llms-full.txt`, mirror `.md` từng bài |
-| `app/(vi)/` | Route tiếng Việt (không tiền tố) + root layout `lang="vi"` |
-| `app/(en)/en/` | Route tiếng Anh + root layout `lang="en"` |
-| `app/(vi)/topics/`, `app/(vi)/tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ (mỗi ngôn ngữ một bản) |
+| `app/(router)/` | Trang chuyển ngôn ngữ ở `/` + `/feed.xml` — root layout riêng |
+| `app/(site)/[locale]/` | Toàn bộ site, một cây cho mọi ngôn ngữ; root layout đặt `<html lang>` |
+| `app/(site)/[locale]/topics/`, `.../tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ |
+| `lib/route.ts` | Đọc + kiểm tra `locale` từ route param |
 | `app/sitemap.ts`, `app/robots.ts`, `app/icon.svg` | Sitemap, robots, favicon |
 | `components/pages/` | Thân trang dùng chung cho mọi ngôn ngữ |
 | `components/` | Header, sidebar, tìm kiếm, mục lục, đổi ngôn ngữ, MDX components |

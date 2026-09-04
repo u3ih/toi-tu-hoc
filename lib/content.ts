@@ -4,6 +4,7 @@ import matter from 'gray-matter'
 import {
   DEFAULT_LOCALE,
   isLocale,
+  LOCALES,
   path as localePath,
   pick,
   t,
@@ -698,21 +699,29 @@ export function getAllDocs(locale: Locale): Doc[] {
 }
 
 /**
- * Routing keys are locale-independent, so static params are generated once and
- * reused by every locale's route tree.
+ * Static params for the route tree.
+ *
+ * Routing keys never change per locale, so each of these is the same list of
+ * keys crossed with every locale — which is also why one `app/[locale]/` tree
+ * can serve every language.
  */
-export function getAllDocPaths(): { collection: string; slug: string }[] {
-  return [...load().entries()].flatMap(([collection, entry]) =>
-    [...entry.docs.keys()].map((slug) => ({ collection, slug })),
+export function collectionParams(): { locale: Locale; collection: string }[] {
+  return LOCALES.flatMap((locale) =>
+    [...load().keys()].map((collection) => ({ locale, collection })),
   )
 }
 
-export function getAllCollectionPaths(): { collection: string }[] {
-  return [...load().keys()].map((collection) => ({ collection }))
+export function docParams(): { locale: Locale; collection: string; slug: string }[] {
+  return LOCALES.flatMap((locale) =>
+    [...load().entries()].flatMap(([collection, entry]) =>
+      [...entry.docs.keys()].map((slug) => ({ locale, collection, slug })),
+    ),
+  )
 }
 
-export function getAllTagPaths(): { tag: string }[] {
-  return getTags(DEFAULT_LOCALE).map(({ key }) => ({ tag: key }))
+export function tagParams(): { locale: Locale; tag: string }[] {
+  const tags = getTags(DEFAULT_LOCALE).map(({ key }) => key)
+  return LOCALES.flatMap((locale) => tags.map((tag) => ({ locale, tag })))
 }
 
 function toMeta(doc: Doc): DocMeta {

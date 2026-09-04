@@ -27,8 +27,9 @@ export function pick(value, locale) {
   return value[locale] ?? value[DEFAULT_LOCALE] ?? Object.values(value)[0]
 }
 
+/** Always `/<code>` — every locale is prefixed. Mirrors lib/i18n.ts. */
 export function localePrefix(locale) {
-  return locale === DEFAULT_LOCALE ? '' : `/${locale}`
+  return `/${locale}`
 }
 
 export function docHref(locale, collection, slug) {

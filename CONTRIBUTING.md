@@ -87,7 +87,8 @@ Quy ước bắt buộc:
   `-`). Chỉ phần chữ hiển thị mới dịch.
 - Bản tiếng Việt là `<slug>.mdx`, bản tiếng Anh là `<slug>.en.mdx`. Frontmatter bản dịch chỉ cần
   `title` và `description` — `section` và `order` luôn lấy từ file gốc.
-- Link nội bộ viết **không kèm tiền tố ngôn ngữ**: `/english/faq/`, không phải `/en/english/faq/`.
+- Link nội bộ viết **không kèm tiền tố ngôn ngữ**: `/english/faq/`, không phải `/vi/english/faq/`.
+  Tiền tố được thêm lúc render, nên cùng một link chạy đúng ở mọi ngôn ngữ.
 - Sửa chữ giao diện thì sửa trong `messages/<locale>.json`, **mọi ngôn ngữ cùng lúc** — thiếu một key
   là build đỏ.
 

@@ -24,6 +24,8 @@ function newest(docs: Doc[]): string | undefined {
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = []
 
+  // The language router at `/` is not listed: it canonicalises to the default
+  // locale's home, and a URL that points elsewhere has no business in a sitemap.
   const add = (bare: string, priority: number, lastModified?: string) => {
     for (const locale of LOCALES) {
       entries.push({

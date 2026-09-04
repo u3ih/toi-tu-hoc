@@ -10,16 +10,18 @@ import vi from '@/messages/vi.json'
  * keeps one URL shape per page and lets the language switcher map a page to its
  * counterpart without a lookup table.
  *
- * The default locale is served unprefixed (`/english/reading/`); every other
- * locale gets a prefix (`/en/english/reading/`).
+ * Every locale is prefixed: `/vi/english/reading/`, `/en/english/reading/`. The
+ * bare `/` is a language router that sends a reader to one of them. Prefixing
+ * the default locale too is what lets the whole site live under a single
+ * `app/[locale]/` route tree instead of one hand-copied tree per language.
  *
  * UI strings live in messages/<locale>.json. `messages/vi.json` is the source of
  * truth for the key set — `scripts/check-messages.mjs` fails the build if another
  * locale drifts from it.
  *
  * To add a locale: add it to i18n.config.json, widen the `Locale` union below,
- * copy messages/vi.json to messages/<code>.json, and add an `app/(<code>)/`
- * route group mirroring app/(en)/. Nothing else is locale-aware.
+ * and copy messages/vi.json to messages/<code>.json. Nothing else is
+ * locale-aware — there are no per-locale route files to copy.
  */
 
 /** Kept in sync with i18n.config.json; the union is what makes message keys type-safe. */
@@ -55,9 +57,9 @@ export function pick<T>(value: Localized<T> | undefined, locale: Locale): T | un
 
 /* --- URLs ------------------------------------------------------------------ */
 
-/** '' for the default locale, '/en' for the rest. */
+/** Always `/<code>` — every locale is prefixed, including the default one. */
 export function localePrefix(locale: Locale): string {
-  return locale === DEFAULT_LOCALE ? '' : `/${locale}`
+  return `/${locale}`
 }
 
 /** Build a trailing-slash URL for `parts` under `locale`. `path('en', 'x', 'y') → /en/x/y/` */
@@ -66,20 +68,33 @@ export function path(locale: Locale, ...parts: string[]): string {
   return `${localePrefix(locale)}/${joined}${joined ? '/' : ''}`
 }
 
-/** Strip any locale prefix, leaving the locale-independent path. */
+/** Strip the locale prefix, leaving the locale-independent path (`/english/faq/`). */
 export function barePath(href: string): string {
   for (const locale of LOCALES) {
-    if (locale === DEFAULT_LOCALE) continue
     if (href === `/${locale}` || href === `/${locale}/`) return '/'
     if (href.startsWith(`/${locale}/`)) return href.slice(`/${locale}`.length)
   }
   return href
 }
 
+/** The locale a URL is under, or the default when it is the language router at `/`. */
+export function localeOf(href: string): Locale {
+  for (const locale of LOCALES) {
+    if (href === `/${locale}` || href.startsWith(`/${locale}/`)) return locale
+  }
+  return DEFAULT_LOCALE
+}
+
+/** Static params for the `[locale]` segment. */
+export function localeParams(): { locale: Locale }[] {
+  return LOCALES.map((locale) => ({ locale }))
+}
+
 /** Move an in-site URL from one locale to another, preserving the hash. */
 export function switchLocale(href: string, to: Locale): string {
   const [bare, hash] = href.split('#')
-  const next = `${localePrefix(to)}${barePath(bare)}` || '/'
+  const stripped = barePath(bare)
+  const next = stripped === '/' ? `${localePrefix(to)}/` : `${localePrefix(to)}${stripped}`
   return hash ? `${next}#${hash}` : next
 }
 
