@@ -417,6 +417,97 @@ và lần tải đó không có đường lùi.
 URL tuyệt đối lấy từ `NEXT_PUBLIC_SITE_URL` (mặc định `http://localhost:3000`). Workflow deploy set
 biến này từ `actions/configure-pages`, nên khi deploy thật canonical sẽ trỏ đúng domain.
 
+## Analytics — Google Tag Manager
+
+Tắt sẵn. Không set `NEXT_PUBLIC_GTM_ID` thì **không có gì được nhúng** — không script tag, không
+`dataLayer`, không một request nào ra ngoài. Fork về chạy local sẽ không bắn dữ liệu vào container
+của ai.
+
+Bật lên:
+
+```bash
+# local
+echo 'NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX' >> .env.local
+```
+
+Khi deploy: **Settings → Secrets and variables → Actions → Variables** → thêm biến `GTM_ID`.
+Để ở Variables chứ không phải Secrets, vì container id nằm công khai trong source của trang —
+giấu nó không có nghĩa gì, mà để ở Secrets thì fork không đọc được và build sẽ khác nhau vô cớ.
+
+Id sai dạng làm **build fail** ngay, kèm tên biến và giá trị sai. Đây là chủ ý: một script tag trỏ
+sai id vẫn chạy, vẫn không báo lỗi, và sẽ không đo được gì trong nhiều tháng mà không ai biết.
+
+| Thứ | Ở đâu |
+| --- | --- |
+| Id container + `pushEvent()` | [`lib/gtm.ts`](lib/gtm.ts) |
+| Snippet loader + `<noscript>` fallback | [`components/analytics/gtm.tsx`](components/analytics/gtm.tsx) |
+| `page_view` khi chuyển trang | [`components/analytics/gtm-route-views.tsx`](components/analytics/gtm-route-views.tsx) |
+
+Hai điều cần biết khi cấu hình tag trong GTM:
+
+- **Chuyển trang phải nghe event `page_view`.** Trigger Page View có sẵn của GTM chỉ chạy một lần,
+  lúc `gtm.js` load. Mọi lần bấm link sau đó là `pushState` của App Router, nên nếu chỉ dùng trigger
+  mặc định thì một người đọc mười bài liền vẫn bị tính là **một** view. `GtmRouteViews` push event
+  `page_view` (kèm `page_path`, `page_location`, `page_title`, `page_locale`) mỗi lần đổi route —
+  bắn GA4 config/event tag theo event đó. Lần load đầu **cố tình không** push, vì trigger có sẵn đã
+  tính rồi; push nữa là đếm đôi.
+- **Trang `/` không có GTM.** Đó là trang chuyển ngôn ngữ, nó `location.replace` ngay trước khi
+  paint. Nhúng vào chỉ làm chậm redirect mà gần như không kịp gửi hit nào.
+
+Script load ở `afterInteractive`: GTM là đo đạc, không phải nội dung — chặn first paint bằng một
+request third-party trên một trang mà việc duy nhất người ta làm là đọc thì không đáng.
+
+## Thư viện UI — `lib/ui/` và `lib/hooks/`
+
+Component nào dùng lại được thì nằm ở `lib/ui/`, và phần lớn chúng **bọc một primitive của Next**
+chứ không thay thế. App code import từ `@/lib/ui`, không import trực tiếp từ `next/*` — nhờ vậy một
+thay đổi xuyên suốt chỉ sửa một file thay vì sửa mọi chỗ gọi.
+
+| Thứ | Bọc | Việc nó làm |
+| --- | --- | --- |
+| `Link` | `next/link` | Chọn đúng element cho ba loại href (xem dưới) |
+| `Image` | `next/image` | Ghim `h-auto max-w-full` để ảnh rộng không đẩy trang ngang |
+| `Overlay` | — | Scrim modal: portal, làm mờ nền, khoá scroll, Escape + click ra ngoài |
+| `Portal` | `react-dom` | Render ra cuối `<body>`, thoát khỏi stacking context |
+| `useBodyScrollLock` | — | Khoá scroll nền, trả lại đúng giá trị `overflow` cũ (`lib/hooks/`) |
+
+Quy ước ba tầng: `lib/hooks/` là hành vi không có markup, `lib/ui/` là primitive không biết gì về nội
+dung site, `components/` là thứ biết về doc / collection / locale.
+
+### `Link` — ba loại href, ba element
+
+Đây là lý do component này tồn tại: chọn sai element thì hoặc link chết, hoặc hở bảo mật.
+
+| Href | Element | Vì sao |
+| --- | --- | --- |
+| `https://…`, `mailto:`, `//cdn…` | `<a target="_blank" rel="noreferrer noopener">` | `next/link` sẽ cố client-route sang origin khác |
+| `#section` | `<a>` | Để browser tự xử fragment, và `scroll-padding-top` trong globals.css có tác dụng |
+| còn lại | `next/link` | Có prefetch và client navigation |
+
+Logic này trước đây nằm inline trong [`components/mdx.tsx`](components/mdx.tsx), **hai lần**. Giờ
+`mdx.tsx` chỉ còn quyết định một việc: href đó có cần thêm tiền tố locale hay không.
+
+### Popup search làm mờ nền
+
+`Overlay` **portal ra `<body>`**, và đó không phải chuyện thẩm mỹ. Một element có `backdrop-filter`
+trở thành containing block cho con `position: fixed` **và** tạo stacking context riêng. Header mang
+`backdrop-blur-xl`, nên overlay render bên trong header sẽ bị tính kích thước theo header cao 64px,
+còn `backdrop-filter` của nó chỉ lấy mẫu những gì header vẽ ra — triệu chứng thấy được là **header bị
+mờ trong khi trang phía sau vẫn nét**. Portal đưa overlay về root stacking context, nơi `fixed` và
+`backdrop-filter` đúng nghĩa.
+
+## Font
+
+Ba face — Alfa Slab One (display), Be Vietnam Pro (thân bài, có subset `vietnamese`), Space Mono
+(nhãn và code) — nạp qua `next/font` ở [`lib/fonts.ts`](lib/fonts.ts), **self-host**: không
+`preconnect` sang hai host lạ, không stylesheet chặn render, không bên thứ ba biết ai đọc gì. Next
+còn sinh metric `size-adjust` cho fallback nên lúc font swap trang không nhảy.
+
+Mỗi face phơi ra một CSS variable; `@theme` trong `app/globals.css` vẫn giữ nguyên chuỗi fallback,
+nên nếu một file font tải lỗi thì trang vẫn đúng hình dạng.
+
+Đánh đổi: **build lần đầu cần mạng** tới `fonts.googleapis.com`. Build ấm thì đọc `.next/cache`.
+
 ## Màu nhấn hoạt động thế nào
 
 Tailwind biên dịch `bg-brand-600` thành `var(--color-brand-600)`. Layout của mỗi collection đặt cả
@@ -488,8 +579,12 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `app/(site)/[locale]/topics/`, `.../tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ |
 | `lib/route.ts` | Đọc + kiểm tra `locale` từ route param |
 | `app/sitemap.ts`, `app/robots.ts`, `app/icon.svg` | Sitemap, robots, favicon |
+| `lib/gtm.ts`, `components/analytics/` | Google Tag Manager (tắt sẵn, bật bằng `NEXT_PUBLIC_GTM_ID`) |
 | `components/pages/` | Thân trang dùng chung cho mọi ngôn ngữ |
 | `components/` | Header, sidebar, tìm kiếm, mục lục, đổi ngôn ngữ, MDX components |
+| `lib/ui/` | Primitive dùng lại được: `Link`, `Image`, `Overlay`, `Portal` |
+| `lib/hooks/` | Hook dùng lại được: `useBodyScrollLock` |
+| `lib/fonts.ts` | Ba face self-host qua `next/font` |
 | `scripts/new.mjs` | Scaffold collection / bài viết / bản dịch |
 | `scripts/check-messages.mjs` | Đối chiếu các file `messages/*.json` (chạy trước dev/build) |
 | `scripts/build-search-index.mjs` | Sinh `public/search-index.json` cho mọi ngôn ngữ (chạy trước dev/build) |

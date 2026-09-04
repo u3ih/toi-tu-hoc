@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
@@ -19,6 +18,7 @@ import { Takeaways } from '@/components/takeaways'
 import { DoneToggle } from '@/components/progress/done-toggle'
 import { TagPill } from '@/components/tag-pill'
 import { LevelBadge } from '@/components/level-badge'
+import { Link } from '@/lib/ui'
 
 export function docMetadata(locale: Locale, collection: string, slug: string): Metadata {
   const doc = getDoc(locale, collection, slug)

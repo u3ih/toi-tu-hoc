@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { paletteVars } from '@/lib/accent'
 import type { Collection, DocMeta } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
 import { CollectionProgressCount } from '@/components/progress/collection-progress'
+import { Link } from '@/lib/ui'
 
 /**
  * One collection, as a card.

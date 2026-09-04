@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { path, t, type Locale } from '@/lib/i18n'
 import { SiteHeader } from '@/components/site-header'
+import { Link } from '@/lib/ui'
 
 export function NotFoundPage({ locale }: { locale: Locale }) {
   return (

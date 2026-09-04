@@ -49,6 +49,10 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           NEXT_PUBLIC_SITE_URL: ${{ steps.pages.outputs.origin }}
+          # Repository variable (Settings -> Secrets and variables -> Actions ->
+          # Variables), not a secret: a container id is public in the page source.
+          # Unset on a fork, so a fork ships no tracker at all.
+          NEXT_PUBLIC_GTM_ID: ${{ vars.GTM_ID }}
         run: pnpm run build
 
       - name: Disable Jekyll processing

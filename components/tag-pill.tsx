@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import type { Tag } from '@/lib/content'
 import { path, type Locale } from '@/lib/i18n'
+import { Link } from '@/lib/ui'
 
 /** A tag, as a link. The count is shown when the caller has one. */
 export function TagPill({

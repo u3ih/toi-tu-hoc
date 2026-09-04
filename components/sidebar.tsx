@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { NavGroup } from '@/lib/content'
 import type { Locale } from '@/lib/i18n'
 import { DocCheck } from './progress/doc-check'
+import { Link } from '@/lib/ui'
 
 export function SidebarNav({
   nav,

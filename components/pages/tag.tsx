@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getCollection, getDocsByTag, tagLabel } from '@/lib/content'
@@ -8,6 +7,7 @@ import { tagSchema } from '@/lib/schema'
 import { SiteHeader } from '@/components/site-header'
 import { JsonLd } from '@/components/json-ld'
 import { DocCard } from '@/components/doc-card'
+import { Link } from '@/lib/ui'
 
 export function tagMetadata(locale: Locale, tag: string): Metadata {
   const label = tagLabel(locale, tag)

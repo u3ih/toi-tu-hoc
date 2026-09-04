@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { getTags } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
 import { contributeUrl, site } from '@/lib/site'
 import { ResetProgress } from '@/components/progress/reset-progress'
+import { Link } from '@/lib/ui'
 
 export function Footer({ locale }: { locale: Locale }) {
   const contribute = contributeUrl()

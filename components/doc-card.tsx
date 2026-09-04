@@ -1,7 +1,7 @@
-import Link from 'next/link'
 import { paletteVars } from '@/lib/accent'
 import type { Collection, DocMeta } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
+import { Link } from '@/lib/ui'
 
 /**
  * One article, as a card, labelled with the collection it came from.

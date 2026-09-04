@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import '../globals.css'
+import { fontVariables } from '@/lib/fonts'
 import { DEFAULT_LOCALE, LOCALE_META } from '@/lib/i18n'
 
 /**
@@ -11,7 +12,7 @@ import { DEFAULT_LOCALE, LOCALE_META } from '@/lib/i18n'
  */
 export default function RouterLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={LOCALE_META[DEFAULT_LOCALE].htmlLang}>
+    <html lang={LOCALE_META[DEFAULT_LOCALE].htmlLang} className={fontVariables}>
       <body className="font-sans">{children}</body>
     </html>
   )

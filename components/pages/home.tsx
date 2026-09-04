@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import {
   getCategories,
   getCollections,
@@ -12,6 +11,7 @@ import { getSite } from '@/lib/site'
 import { SiteHeader } from '@/components/site-header'
 import { JsonLd } from '@/components/json-ld'
 import { CollectionCard } from '@/components/collection-card'
+import { Link } from '@/lib/ui'
 
 /** Collections shown per category before the reader is sent to /topics/ instead. */
 const PER_CATEGORY = 4

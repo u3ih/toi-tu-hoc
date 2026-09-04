@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getCollection, getDocs, getFlatNav, getNav } from '@/lib/content'
@@ -8,6 +7,7 @@ import { collectionSchema } from '@/lib/schema'
 import { JsonLd } from '@/components/json-ld'
 import { CollectionProgress } from '@/components/progress/collection-progress'
 import { DocCheck } from '@/components/progress/doc-check'
+import { Link } from '@/lib/ui'
 
 export function collectionMetadata(locale: Locale, slug: string): Metadata {
   const collection = getCollection(locale, slug)

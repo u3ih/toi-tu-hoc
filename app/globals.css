@@ -5,10 +5,15 @@
 
 @theme {
   /* Retro type stack: slab display, humanist body (full Vietnamese coverage),
-     typewriter mono for labels and code. */
-  --font-display: 'Alfa Slab One', 'Rockwell', Georgia, serif;
-  --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+     typewriter mono for labels and code.
+
+     The `*-face` variables are supplied by next/font in lib/fonts.ts, which
+     self-hosts the files and generates a metric-matched local fallback. The
+     stacks stay written out here so the page still has the right shape if a
+     font file fails to load. */
+  --font-display: var(--font-display-face), 'Rockwell', Georgia, serif;
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   /* Cobalt blue — the primary. */
   --color-brand-50: oklch(0.95 0.03 255);
@@ -159,6 +164,58 @@
   font-size: 0.6875rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+/* MDX tables.
+   The frame — outline, radius, hard shadow, horizontal scroll — comes from the
+   wrapper in components/mdx.tsx, so all these rules have to do is make rows
+   scannable: a filled header band, hairline rules between rows and flat zebra
+   banding. Element selectors beat the typography plugin's `:where(...)` rules
+   without needing `!important`. */
+.prose table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.prose thead {
+  background-color: color-mix(in oklab, var(--color-brand-500) 14%, transparent);
+}
+
+/* Same typewriter eyebrow as every other label on the site, at full contrast —
+   a column heading a reader has to squint at is not a heading. */
+.prose thead th {
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.prose tbody td {
+  padding: 0.75rem 1rem;
+  vertical-align: top;
+}
+
+/* The first column is the row's subject; the rest qualify it. */
+.prose tbody td:first-child {
+  font-weight: 600;
+}
+
+.prose tbody tr + tr {
+  border-top: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+}
+
+.prose tbody tr:nth-child(even) {
+  background-color: color-mix(in oklab, var(--fg) 4%, transparent);
 }
 
 /* Radiating rays behind a hero, faded out at the edges. */

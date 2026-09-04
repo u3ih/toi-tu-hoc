@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getTags } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
@@ -7,6 +6,7 @@ import { tagsSchema } from '@/lib/schema'
 import { SiteHeader } from '@/components/site-header'
 import { JsonLd } from '@/components/json-ld'
 import { TagPill } from '@/components/tag-pill'
+import { Link } from '@/lib/ui'
 
 export function tagsMetadata(locale: Locale): Metadata {
   return pageMetadata({

@@ -70,8 +70,8 @@
   "doc": {
     "readingTime": "⏱ About {minutes} min read",
     "toc": "On this page",
-    "prev": "← Previous",
-    "next": "Next →",
+    "prev": "Previous",
+    "next": "Next",
     "related": "Read next",
     "takeaways": "Key points",
     "sourcesHeading": "Sources for this page",

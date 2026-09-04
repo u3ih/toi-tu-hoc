@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { paletteVars } from '@/lib/accent'
 import type { CategoryGroup, Collection } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
+import { Link } from '@/lib/ui'
 
 /** Above this many collections a flat list stops being scannable. */
 const FILTER_THRESHOLD = 8

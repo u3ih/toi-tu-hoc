@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import type { ComponentProps, ReactNode } from 'react'
 import type { MDXComponents } from 'mdx/types'
 import { slugify } from '@/lib/content'
 import { DEFAULT_LOCALE, localePrefix, t, type Locale } from '@/lib/i18n'
+import { isExternalHref, Link } from '@/lib/ui'
 
 function toText(node: ReactNode): string {
   if (node === null || node === undefined || typeof node === 'boolean') return ''
@@ -100,12 +100,11 @@ export function Card({
 
   if (!href) return <div className="surface p-4">{inner}</div>
 
-  return /^https?:\/\//.test(href) ? (
-    <a href={href} target="_blank" rel="noreferrer noopener" className="surface retro-lift p-4">
-      {inner}
-    </a>
-  ) : (
-    <Link href={`${localePrefix(locale)}${href}`} className="surface retro-lift p-4">
+  return (
+    <Link
+      href={inSite(href) ? `${localePrefix(locale)}${href}` : href}
+      className="surface retro-lift p-4"
+    >
       {inner}
     </Link>
   )
@@ -129,6 +128,14 @@ function heading(level: 2 | 3 | 4) {
 }
 
 /**
+ * An href an MDX author wrote as a site path, so it needs the locale prefix.
+ * External URLs and bare fragments are left exactly as written.
+ */
+function inSite(href: string): boolean {
+  return !isExternalHref(href) && !href.startsWith('#')
+}
+
+/**
  * MDX authors write locale-independent links (`/english/reading/`), the same keys
  * the route tree uses. The prefix for the current locale is added here so a
  * translated page never leaks back into the default locale.
@@ -142,26 +149,19 @@ export function mdxComponents(locale: Locale, textLocale: Locale = locale): MDXC
     h2: heading(2),
     h3: heading(3),
     h4: heading(4),
-    a: ({ href = '', children, ...props }: ComponentProps<'a'>) => {
-      if (/^https?:\/\//.test(href)) {
-        return (
-          <a href={href} target="_blank" rel="noreferrer noopener" {...props}>
-            {children}
-          </a>
-        )
-      }
-      if (href.startsWith('#'))
-        return (
-          <a href={href} {...props}>
-            {children}
-          </a>
-        )
-
-      return <Link href={`${localePrefix(locale)}${href}`}>{children}</Link>
-    },
+    // Link picks the right element for external, `#section` and in-site hrefs;
+    // all this has to decide is whether the locale prefix belongs on the front.
+    a: ({ href = '', children, ...props }: ComponentProps<'a'>) => (
+      <Link href={inSite(href) ? `${localePrefix(locale)}${href}` : href} {...props}>
+        {children}
+      </Link>
+    ),
+    // The scroll container is the frame: a wide table scrolls inside its own
+    // outline instead of pushing the article sideways. Cell styling lives in
+    // globals.css next to the rest of the prose rules.
     table: (props: ComponentProps<'table'>) => (
-      <div className="my-6 overflow-x-auto rounded-retro border-2">
-        <table {...props} className="my-0" />
+      <div className="retro-shadow my-6 overflow-x-auto rounded-retro border-2">
+        <table {...props} />
       </div>
     ),
     Callout: (props: ComponentProps<typeof Callout>) => <Callout locale={textLocale} {...props} />,

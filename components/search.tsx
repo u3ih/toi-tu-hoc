@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ACCENT_PALETTES, DEFAULT_ACCENT, paletteVars } from '@/lib/accent'
 import type { CategoryGroup, Collection } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
+import { Overlay } from '@/lib/ui'
 
 /** Above this many collections the scope chips wrap into a wall; use a select. */
 const SCOPE_SELECT_THRESHOLD = 8
@@ -122,14 +123,13 @@ export function Search({
   // biome-ignore lint/correctness/useExhaustiveDependencies: run on input change
   useEffect(() => setCursor(0), [query, scope])
 
-  // Cmd/Ctrl+K opens, Escape closes.
+  // Cmd/Ctrl+K opens. Escape is the Overlay's job, along with the click-outside.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setOpen((v) => !v)
       }
-      if (e.key === 'Escape') setOpen(false)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -173,18 +173,7 @@ export function Search({
       </button>
 
       {open && (
-        // The click is the backdrop shortcut; Escape closes the dialog from the
-        // keyboard, wired in the effect above.
-        // biome-ignore lint/a11y/useKeyWithClickEvents: Escape is the keyboard path
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={t(locale, 'search.dialog')}
-          className="fixed inset-0 z-50 flex items-start justify-center bg-brand-900/60 p-4 pt-[12vh] backdrop-blur-sm"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setOpen(false)
-          }}
-        >
+        <Overlay label={t(locale, 'search.dialog')} onClose={() => setOpen(false)}>
           <div className="surface w-full max-w-xl overflow-hidden shadow-[6px_6px_0_var(--shadow-ink)]">
             <div className="flex items-center gap-3 border-b-2 px-4">
               <SearchIcon className="muted" />
@@ -284,7 +273,7 @@ export function Search({
               )}
             </ul>
           </div>
-        </div>
+        </Overlay>
       )}
     </>
   )

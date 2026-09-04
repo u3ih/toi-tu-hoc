@@ -70,8 +70,8 @@
   "doc": {
     "readingTime": "⏱ Khoảng {minutes} phút đọc",
     "toc": "Trong bài này",
-    "prev": "← Bài trước",
-    "next": "Bài tiếp →",
+    "prev": "Bài trước",
+    "next": "Bài tiếp",
     "related": "Đọc tiếp",
     "takeaways": "Ý chính",
     "sourcesHeading": "Nguồn cho bài này",

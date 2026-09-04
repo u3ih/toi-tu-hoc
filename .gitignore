@@ -5,3 +5,6 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 public/search-index.json
+
+# README tells you to put NEXT_PUBLIC_GTM_ID here for local runs.
+.env*.local

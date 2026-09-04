@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getCategories, getCollections, getDocs, getTags } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
@@ -8,6 +7,7 @@ import { SiteHeader } from '@/components/site-header'
 import { JsonLd } from '@/components/json-ld'
 import { CollectionCard } from '@/components/collection-card'
 import { TagPill } from '@/components/tag-pill'
+import { Link } from '@/lib/ui'
 
 export function topicsMetadata(locale: Locale): Metadata {
   return pageMetadata({

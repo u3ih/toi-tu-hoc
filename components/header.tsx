@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { CategoryGroup, Collection, NavGroup } from '@/lib/content'
@@ -10,6 +9,8 @@ import { Search } from './search'
 import { ThemeToggle } from './theme-toggle'
 import { CollectionSwitcher } from './collection-switcher'
 import { LocaleSwitcher } from './locale-switcher'
+import { useBodyScrollLock } from '@/lib/hooks'
+import { Link } from '@/lib/ui'
 
 export function Header({
   siteName,
@@ -35,12 +36,7 @@ export function Header({
   // biome-ignore lint/correctness/useExhaustiveDependencies: run on route change
   useEffect(() => setDrawerOpen(false), [pathname])
 
-  useEffect(() => {
-    document.body.style.overflow = drawerOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [drawerOpen])
+  useBodyScrollLock(drawerOpen)
 
   const hasNav = nav.length > 0
 
