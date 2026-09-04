@@ -12,33 +12,36 @@ export default function HomePage() {
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden border-b-2">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-            <div className="animate-float-slow absolute -top-32 left-1/4 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl" />
-            <div className="animate-float-slow absolute -top-20 right-1/4 h-80 w-80 rounded-full bg-brand-300/20 blur-3xl [animation-delay:3s]" />
+            {/* Sun rays fanning out from above the title. */}
+            <div className="retro-rays animate-float-slow absolute -top-64 left-1/2 h-[46rem] w-[46rem] -translate-x-1/2" />
+            {/* Half-disc cresting the top edge, like a sun on a travel poster. */}
+            <div className="absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full border-2 border-brand-900 bg-accent-400" />
           </div>
 
           <div className="mx-auto max-w-4xl px-6 py-24 text-center sm:py-32">
-            <p className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <p className="retro-shadow-sm inline-flex items-center gap-2 rounded-full border-2 border-brand-900 bg-accent-400 px-4 py-1.5 label-retro text-brand-900">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-900" />
               Miễn phí · Cập nhật liên tục
             </p>
 
-            <h1 className="mt-6 text-4xl font-bold tracking-tight text-balance sm:text-6xl">
+            <h1 className="mt-7 font-display text-4xl leading-[1.08] text-balance sm:text-6xl">
               {site.name}
-              <span className="block bg-gradient-to-r from-brand-500 to-brand-300 bg-clip-text text-transparent">
-                {site.tagline}
-              </span>
+              <span className="mt-2 block text-brand-600 dark:text-accent-400">{site.tagline}</span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-2xl text-lg muted text-pretty">{site.description}</p>
+            {/* Barber-pole rule under the title. */}
+            <div aria-hidden className="retro-stripes mx-auto mt-8 h-3 w-40 rounded-retro border-2" />
+
+            <p className="mx-auto mt-8 max-w-2xl text-lg muted text-pretty">{site.description}</p>
           </div>
         </section>
 
         {/* Collections */}
         <section className="mx-auto max-w-5xl px-6 pb-24">
-          <h2 className="text-center text-2xl font-bold sm:text-3xl">Các bộ nội dung</h2>
-          <p className="mt-2 text-center muted">Chọn một chủ đề để bắt đầu.</p>
+          <h2 className="text-center font-display text-2xl sm:text-3xl">Các bộ nội dung</h2>
+          <p className="mt-3 text-center label-retro muted">Chọn một chủ đề để bắt đầu</p>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
             {collections.map((c) => (
@@ -46,26 +49,27 @@ export default function HomePage() {
                 key={c.slug}
                 href={`/${c.slug}/`}
                 data-accent={c.accent}
-                className="surface group relative overflow-hidden rounded-2xl p-6 transition-colors hover:border-brand-500"
+                className="surface retro-lift group relative overflow-hidden p-6"
               >
+                {/* Colour block in the corner, hard-edged like a printed swatch. */}
                 <div
                   aria-hidden
-                  className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-brand-500/20 opacity-50 blur-2xl transition-opacity group-hover:opacity-100"
+                  className="absolute -top-9 -right-9 h-20 w-20 rotate-45 bg-brand-500/30 transition-colors group-hover:bg-accent-400/70"
                 />
                 <div className="relative">
-                  <span className="text-3xl" aria-hidden>
+                  <span className="grid h-12 w-12 place-items-center rounded-retro border-2 bg-brand-500/15 text-2xl" aria-hidden>
                     {c.emoji}
                   </span>
-                  <h3 className="mt-3 flex items-center gap-2 text-lg font-semibold">
+                  <h3 className="mt-4 flex items-center gap-2 font-display text-lg">
                     {c.title}
                     {c.status === 'wip' && (
-                      <span className="rounded bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-normal text-brand-700 dark:text-brand-300">
+                      <span className="rounded-retro border-2 border-brand-900 bg-accent-400 px-1.5 py-0.5 label-retro text-brand-900">
                         đang viết
                       </span>
                     )}
                   </h3>
                   <p className="mt-2 text-sm muted">{c.description}</p>
-                  <p className="mt-4 text-xs muted">
+                  <p className="mt-4 border-t-2 pt-3 label-retro muted">
                     {c.docCount} bài · {c.sections.length} phần
                   </p>
                 </div>

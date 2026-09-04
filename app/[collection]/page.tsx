@@ -26,26 +26,29 @@ export default async function CollectionHome({ params }: Props) {
 
   return (
     <main>
-      <section className="relative overflow-hidden border-b">
+      <section className="relative overflow-hidden border-b-2">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="animate-float-slow absolute -top-40 left-1/3 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl" />
+          <div className="retro-rays animate-float-slow absolute -top-72 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2" />
         </div>
 
         <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <span className="text-4xl" aria-hidden>
+          <span
+            className="retro-shadow mx-auto grid h-16 w-16 place-items-center rounded-retro border-2 border-brand-900 bg-accent-400 text-3xl"
+            aria-hidden
+          >
             {collection.emoji}
           </span>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+          <h1 className="mt-6 font-display text-4xl leading-[1.1] text-balance sm:text-5xl">
             {collection.title}
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg muted text-pretty">{collection.description}</p>
+          <p className="mx-auto mt-5 max-w-xl text-lg muted text-pretty">{collection.description}</p>
 
           {first && (
             <Link
               href={first.href}
-              className="mt-8 inline-block rounded-xl bg-brand-600 px-6 py-3 font-medium text-white transition-colors hover:bg-brand-700"
+              className="retro-lift retro-shadow mt-9 inline-block rounded-retro border-2 bg-brand-600 px-6 py-3 font-semibold text-white"
             >
-              Bắt đầu: {first.title}
+              Bắt đầu: {first.title} →
             </Link>
           )}
         </div>
@@ -54,17 +57,17 @@ export default async function CollectionHome({ params }: Props) {
       <section className="mx-auto max-w-4xl px-6 py-16">
         <div className="grid gap-6 sm:grid-cols-2">
           {nav.map(({ section, items }) => (
-            <div key={section.title} className="surface rounded-2xl p-6">
-              <h2 className="flex items-center gap-2 font-semibold">
+            <div key={section.title} className="surface p-6">
+              <h2 className="flex items-center gap-2 border-b-2 pb-3 font-display text-base">
                 {section.emoji && <span aria-hidden>{section.emoji}</span>}
                 {section.title}
               </h2>
-              <ul className="mt-3 space-y-2 text-sm">
+              <ul className="mt-4 space-y-2.5 text-sm">
                 {items.map((item) => (
                   <li key={item.slug}>
                     <Link
                       href={item.href}
-                      className="transition-colors hover:text-brand-600 dark:hover:text-brand-300"
+                      className="font-medium decoration-2 underline-offset-4 transition-colors hover:text-brand-600 hover:underline dark:hover:text-accent-400"
                     >
                       {item.title}
                     </Link>

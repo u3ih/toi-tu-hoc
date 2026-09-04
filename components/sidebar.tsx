@@ -11,7 +11,7 @@ export function SidebarNav({ nav, onNavigate }: { nav: NavGroup[]; onNavigate?: 
     <nav className="flex flex-col gap-7 text-sm">
       {nav.map(({ section, items }) => (
         <div key={section.title}>
-          <p className="mb-2 flex items-center gap-2 px-3 text-xs font-semibold tracking-wide uppercase muted">
+          <p className="mb-2.5 flex items-center gap-2 border-b-2 px-3 pb-1.5 label-retro muted">
             {section.emoji && <span aria-hidden>{section.emoji}</span>}
             {section.title}
           </p>
@@ -26,10 +26,10 @@ export function SidebarNav({ nav, onNavigate }: { nav: NavGroup[]; onNavigate?: 
                     onClick={onNavigate}
                     aria-current={active ? 'page' : undefined}
                     className={[
-                      'block rounded-lg px-3 py-1.5 transition-colors',
+                      'block rounded-retro border-2 px-3 py-1.5 transition-colors',
                       active
-                        ? 'bg-brand-500/12 font-medium text-brand-700 dark:text-brand-300'
-                        : 'muted hover:bg-brand-500/8 hover:text-brand-600 dark:hover:text-brand-300',
+                        ? 'retro-shadow-sm border-brand-900 bg-accent-400 font-semibold text-brand-900'
+                        : 'border-transparent muted hover:border-[var(--border)] hover:bg-brand-500/10 hover:text-brand-700 dark:hover:text-accent-300',
                     ].join(' ')}
                   >
                     {item.title}
@@ -46,7 +46,7 @@ export function SidebarNav({ nav, onNavigate }: { nav: NavGroup[]; onNavigate?: 
 
 export function Sidebar({ nav }: { nav: NavGroup[] }) {
   return (
-    <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 overflow-y-auto py-8 pr-4 lg:block">
+    <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 overflow-y-auto border-r-2 py-8 pr-4 lg:block">
       <SidebarNav nav={nav} />
     </aside>
   )

@@ -37,33 +37,44 @@ export default async function DocPage({ params }: Props) {
 
         <main className="min-w-0 flex-1 py-10">
           <article className="mx-auto max-w-3xl">
-            <header className="mb-10 border-b pb-8">
-              <nav className="flex flex-wrap items-center gap-1.5 text-sm muted" aria-label="Breadcrumb">
-                <Link href={`/${collection.slug}/`} className="hover:text-brand-600">
+            <header className="mb-10 border-b-2 pb-8">
+              <nav className="flex flex-wrap items-center gap-1.5 label-retro muted" aria-label="Breadcrumb">
+                <Link href={`/${collection.slug}/`} className="hover:text-brand-600 dark:hover:text-accent-400">
                   {collection.emoji} {collection.title}
                 </Link>
                 <span aria-hidden>/</span>
                 <span>{doc.section}</span>
               </nav>
 
-              <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+              <h1 className="mt-4 font-display text-3xl leading-[1.15] text-balance sm:text-4xl">
                 {doc.title}
               </h1>
-              {doc.description && <p className="mt-3 text-lg muted text-pretty">{doc.description}</p>}
-              <p className="mt-4 text-sm muted">⏱ Khoảng {doc.readingTime} phút đọc</p>
+              {doc.description && <p className="mt-4 text-lg muted text-pretty">{doc.description}</p>}
+              <p className="retro-shadow-sm mt-5 inline-block rounded-retro border-2 border-brand-900 bg-accent-400 px-2.5 py-1 label-retro text-brand-900">
+                ⏱ Khoảng {doc.readingTime} phút đọc
+              </p>
             </header>
 
             <div
               className="prose prose-neutral max-w-none dark:prose-invert
-                prose-headings:scroll-mt-24 prose-headings:font-semibold
-                prose-h2:mt-12 prose-h2:text-2xl
+                prose-headings:scroll-mt-24 prose-headings:font-display prose-headings:font-normal
+                prose-headings:tracking-tight
+                prose-h2:mt-12 prose-h2:text-2xl prose-h2:border-b-2 prose-h2:pb-2
                 prose-h3:mt-8 prose-h3:text-lg
-                prose-a:text-brand-600 prose-a:no-underline hover:prose-a:underline
-                dark:prose-a:text-brand-400
-                prose-code:rounded prose-code:bg-brand-500/10 prose-code:px-1.5 prose-code:py-0.5
+                prose-a:text-brand-600 prose-a:font-medium prose-a:decoration-2
+                prose-a:underline-offset-4 dark:prose-a:text-accent-400
+                prose-strong:text-brand-700 dark:prose-strong:text-accent-300
+                prose-code:rounded-retro prose-code:border-2 prose-code:bg-accent-400/25
+                prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-[0.85em]
+                prose-code:font-normal
                 prose-code:before:content-none prose-code:after:content-none
-                prose-blockquote:border-l-brand-500 prose-blockquote:not-italic
-                prose-img:rounded-xl prose-hr:border-dashed"
+                prose-pre:rounded-retro prose-pre:border-2 prose-pre:border-[var(--border)]
+                prose-blockquote:border-l-4 prose-blockquote:border-l-accent-500
+                prose-blockquote:bg-accent-400/12 prose-blockquote:py-1 prose-blockquote:not-italic
+                prose-blockquote:rounded-r-retro
+                prose-th:label-retro prose-td:border-[var(--border)] prose-th:border-[var(--border)]
+                prose-img:rounded-retro prose-img:border-2
+                prose-hr:border-t-2 prose-hr:border-dashed"
             >
               <MDXRemote
                 source={doc.body}

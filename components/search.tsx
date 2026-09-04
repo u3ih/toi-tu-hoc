@@ -131,11 +131,11 @@ export function Search({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm muted transition-colors hover:bg-brand-500/8 sm:w-52"
+        className="retro-shadow-sm flex items-center gap-2 rounded-retro border-2 px-2.5 py-1.5 text-sm muted transition-colors hover:bg-accent-400 hover:text-brand-900 sm:w-52"
       >
         <SearchIcon />
         <span className="hidden sm:inline">Tìm kiếm…</span>
-        <kbd className="ml-auto hidden rounded border px-1.5 py-0.5 font-sans text-[11px] sm:inline">⌘K</kbd>
+        <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">⌘K</kbd>
       </button>
 
       {open && (
@@ -143,13 +143,13 @@ export function Search({
           role="dialog"
           aria-modal="true"
           aria-label="Tìm kiếm nội dung"
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-[12vh] backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-brand-900/60 p-4 pt-[12vh] backdrop-blur-sm"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false)
           }}
         >
-          <div className="surface w-full max-w-xl overflow-hidden rounded-2xl shadow-2xl">
-            <div className="flex items-center gap-3 border-b px-4">
+          <div className="surface w-full max-w-xl overflow-hidden shadow-[6px_6px_0_var(--shadow-ink)]">
+            <div className="flex items-center gap-3 border-b-2 px-4">
               <SearchIcon className="muted" />
               <input
                 ref={inputRef}
@@ -172,7 +172,7 @@ export function Search({
             </div>
 
             {collections.length > 1 && (
-              <div className="flex flex-wrap gap-1.5 border-b px-3 py-2">
+              <div className="flex flex-wrap gap-1.5 border-b-2 px-3 py-2">
                 <ScopeChip active={scope === 'all'} onClick={() => setScope('all')}>
                   Tất cả
                 </ScopeChip>
@@ -193,14 +193,14 @@ export function Search({
                     onClick={() => go(hit)}
                     data-accent={hit.accent}
                     className={[
-                      'w-full rounded-lg px-3 py-2.5 text-left transition-colors',
-                      i === cursor ? 'bg-brand-500/12' : '',
+                      'w-full rounded-retro border-2 px-3 py-2.5 text-left transition-colors',
+                      i === cursor ? 'border-[var(--border)] bg-accent-400/30' : 'border-transparent',
                     ].join(' ')}
                   >
-                    <p className="text-xs muted">
+                    <p className="label-retro muted">
                       {hit.collectionTitle} · {hit.section}
                     </p>
-                    <p className="text-sm font-medium">{hit.title}</p>
+                    <p className="mt-0.5 text-sm font-semibold">{hit.title}</p>
                     <p className="line-clamp-2 text-xs muted">{hit.snippet}</p>
                   </button>
                 </li>
@@ -235,8 +235,10 @@ function ScopeChip({
       type="button"
       onClick={onClick}
       className={[
-        'rounded-full px-2.5 py-1 text-xs transition-colors',
-        active ? 'bg-brand-500/15 font-medium text-brand-700 dark:text-brand-300' : 'muted hover:bg-brand-500/8',
+        'rounded-full border-2 px-2.5 py-1 text-xs transition-colors',
+        active
+          ? 'border-brand-900 bg-accent-400 font-semibold text-brand-900'
+          : 'border-transparent muted hover:border-[var(--border)] hover:bg-brand-500/10',
       ].join(' ')}
     >
       {children}

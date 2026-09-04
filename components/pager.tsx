@@ -9,11 +9,11 @@ export function Pager({ flatNav, slug }: { flatNav: DocMeta[]; slug: string }) {
   if (!prev && !next) return null
 
   return (
-    <nav className="mt-14 grid gap-3 border-t pt-8 sm:grid-cols-2">
+    <nav className="mt-14 grid gap-4 border-t-2 pt-8 sm:grid-cols-2">
       {prev ? (
-        <Link href={prev.href} className="surface group rounded-xl p-4 transition-colors hover:border-brand-500">
-          <p className="text-xs muted">← Bài trước</p>
-          <p className="mt-1 font-medium group-hover:text-brand-600 dark:group-hover:text-brand-300">
+        <Link href={prev.href} className="surface retro-lift group p-4">
+          <p className="label-retro muted">← Bài trước</p>
+          <p className="mt-1.5 font-semibold group-hover:text-brand-700 dark:group-hover:text-accent-400">
             {prev.title}
           </p>
         </Link>
@@ -23,10 +23,10 @@ export function Pager({ flatNav, slug }: { flatNav: DocMeta[]; slug: string }) {
       {next && (
         <Link
           href={next.href}
-          className="surface group rounded-xl p-4 text-right transition-colors hover:border-brand-500 sm:col-start-2"
+          className="surface retro-lift group p-4 text-right sm:col-start-2"
         >
-          <p className="text-xs muted">Bài tiếp →</p>
-          <p className="mt-1 font-medium group-hover:text-brand-600 dark:group-hover:text-brand-300">
+          <p className="label-retro muted">Bài tiếp →</p>
+          <p className="mt-1.5 font-semibold group-hover:text-brand-700 dark:group-hover:text-accent-400">
             {next.title}
           </p>
         </Link>

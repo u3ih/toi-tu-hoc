@@ -32,18 +32,18 @@ export function Toc({ headings }: { headings: Heading[] }) {
 
   return (
     <aside className="sticky top-24 hidden h-fit max-h-[calc(100dvh-8rem)] w-56 shrink-0 overflow-y-auto py-8 xl:block">
-      <p className="mb-3 text-xs font-semibold tracking-wide uppercase muted">Trong bài này</p>
-      <ul className="space-y-1 border-l text-sm">
+      <p className="mb-3 label-retro muted">Trong bài này</p>
+      <ul className="space-y-1 border-l-2 text-sm">
         {headings.map((h) => (
           <li key={h.id}>
             <a
               href={`#${h.id}`}
               className={[
-                '-ml-px block border-l py-1 transition-colors',
+                '-ml-0.5 block border-l-2 py-1 transition-colors',
                 h.level === 3 ? 'pl-6' : 'pl-3',
                 activeId === h.id
-                  ? 'border-brand-500 font-medium text-brand-600 dark:text-brand-300'
-                  : 'border-transparent muted hover:text-brand-600 dark:hover:text-brand-300',
+                  ? 'border-accent-500 font-semibold text-brand-700 dark:text-accent-400'
+                  : 'border-transparent muted hover:text-brand-600 dark:hover:text-accent-300',
               ].join(' ')}
             >
               {h.text}

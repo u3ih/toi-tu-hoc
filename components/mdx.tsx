@@ -14,11 +14,11 @@ function toText(node: ReactNode): string {
 }
 
 const CALLOUTS = {
-  tip: { label: 'Mẹo', icon: '💡', ring: 'border-emerald-500/40 bg-emerald-500/8' },
-  warning: { label: 'Lưu ý', icon: '⚠️', ring: 'border-amber-500/40 bg-amber-500/8' },
-  danger: { label: 'Cẩn thận', icon: '🛑', ring: 'border-rose-500/40 bg-rose-500/8' },
-  info: { label: 'Thông tin', icon: 'ℹ️', ring: 'border-brand-500/40 bg-brand-500/8' },
-  story: { label: 'Chuyện của mình', icon: '📖', ring: 'border-brand-500/40 bg-brand-500/8' },
+  tip: { label: 'Mẹo', icon: '💡', ring: 'bg-[oklch(0.56_0.115_154)]/12' },
+  warning: { label: 'Lưu ý', icon: '⚠️', ring: 'bg-accent-400/25' },
+  danger: { label: 'Cẩn thận', icon: '🛑', ring: 'bg-[oklch(0.56_0.15_21)]/15' },
+  info: { label: 'Thông tin', icon: 'ℹ️', ring: 'bg-brand-500/12' },
+  story: { label: 'Chuyện của mình', icon: '📖', ring: 'bg-brand-500/12' },
 } as const
 
 export function Callout({
@@ -35,8 +35,8 @@ export function Callout({
   // Personal asides read as a quiet aside rather than a boxed warning.
   if (type === 'story') {
     return (
-      <aside className="my-7 border-l-2 border-brand-500/50 pl-5">
-        <p className="mb-1 flex items-center gap-2 text-xs font-semibold tracking-wide uppercase not-prose muted">
+      <aside className="my-7 border-l-4 border-accent-500 bg-accent-400/10 py-2 pl-5">
+        <p className="mb-1 flex items-center gap-2 label-retro not-prose muted">
           <span aria-hidden>{style.icon}</span>
           {title ?? style.label}
         </p>
@@ -46,8 +46,8 @@ export function Callout({
   }
 
   return (
-    <div className={`my-6 rounded-xl border p-4 ${style.ring}`}>
-      <p className="mb-1 flex items-center gap-2 font-semibold not-prose">
+    <div className={`retro-shadow my-6 rounded-retro border-2 p-4 ${style.ring}`}>
+      <p className="mb-1 flex items-center gap-2 font-display text-sm not-prose">
         <span aria-hidden>{style.icon}</span>
         {title ?? style.label}
       </p>
@@ -59,7 +59,7 @@ export function Callout({
 /** Wraps an ordered sequence of `###` steps in a vertical rail. */
 export function Steps({ children }: { children: ReactNode }) {
   return (
-    <div className="my-6 border-l-2 border-brand-500/30 pl-6 [&>h3:first-child]:mt-0">{children}</div>
+    <div className="my-6 border-l-4 border-brand-500/50 pl-6 [&>h3:first-child]:mt-0">{children}</div>
   )
 }
 
@@ -80,7 +80,7 @@ export function Card({
 }) {
   const inner = (
     <>
-      <p className="flex items-center gap-2 font-medium">
+      <p className="flex items-center gap-2 font-display text-sm">
         {emoji && <span aria-hidden>{emoji}</span>}
         {title}
       </p>
@@ -89,11 +89,11 @@ export function Card({
   )
 
   return href ? (
-    <Link href={href} className="surface rounded-xl p-4 transition-colors hover:border-brand-500">
+    <Link href={href} className="surface retro-lift p-4">
       {inner}
     </Link>
   ) : (
-    <div className="surface rounded-xl p-4">{inner}</div>
+    <div className="surface p-4">{inner}</div>
   )
 }
 
@@ -132,7 +132,7 @@ export const mdxComponents: MDXComponents = {
     )
   },
   table: (props: ComponentProps<'table'>) => (
-    <div className="my-6 overflow-x-auto">
+    <div className="my-6 overflow-x-auto rounded-retro border-2">
       <table {...props} className="my-0" />
     </div>
   ),

@@ -38,8 +38,8 @@ export function Header({
   return (
     <>
       <header
-        className="sticky top-0 z-40 border-b backdrop-blur-xl"
-        style={{ background: 'color-mix(in oklab, var(--bg) 82%, transparent)' }}
+        className="sticky top-0 z-40 border-b-2 backdrop-blur-xl"
+        style={{ background: 'color-mix(in oklab, var(--bg) 88%, transparent)' }}
       >
         <div className="mx-auto flex h-16 max-w-[100rem] items-center gap-2 px-4 sm:gap-3 sm:px-6">
           {hasNav && (
@@ -48,7 +48,7 @@ export function Header({
               aria-label="Mở menu"
               aria-expanded={drawerOpen}
               onClick={() => setDrawerOpen((v) => !v)}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border lg:hidden"
+              className="retro-shadow-sm grid h-9 w-9 shrink-0 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 lg:hidden"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -64,11 +64,11 @@ export function Header({
             </button>
           )}
 
-          <Link href="/" className="flex shrink-0 items-center gap-2.5 font-semibold">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white">
+          <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+            <span className="retro-shadow-sm grid h-9 w-9 place-items-center rounded-retro border-2 border-brand-900 bg-accent-400 font-display text-base text-brand-900 transition-transform group-hover:-translate-y-0.5">
               {siteName.charAt(0)}
             </span>
-            <span className="hidden sm:inline">{siteName}</span>
+            <span className="hidden font-display text-base tracking-tight sm:inline">{siteName}</span>
           </Link>
 
           <div className="ml-auto flex items-center gap-2">
@@ -83,11 +83,11 @@ export function Header({
         <div className="fixed inset-0 top-16 z-30 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setDrawerOpen(false)} aria-hidden />
           <div
-            className="surface relative h-full w-72 max-w-[85vw] overflow-y-auto p-5"
+            className="relative h-full w-72 max-w-[85vw] overflow-y-auto border-r-2 p-5"
             style={{ background: 'var(--bg)' }}
           >
             {collection && (
-              <p className="mb-5 flex items-center gap-2 border-b pb-4 font-semibold">
+              <p className="mb-5 flex items-center gap-2 border-b-2 pb-4 font-display text-sm">
                 <span aria-hidden>{collection.emoji}</span>
                 {collection.title}
               </p>

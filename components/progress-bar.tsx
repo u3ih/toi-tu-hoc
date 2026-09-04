@@ -21,9 +21,9 @@ export function ReadingProgress() {
   }, [])
 
   return (
-    <div className="sticky top-16 z-40 -mt-px h-0.5 w-full">
+    <div className="sticky top-16 z-40 -mt-0.5 h-1.5 w-full">
       <div
-        className="h-full origin-left bg-gradient-to-r from-brand-400 to-brand-600 transition-transform duration-75"
+        className="h-full origin-left border-b-2 border-brand-900 bg-accent-400 transition-transform duration-75"
         style={{ transform: `scaleX(${progress})` }}
       />
     </div>

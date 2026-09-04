@@ -38,7 +38,7 @@ export function CollectionSwitcher({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm transition-colors hover:bg-brand-500/8"
+        className="retro-shadow-sm flex items-center gap-1.5 rounded-retro border-2 px-2.5 py-1.5 text-sm transition-colors hover:bg-accent-400 hover:text-brand-900"
       >
         <span aria-hidden>{current?.emoji ?? '📚'}</span>
         <span className="hidden max-w-32 truncate sm:inline">
@@ -60,7 +60,7 @@ export function CollectionSwitcher({
       {open && (
         <div
           role="menu"
-          className="surface absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-xl p-1.5 shadow-xl"
+          className="surface absolute right-0 z-50 mt-2 w-64 overflow-hidden p-1.5 shadow-[6px_6px_0_var(--shadow-ink)]"
         >
           {collections.map((c) => (
             <Link
@@ -70,8 +70,10 @@ export function CollectionSwitcher({
               onClick={() => setOpen(false)}
               data-accent={c.accent}
               className={[
-                'flex items-start gap-2.5 rounded-lg px-2.5 py-2 transition-colors',
-                c.slug === current?.slug ? 'bg-brand-500/12' : 'hover:bg-brand-500/8',
+                'flex items-start gap-2.5 rounded-retro border-2 px-2.5 py-2 transition-colors',
+                c.slug === current?.slug
+                  ? 'border-[var(--border)] bg-accent-400/30'
+                  : 'border-transparent hover:border-[var(--border)] hover:bg-brand-500/10',
               ].join(' ')}
             >
               <span aria-hidden className="mt-0.5">
@@ -81,7 +83,7 @@ export function CollectionSwitcher({
                 <span className="flex items-center gap-2 text-sm font-medium">
                   {c.title}
                   {c.status === 'wip' && (
-                    <span className="rounded bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-normal text-brand-700 dark:text-brand-300">
+                    <span className="rounded-retro border-2 border-brand-900 bg-accent-400 px-1.5 py-0.5 label-retro text-brand-900">
                       đang viết
                     </span>
                   )}

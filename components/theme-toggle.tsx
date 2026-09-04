@@ -16,7 +16,7 @@ export function ThemeToggle() {
       type="button"
       aria-label="Đổi giao diện sáng/tối"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="grid h-9 w-9 place-items-center rounded-lg border transition-colors hover:bg-brand-500/10"
+      className="retro-shadow-sm grid h-9 w-9 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 hover:text-brand-900"
     >
       {/* Render a stable icon until mounted so SSR and client markup agree. */}
       <svg
