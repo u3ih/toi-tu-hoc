@@ -17,7 +17,7 @@ export function ThemeToggle({ locale }: { locale: Locale }) {
       type="button"
       aria-label={t(locale, 'nav.theme')}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="retro-shadow-sm grid h-9 w-9 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 hover:text-brand-900"
+      className="retro-shadow-sm grid h-10 w-10 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 hover:text-brand-900 sm:h-9 sm:w-9"
     >
       {/* Render a stable icon until mounted so SSR and client markup agree. */}
       <svg

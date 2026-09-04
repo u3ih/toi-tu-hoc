@@ -84,21 +84,27 @@ export function CollectionPage({ locale, slug }: { locale: Locale; slug: string 
                 {section.emoji && <span aria-hidden>{section.emoji}</span>}
                 {section.title}
               </h2>
-              <ul className="mt-4 space-y-2.5 text-sm">
+              {/* The whole row is the link, title and blurb together: on a phone
+                  a reader aims at the row, not at one line of 14px type. */}
+              <ul className="mt-4 space-y-1 text-sm sm:space-y-2.5">
                 {items.map((item) => (
                   <li key={item.slug}>
-                    <span className="flex items-start gap-2">
-                      <Link
-                        href={item.href}
-                        className="font-medium decoration-2 underline-offset-4 transition-colors hover:text-brand-600 hover:underline dark:hover:text-accent-400"
-                      >
-                        {item.title}
-                      </Link>
+                    <Link
+                      href={item.href}
+                      className="group -mx-2 flex items-start gap-2 rounded-retro px-2 py-1.5 transition-colors hover:bg-brand-500/10 sm:mx-0 sm:px-0 sm:py-0 sm:hover:bg-transparent"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="font-medium decoration-2 underline-offset-4 transition-colors group-hover:text-brand-600 group-hover:underline dark:group-hover:text-accent-400">
+                          {item.title}
+                        </span>
+                        {item.description && (
+                          <span className="line-clamp-2 text-xs muted sm:line-clamp-1">
+                            {item.description}
+                          </span>
+                        )}
+                      </span>
                       <DocCheck locale={locale} collection={slug} slug={item.slug} />
-                    </span>
-                    {item.description && (
-                      <p className="line-clamp-1 text-xs muted">{item.description}</p>
-                    )}
+                    </Link>
                   </li>
                 ))}
               </ul>

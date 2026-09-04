@@ -158,12 +158,20 @@
   }
 }
 
-/* Typewriter eyebrow used on badges, section labels and metadata. */
+/* Typewriter eyebrow used on badges, section labels and metadata.
+
+   A touch larger on a phone: 11px of uppercase mono with this much tracking is
+   readable on a desk and squinty in one hand, and Vietnamese stacks two
+   diacritics on some of these caps. */
 @utility label-retro {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+
+  @media (width >= 40rem) {
+    font-size: 0.6875rem;
+  }
 }
 
 /* MDX tables.

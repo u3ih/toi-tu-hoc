@@ -15,7 +15,7 @@ export function TagPill({
   return (
     <Link
       href={path(locale, 'tags', tag.key)}
-      className="retro-shadow-sm inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 text-xs transition-colors hover:bg-accent-400 hover:text-brand-900"
+      className="retro-shadow-sm inline-flex items-center gap-1.5 min-h-9 rounded-full border-2 px-3 text-xs transition-colors hover:bg-accent-400 hover:text-brand-900 sm:min-h-0 sm:py-1"
     >
       <span aria-hidden className="muted">
         #

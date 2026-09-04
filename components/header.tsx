@@ -42,10 +42,10 @@ export function Header({
 
   return (
     <>
-      <header
-        className="sticky top-0 z-40 border-b-2 backdrop-blur-xl"
-        style={{ background: 'color-mix(in oklab, var(--bg) 88%, transparent)' }}
-      >
+      {/* Opaque on a phone, frosted from sm up: a blurred backdrop is the one
+          expensive thing in this header, and it buys the least on the device
+          that scrolls the most. */}
+      <header className="sticky top-0 z-40 border-b-2 bg-[var(--bg)] sm:bg-[color-mix(in_oklab,var(--bg)_88%,transparent)] sm:backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[100rem] items-center gap-1.5 px-3 sm:gap-3 sm:px-6">
           {hasNav && (
             <button
@@ -53,7 +53,7 @@ export function Header({
               aria-label={t(locale, drawerOpen ? 'nav.close' : 'nav.menu')}
               aria-expanded={drawerOpen}
               onClick={() => setDrawerOpen((v) => !v)}
-              className="retro-shadow-sm grid h-9 w-9 shrink-0 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 lg:hidden"
+              className="retro-shadow-sm grid h-10 w-10 shrink-0 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 sm:h-9 sm:w-9 lg:hidden"
             >
               <svg
                 aria-hidden="true"
@@ -79,7 +79,7 @@ export function Header({
             aria-label={t(locale, 'nav.home')}
             className="group flex shrink-0 items-center gap-2.5"
           >
-            <span className="retro-shadow-sm grid h-9 w-9 place-items-center rounded-retro border-2 border-brand-900 bg-accent-400 font-display text-base text-brand-900 transition-transform group-hover:-translate-y-0.5">
+            <span className="retro-shadow-sm grid h-10 w-10 place-items-center rounded-retro border-2 border-brand-900 bg-accent-400 font-display text-base text-brand-900 transition-transform group-hover:-translate-y-0.5 sm:h-9 sm:w-9">
               {siteName.charAt(0)}
             </span>
             <span className="hidden font-display text-base tracking-tight sm:inline">
@@ -107,14 +107,16 @@ export function Header({
       </header>
 
       {drawerOpen && hasNav && (
-        <div className="fixed inset-0 top-16 z-30 lg:hidden">
+        // Above the header band (z-40) and the article's sticky anchor bar
+        // (z-30), which otherwise paints a strip straight across the drawer.
+        <div className="fixed inset-0 top-16 z-50 lg:hidden">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}
             aria-hidden
           />
           <div
-            className="relative h-full w-72 max-w-[85vw] overflow-y-auto border-r-2 p-5"
+            className="relative h-full w-72 max-w-[85vw] overflow-y-auto border-r-2 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
             style={{ background: 'var(--bg)' }}
           >
             {collection && (

@@ -36,7 +36,7 @@ export function SidebarNav({
                     onClick={onNavigate}
                     aria-current={active ? 'page' : undefined}
                     className={[
-                      'flex items-start gap-2 rounded-retro border-2 px-3 py-1.5 transition-colors',
+                      'flex items-start gap-2 rounded-retro border-2 px-3 py-2.5 transition-colors lg:py-1.5',
                       active
                         ? 'retro-shadow-sm border-brand-900 bg-accent-400 font-semibold text-brand-900'
                         : 'border-transparent muted hover:border-[var(--border)] hover:bg-brand-500/10 hover:text-brand-700 dark:hover:text-accent-300',

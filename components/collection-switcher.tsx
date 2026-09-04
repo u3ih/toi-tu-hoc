@@ -89,7 +89,7 @@ export function CollectionSwitcher({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="retro-shadow-sm flex items-center gap-1.5 rounded-retro border-2 px-2.5 py-1.5 text-sm transition-colors hover:bg-accent-400 hover:text-brand-900"
+        className="retro-shadow-sm flex h-10 items-center gap-1.5 rounded-retro border-2 px-2.5 text-sm transition-colors hover:bg-accent-400 hover:text-brand-900 sm:h-9"
       >
         <span aria-hidden>{current?.emoji ?? '📚'}</span>
         <span className="hidden max-w-32 truncate sm:inline">

@@ -13,20 +13,23 @@ export function Footer({ locale }: { locale: Locale }) {
       <div aria-hidden className="retro-stripes mx-auto mb-6 h-2.5 w-32 rounded-retro border-2" />
 
       {/* Every hub reachable from every page — the cheapest internal linking there is. */}
-      <nav className="mb-5 flex flex-wrap justify-center gap-x-5 gap-y-2 label-retro">
-        <Link href={path(locale)} className="hover:text-brand-600 dark:hover:text-accent-400">
+      <nav className="mb-2 flex flex-wrap justify-center gap-x-5 label-retro">
+        <Link
+          href={path(locale)}
+          className="inline-flex min-h-11 items-center hover:text-brand-600 dark:hover:text-accent-400"
+        >
           {t(locale, 'nav.home')}
         </Link>
         <Link
           href={path(locale, 'topics')}
-          className="hover:text-brand-600 dark:hover:text-accent-400"
+          className="inline-flex min-h-11 items-center hover:text-brand-600 dark:hover:text-accent-400"
         >
           {t(locale, 'topics.title')}
         </Link>
         {hasTags && (
           <Link
             href={path(locale, 'tags')}
-            className="hover:text-brand-600 dark:hover:text-accent-400"
+            className="inline-flex min-h-11 items-center hover:text-brand-600 dark:hover:text-accent-400"
           >
             {t(locale, 'tags.title')}
           </Link>

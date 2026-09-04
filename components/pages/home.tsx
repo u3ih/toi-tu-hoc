@@ -68,13 +68,13 @@ export function HomePage({ locale }: { locale: Locale }) {
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <Link
                   href={start.href}
-                  className="retro-lift retro-shadow rounded-retro border-2 bg-brand-600 px-6 py-3 font-semibold text-white"
+                  className="retro-lift retro-shadow inline-flex min-h-12 items-center rounded-retro border-2 bg-brand-600 px-6 font-semibold text-white"
                 >
                   {t(locale, 'home.startHere')} →
                 </Link>
                 <Link
                   href={path(locale, 'topics')}
-                  className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+                  className="inline-flex min-h-11 items-center font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
                 >
                   {t(locale, 'home.browseAll')}
                 </Link>
@@ -93,7 +93,7 @@ export function HomePage({ locale }: { locale: Locale }) {
             {collections.length > PER_CATEGORY && (
               <Link
                 href={path(locale, 'topics')}
-                className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+                className="inline-flex min-h-11 items-center font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
               >
                 {t(locale, 'home.browseAll')} →
               </Link>
@@ -164,7 +164,7 @@ function CategorySection({ group, locale }: { group: CategoryGroup; locale: Loca
         <p className="mt-4 text-sm">
           <Link
             href={path(locale, 'topics')}
-            className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+            className="inline-flex min-h-11 items-center font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
           >
             {t(locale, 'home.andMore', { count: hidden })} →
           </Link>

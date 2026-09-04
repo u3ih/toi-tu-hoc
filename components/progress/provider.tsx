@@ -23,6 +23,14 @@ type ProgressApi = {
   ready: boolean
   isDone(collection: string, slug: string): boolean
   toggle(collection: string, slug: string): void
+  /**
+   * Mark finished, idempotently.
+   *
+   * Separate from `toggle` because the caller is not always the reader: an
+   * article that has been read to the end marks itself, and doing that with
+   * `toggle` would un-mark one the reader had already ticked.
+   */
+  markDone(collection: string, slug: string): void
   /** How many of `slugs` are finished, for a collection's counter. */
   countDone(collection: string, slugs: string[]): number
   /** Total finished across the whole site. */
@@ -34,6 +42,7 @@ const NOOP: ProgressApi = {
   ready: false,
   isDone: () => false,
   toggle: () => {},
+  markDone: () => {},
   countDone: () => 0,
   total: 0,
   reset: () => {},
@@ -92,6 +101,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [store],
   )
 
+  const markDone = useCallback(
+    (collection: string, slug: string) => {
+      const key = progressKey(collection, slug)
+
+      setData((current) => {
+        if (current[key]?.done) return current
+        const entry = { done: true, at: new Date().toISOString() }
+        void store.write(key, entry)
+        return { ...current, [key]: entry }
+      })
+    },
+    [store],
+  )
+
   const reset = useCallback(() => {
     setData({})
     void store.clear()
@@ -102,12 +125,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       ready,
       isDone: (collection, slug) => data[progressKey(collection, slug)]?.done === true,
       toggle,
+      markDone,
       countDone: (collection, slugs) =>
         slugs.filter((slug) => data[progressKey(collection, slug)]?.done).length,
       total: Object.values(data).filter((entry) => entry.done).length,
       reset,
     }),
-    [data, ready, toggle, reset],
+    [data, ready, toggle, markDone, reset],
   )
 
   return <ProgressContext.Provider value={api}>{children}</ProgressContext.Provider>

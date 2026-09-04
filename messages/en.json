@@ -90,6 +90,7 @@
   "progress": {
     "done": "Done",
     "markDone": "Mark as done",
+    "autoDone": "Marked automatically because you read to the end. Press to undo.",
     "count": "{done}/{total} read",
     "complete": "All done",
     "storedLocally": "Progress is kept in your browser and sent nowhere.",

@@ -167,7 +167,7 @@ export function DocPage({
                   href={edit}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+                  className="inline-flex min-h-11 items-center font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
                 >
                   ✏️ {t(locale, 'doc.edit')} →
                 </a>

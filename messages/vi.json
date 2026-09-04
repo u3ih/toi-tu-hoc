@@ -90,6 +90,7 @@
   "progress": {
     "done": "Đã học xong",
     "markDone": "Đánh dấu đã học xong",
+    "autoDone": "Tự đánh dấu xong vì bạn đã đọc hết bài. Bấm lại để bỏ.",
     "count": "{done}/{total} bài",
     "complete": "Xong cả bộ",
     "storedLocally": "Tiến độ lưu trong máy bạn, không gửi đi đâu.",

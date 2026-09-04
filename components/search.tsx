@@ -163,7 +163,7 @@ export function Search({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="retro-shadow-sm flex items-center gap-2 rounded-retro border-2 px-2.5 py-1.5 text-sm muted transition-colors hover:bg-accent-400 hover:text-brand-900 sm:w-52"
+        className="retro-shadow-sm flex h-10 w-10 items-center justify-center gap-2 rounded-retro border-2 text-sm muted transition-colors hover:bg-accent-400 hover:text-brand-900 sm:h-9 sm:w-52 sm:justify-start sm:px-2.5"
       >
         <SearchIcon />
         <span className="hidden sm:inline">{t(locale, 'search.open')}</span>

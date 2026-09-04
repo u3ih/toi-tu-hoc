@@ -299,6 +299,11 @@ theo scroll chứ không dùng `IntersectionObserver`, vì câu hỏi không ph�
 Mỗi bài có nút **Đánh dấu đã học xong**. Sidebar và trang collection hiện dấu ✓, kèm thanh tiến độ
 `x/y` cho cả bộ. Xoá được ở footer.
 
+Bài cũng **tự đánh dấu** khi người đọc đã đọc thật: cuộn tới cuối trang *và* ở trên trang ít nhất
+một phút. Đồng hồ chỉ chạy khi tab đang hiện, nên một tab để quên trong nền không tự đánh dấu. Mỗi
+lần vào trang chỉ tự đánh dấu một lần, nên ai bỏ dấu ngay sau đó thì không bị đánh dấu lại — và nút
+nói rõ là nó tự đánh dấu, chứ không im lặng đổi trạng thái.
+
 Hiện tiến độ lưu trong `localStorage` của người đọc — không có tài khoản, không gửi đi đâu. Nhưng
 **không có component nào biết điều đó**: tất cả nói chuyện qua một interface.
 
@@ -318,6 +323,7 @@ export interface ProgressStore {
 | [`lib/progress/local-store.ts`](lib/progress/local-store.ts) | Bản `localStorage` |
 | [`lib/progress/store.ts`](lib/progress/store.ts) | **Chỗ duy nhất** quyết định dùng store nào |
 | [`components/progress/provider.tsx`](components/progress/provider.tsx) | Context + hook `useProgress()` |
+| [`components/progress/use-auto-done.ts`](components/progress/use-auto-done.ts) | Đọc hết bài thì tự đánh dấu |
 
 Đổi sang lưu ở database: viết một `ProgressStore` mới, rồi chọn nó trong `createProgressStore()` —
 ví dụ dùng store server cho người đã đăng nhập, còn lại rơi về store local. Không component nào phải

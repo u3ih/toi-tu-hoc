@@ -57,7 +57,7 @@ function TocList({
             onClick={onNavigate}
             aria-current={activeId === h.id ? 'location' : undefined}
             className={[
-              '-ml-0.5 block border-l-2 py-1 transition-colors',
+              '-ml-0.5 block border-l-2 py-2 transition-colors xl:py-1',
               h.level === 3 ? 'pl-6' : 'pl-3',
               activeId === h.id
                 ? 'border-accent-500 font-semibold text-brand-700 dark:text-accent-400'
@@ -110,15 +110,18 @@ export function TocMenu({ headings, locale }: { headings: Heading[]; locale: Loc
   const current = headings.find((h) => h.id === activeId) ?? headings[0]
 
   return (
+    // The fill is solid, not translucent: this band scrolls over body text and,
+    // once open, covers it — and a phone should not have to blur a whole page
+    // to keep one strip readable.
     <div
       className="sticky top-[4.375rem] z-30 -mx-4 mb-8 border-b-2 sm:-mx-6 xl:hidden"
-      style={{ background: 'color-mix(in oklab, var(--bg) 94%, transparent)' }}
+      style={{ background: 'var(--bg)' }}
     >
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2 px-4 py-2.5 text-left sm:px-6"
+        className="flex min-h-11 w-full items-center gap-2 px-4 py-2.5 text-left sm:px-6"
       >
         <span className="label-retro muted">{t(locale, 'doc.toc')}</span>
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{current.text}</span>
