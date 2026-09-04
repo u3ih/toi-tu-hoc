@@ -79,6 +79,7 @@ export function TopicsPage({ locale }: { locale: Locale }) {
                     collection={c}
                     locale={locale}
                     preview={getDocs(locale, c.slug).slice(0, 3)}
+                    slugs={getDocs(locale, c.slug).map((doc) => doc.slug)}
                   />
                 ))}
               </div>

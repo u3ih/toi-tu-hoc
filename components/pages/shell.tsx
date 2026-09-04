@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { LOCALE_META, type Locale } from '@/lib/i18n'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Footer } from '@/components/footer'
+import { ProgressProvider } from '@/components/progress/provider'
 
 /**
  * The document shell.
@@ -28,8 +29,10 @@ export function Shell({ locale, children }: { locale: Locale; children: ReactNod
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Footer locale={locale} />
+          <ProgressProvider>
+            {children}
+            <Footer locale={locale} />
+          </ProgressProvider>
         </ThemeProvider>
       </body>
     </html>

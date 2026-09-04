@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getTags } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
 import { contributeUrl, site } from '@/lib/site'
+import { ResetProgress } from '@/components/progress/reset-progress'
 
 export function Footer({ locale }: { locale: Locale }) {
   const contribute = contributeUrl()
@@ -48,6 +49,10 @@ export function Footer({ locale }: { locale: Locale }) {
           </>
         )}
         .
+      </p>
+
+      <p className="mt-3 text-xs">
+        <ResetProgress locale={locale} />
       </p>
     </footer>
   )

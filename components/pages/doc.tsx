@@ -16,6 +16,7 @@ import { Pager } from '@/components/pager'
 import { ReadingProgress } from '@/components/progress-bar'
 import { Related } from '@/components/related'
 import { Takeaways } from '@/components/takeaways'
+import { DoneToggle } from '@/components/progress/done-toggle'
 import { TagPill } from '@/components/tag-pill'
 
 export function docMetadata(locale: Locale, collection: string, slug: string): Metadata {
@@ -56,7 +57,7 @@ export function DocPage({
       <ReadingProgress />
 
       <div className="mx-auto flex max-w-[100rem] gap-8 px-4 sm:px-6">
-        <Sidebar nav={getNav(locale, collectionSlug)} />
+        <Sidebar nav={getNav(locale, collectionSlug)} locale={locale} />
 
         <main id="main" className="min-w-0 flex-1 py-10">
           <article className="mx-auto max-w-3xl">
@@ -161,6 +162,8 @@ export function DocPage({
                 </a>
               </p>
             )}
+
+            <DoneToggle locale={locale} collection={collectionSlug} slug={doc.slug} />
 
             <Pager flatNav={getFlatNav(locale, collectionSlug)} slug={doc.slug} locale={locale} />
 

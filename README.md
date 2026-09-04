@@ -272,6 +272,46 @@ bài mới.
 Link nội bộ trong MDX viết **không kèm tiền tố ngôn ngữ** (`/english/faq/`). Tiền tố được thêm lúc
 render, nên cùng một file dùng lại được cho mọi ngôn ngữ.
 
+## Tiến độ đọc
+
+Mỗi bài có nút **Đánh dấu đã học xong**. Sidebar và trang collection hiện dấu ✓, kèm thanh tiến độ
+`x/y` cho cả bộ. Xoá được ở footer.
+
+Hiện tiến độ lưu trong `localStorage` của người đọc — không có tài khoản, không gửi đi đâu. Nhưng
+**không có component nào biết điều đó**: tất cả nói chuyện qua một interface.
+
+```ts
+// lib/progress/types.ts
+export interface ProgressStore {
+  load(): Promise<ProgressData>
+  write(key: ProgressKey, entry: ProgressEntry | null): Promise<void>
+  clear(): Promise<void>
+  subscribe(listener: () => void): () => void
+}
+```
+
+| File | Vai trò |
+| --- | --- |
+| [`lib/progress/types.ts`](lib/progress/types.ts) | Interface + kiểu dữ liệu |
+| [`lib/progress/local-store.ts`](lib/progress/local-store.ts) | Bản `localStorage` |
+| [`lib/progress/store.ts`](lib/progress/store.ts) | **Chỗ duy nhất** quyết định dùng store nào |
+| [`components/progress/provider.tsx`](components/progress/provider.tsx) | Context + hook `useProgress()` |
+
+Đổi sang lưu ở database: viết một `ProgressStore` mới, rồi chọn nó trong `createProgressStore()` —
+ví dụ dùng store server cho người đã đăng nhập, còn lại rơi về store local. Không component nào phải
+sửa. Các method để `async` sẵn dù bản local trả về ngay, chính là để bước này không phải đổi API.
+
+Vài điểm đã tính trước:
+
+- **`ready`.** Server không thể biết tiến độ, nên mọi component giữ trạng thái trung tính tới khi
+  store trả lời. Nhờ vậy lần paint đầu giống nhau ở server và client, không có hydration mismatch.
+- **`localStorage` có thể ném lỗi** (chế độ riêng tư). Mọi lần đọc/ghi đều bọc `try/catch`; đọc lỗi
+  nghĩa là "chưa học bài nào", không phải màn hình lỗi.
+- **Dữ liệu hỏng bị loại từng dòng**, để một blob sai định dạng không làm sập render.
+- **`subscribe`** đồng bộ giữa các tab qua sự kiện `storage`; sau này là chỗ để server push xuống.
+- **Key là `collection/slug`**, không kèm locale — đọc bản tiếng Việt rồi mở bản tiếng Anh thì vẫn là
+  một bài đã học.
+
 ## SEO
 
 | Thứ | Ở đâu |
@@ -415,6 +455,7 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager, category, tag, "Đọc tiếp" |
 | `lib/accent.ts` | Sinh ramp `--color-brand-*` từ một góc màu |
 | `lib/metadata.ts` | canonical, hreflang, OpenGraph, Twitter |
+| `lib/progress/` | Tiến độ đọc: interface, bản `localStorage`, chỗ chọn store |
 | `lib/schema.ts` | JSON-LD (kèm `FAQPage`, `HowTo`) |
 | `lib/og.tsx` | Ảnh social sinh lúc build |
 | `lib/feed.ts` | RSS |

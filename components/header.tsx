@@ -127,7 +127,7 @@ export function Header({
                 {collection.title}
               </p>
             )}
-            <SidebarNav nav={nav} onNavigate={() => setDrawerOpen(false)} />
+            <SidebarNav nav={nav} locale={locale} onNavigate={() => setDrawerOpen(false)} />
           </div>
         </div>
       )}

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { paletteVars } from '@/lib/accent'
 import type { Collection, DocMeta } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
+import { CollectionProgressCount } from '@/components/progress/collection-progress'
 
 /**
  * One collection, as a card.
@@ -13,11 +14,14 @@ export function CollectionCard({
   collection,
   locale,
   preview = [],
+  slugs = [],
 }: {
   collection: Collection
   locale: Locale
   /** First few articles, shown so a reader can judge the topic without clicking. */
   preview?: DocMeta[]
+  /** Every article in the collection, so the card can show progress through it. */
+  slugs?: string[]
 }) {
   return (
     <Link
@@ -40,6 +44,7 @@ export function CollectionCard({
         </span>
         <h3 className="mt-4 flex flex-wrap items-center gap-2 font-display text-lg">
           {collection.title}
+          <CollectionProgressCount locale={locale} collection={collection.slug} slugs={slugs} />
           {collection.status === 'wip' && (
             <span className="rounded-retro border-2 border-brand-900 bg-accent-400 px-1.5 py-0.5 label-retro text-brand-900">
               {t(locale, 'collection.wip')}

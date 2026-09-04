@@ -79,6 +79,18 @@
     "edit": "Sửa bài này trên GitHub"
   },
 
+  "progress": {
+    "done": "Đã học xong",
+    "markDone": "Đánh dấu đã học xong",
+    "count": "{done}/{total} bài",
+    "complete": "Xong cả bộ",
+    "storedLocally": "Tiến độ lưu trong máy bạn, không gửi đi đâu.",
+    "reset": "Xoá tiến độ đã lưu",
+    "resetConfirm": "Xoá {count} bài đã đánh dấu?",
+    "resetYes": "Xoá",
+    "resetNo": "Thôi"
+  },
+
   "callout": {
     "tip": "Mẹo",
     "warning": "Lưu ý",

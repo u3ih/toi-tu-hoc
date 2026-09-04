@@ -86,6 +86,7 @@ export function HomePage({ locale }: { locale: Locale }) {
                   collection={c}
                   locale={locale}
                   preview={previewOf(locale, c.slug)}
+                  slugs={slugsOf(locale, c.slug)}
                 />
               ))}
             </div>
@@ -126,6 +127,7 @@ function CategorySection({ group, locale }: { group: CategoryGroup; locale: Loca
             collection={c}
             locale={locale}
             preview={previewOf(locale, c.slug)}
+            slugs={slugsOf(locale, c.slug)}
           />
         ))}
       </div>
@@ -147,4 +149,9 @@ function CategorySection({ group, locale }: { group: CategoryGroup; locale: Loca
 /** First three articles of a collection, so the card shows content, not just a count. */
 function previewOf(locale: Locale, slug: string) {
   return getDocs(locale, slug).slice(0, 3)
+}
+
+/** Every article key in a collection — the denominator for its progress badge. */
+function slugsOf(locale: Locale, slug: string) {
+  return getDocs(locale, slug).map((doc) => doc.slug)
 }

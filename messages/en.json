@@ -79,6 +79,18 @@
     "edit": "Edit this page on GitHub"
   },
 
+  "progress": {
+    "done": "Done",
+    "markDone": "Mark as done",
+    "count": "{done}/{total} read",
+    "complete": "All done",
+    "storedLocally": "Progress is kept in your browser and sent nowhere.",
+    "reset": "Clear saved progress",
+    "resetConfirm": "Clear {count} marked articles?",
+    "resetYes": "Clear",
+    "resetNo": "Cancel"
+  },
+
   "callout": {
     "tip": "Tip",
     "warning": "Note",
