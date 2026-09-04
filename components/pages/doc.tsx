@@ -57,7 +57,12 @@ export function DocPage({
       <JsonLd data={docSchema(locale, collection, doc, section?.title ?? doc.section)} />
       <ReadingProgress />
 
-      <div className="mx-auto flex max-w-[100rem] gap-8 px-4 sm:px-6">
+      {/* `w-full` is load-bearing: the collection shell wraps the page in a
+          `display: contents` node, so this div is a flex item of the column-flex
+          body. An auto inline margin defeats the stretch, which would leave the
+          row shrink-to-fit — sized by its content instead of the viewport, and
+          wider than a phone screen. */}
+      <div className="mx-auto flex w-full max-w-[100rem] gap-8 px-4 sm:px-6">
         <Sidebar nav={getNav(locale, collectionSlug)} locale={locale} />
 
         <main id="main" className="min-w-0 flex-1 py-10">

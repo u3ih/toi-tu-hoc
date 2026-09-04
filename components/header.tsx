@@ -46,7 +46,7 @@ export function Header({
         className="sticky top-0 z-40 border-b-2 backdrop-blur-xl"
         style={{ background: 'color-mix(in oklab, var(--bg) 88%, transparent)' }}
       >
-        <div className="mx-auto flex h-16 max-w-[100rem] items-center gap-2 px-4 sm:gap-3 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-[100rem] items-center gap-1.5 px-3 sm:gap-3 sm:px-6">
           {hasNav && (
             <button
               type="button"
@@ -87,7 +87,7 @@ export function Header({
             </span>
           </Link>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
             <Search
               locale={locale}
               collections={collections}

@@ -6,7 +6,10 @@ export function NotFoundPage({ locale }: { locale: Locale }) {
   return (
     <>
       <SiteHeader locale={locale} />
-      <main id="main" className="mx-auto grid max-w-xl place-items-center px-6 py-32 text-center">
+      <main
+        id="main"
+        className="mx-auto grid w-full max-w-xl place-items-center px-6 py-32 text-center"
+      >
         <p className="retro-shadow rounded-retro border-2 border-brand-900 bg-accent-400 px-6 py-2 font-display text-6xl text-brand-900">
           404
         </p>

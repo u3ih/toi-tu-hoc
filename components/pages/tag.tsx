@@ -37,7 +37,7 @@ export function TagPage({ locale, tag }: { locale: Locale; tag: string }) {
       <JsonLd data={tagSchema(locale, tag, label, docs)} />
       <SiteHeader locale={locale} />
 
-      <main id="main" className="mx-auto max-w-4xl px-6 py-16">
+      <main id="main" className="mx-auto w-full max-w-4xl px-6 py-16">
         <nav
           className="flex flex-wrap items-center gap-1.5 label-retro muted"
           aria-label={t(locale, 'nav.breadcrumb')}

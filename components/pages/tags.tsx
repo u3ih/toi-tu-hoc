@@ -26,7 +26,7 @@ export function TagsPage({ locale }: { locale: Locale }) {
       <JsonLd data={tagsSchema(locale, tags)} />
       <SiteHeader locale={locale} />
 
-      <main id="main" className="mx-auto max-w-3xl px-6 py-16">
+      <main id="main" className="mx-auto w-full max-w-3xl px-6 py-16">
         <nav className="label-retro muted" aria-label={t(locale, 'nav.breadcrumb')}>
           <Link href={path(locale)} className="hover:text-brand-600 dark:hover:text-accent-400">
             {t(locale, 'nav.home')}
