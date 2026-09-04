@@ -37,8 +37,10 @@ jobs:
       - name: Build static site
         # A project page is served from /<repo>, a user/org page from /.
         # base_path comes back empty for the latter, which is what we want.
+        # SITE_URL is the origin only; canonical URLs add base_path themselves.
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_SITE_URL: ${{ steps.pages.outputs.origin }}
         run: pnpm run build
 
       - name: Disable Jekyll processing

@@ -1,0 +1,67 @@
+{
+  "site": {
+    "tagline": "Notes on everything I taught myself",
+    "description": "I taught myself English, then taught myself to program — and got a lot wrong before finding what suited me. These are my notes: where I got stuck, what got me unstuck, and the tools I used.",
+    "keywords": "learn English on your own, self-study English, comprehensible input, immersion, Anki, self-taught programming"
+  },
+
+  "nav": {
+    "menu": "Open menu",
+    "close": "Close menu",
+    "theme": "Toggle light and dark theme",
+    "topics": "Topics",
+    "language": "Change language",
+    "breadcrumb": "Breadcrumb",
+    "skip": "Skip to main content",
+    "home": "Home"
+  },
+
+  "search": {
+    "open": "Search…",
+    "dialog": "Search the site",
+    "placeholder": "Search articles, topics…",
+    "all": "All",
+    "empty": "No results found.",
+    "hint": "Type at least 2 characters. Use ↑ ↓ to move, Enter to open."
+  },
+
+  "home": {
+    "badge": "Free · Updated regularly",
+    "collections": "Collections",
+    "pick": "Pick a topic to start",
+    "empty": "No collections yet. Create a folder under content/ to start."
+  },
+
+  "collection": {
+    "start": "Start",
+    "wip": "in progress",
+    "count": "{docs} articles · {sections} sections"
+  },
+
+  "doc": {
+    "readingTime": "⏱ About {minutes} min read",
+    "toc": "On this page",
+    "prev": "← Previous",
+    "next": "Next →",
+    "untranslated": "This page has no {language} version yet. You are reading the {fallback} original."
+  },
+
+  "callout": {
+    "tip": "Tip",
+    "warning": "Note",
+    "danger": "Careful",
+    "info": "Info",
+    "story": "My story"
+  },
+
+  "footer": {
+    "open": "open content",
+    "contribute": "contribute on"
+  },
+
+  "notFound": {
+    "title": "Page not found",
+    "body": "It may have been renamed, or it may not be written yet.",
+    "home": "Back to home"
+  }
+}

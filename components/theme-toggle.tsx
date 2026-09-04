@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
+import { t, type Locale } from '@/lib/i18n'
 
-export function ThemeToggle() {
+export function ThemeToggle({ locale }: { locale: Locale }) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -14,7 +15,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label="Đổi giao diện sáng/tối"
+      aria-label={t(locale, 'nav.theme')}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="retro-shadow-sm grid h-9 w-9 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 hover:text-brand-900"
     >

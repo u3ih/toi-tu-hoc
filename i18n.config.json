@@ -1,0 +1,7 @@
+{
+  "defaultLocale": "vi",
+  "locales": [
+    { "code": "vi", "label": "Tiếng Việt", "short": "VI", "htmlLang": "vi", "ogLocale": "vi_VN" },
+    { "code": "en", "label": "English", "short": "EN", "htmlLang": "en", "ogLocale": "en_US" }
+  ]
+}

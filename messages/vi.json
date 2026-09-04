@@ -1,0 +1,67 @@
+{
+  "site": {
+    "tagline": "Ghi lại những gì mình đã tự học",
+    "description": "Mình tự học tiếng Anh, rồi tự học lập trình — sai rất nhiều trước khi tìm được cách hợp với mình. Đây là ghi chép của mình: đã mắc kẹt ở đâu, đã làm gì để thoát ra, và dùng công cụ nào.",
+    "keywords": "tự học tiếng Anh, học tiếng Anh, comprehensible input, immersion, Anki, tự học lập trình"
+  },
+
+  "nav": {
+    "menu": "Mở menu",
+    "close": "Đóng menu",
+    "theme": "Đổi giao diện sáng/tối",
+    "topics": "Chủ đề",
+    "language": "Đổi ngôn ngữ",
+    "breadcrumb": "Đường dẫn",
+    "skip": "Tới nội dung chính",
+    "home": "Trang chủ"
+  },
+
+  "search": {
+    "open": "Tìm kiếm…",
+    "dialog": "Tìm kiếm nội dung",
+    "placeholder": "Tìm bài viết, chủ đề…",
+    "all": "Tất cả",
+    "empty": "Không tìm thấy kết quả nào.",
+    "hint": "Nhập ít nhất 2 ký tự. Dùng ↑ ↓ để chọn, Enter để mở."
+  },
+
+  "home": {
+    "badge": "Miễn phí · Cập nhật liên tục",
+    "collections": "Các bộ nội dung",
+    "pick": "Chọn một chủ đề để bắt đầu",
+    "empty": "Chưa có bộ nội dung nào. Tạo một thư mục trong content/ để bắt đầu."
+  },
+
+  "collection": {
+    "start": "Bắt đầu",
+    "wip": "đang viết",
+    "count": "{docs} bài · {sections} phần"
+  },
+
+  "doc": {
+    "readingTime": "⏱ Khoảng {minutes} phút đọc",
+    "toc": "Trong bài này",
+    "prev": "← Bài trước",
+    "next": "Bài tiếp →",
+    "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}."
+  },
+
+  "callout": {
+    "tip": "Mẹo",
+    "warning": "Lưu ý",
+    "danger": "Cẩn thận",
+    "info": "Thông tin",
+    "story": "Chuyện của mình"
+  },
+
+  "footer": {
+    "open": "nội dung mở",
+    "contribute": "đóng góp trên"
+  },
+
+  "notFound": {
+    "title": "Không tìm thấy trang này",
+    "body": "Có thể bài viết đã được đổi tên hoặc chưa được viết.",
+    "home": "Về trang chủ"
+  }
+}

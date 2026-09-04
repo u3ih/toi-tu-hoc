@@ -1,0 +1,40 @@
+{
+  "emoji": "🇬🇧",
+  "accent": "indigo",
+  "order": 1,
+  "status": "active",
+  "title": {
+    "vi": "Tiếng Anh",
+    "en": "English"
+  },
+  "shortTitle": {
+    "vi": "Tiếng Anh",
+    "en": "English"
+  },
+  "description": {
+    "vi": "Mình học tiếng Anh 10 năm mà vẫn không xem nổi một tập phim. Đây là thứ cuối cùng đã hiệu quả.",
+    "en": "Ten years of studying English and I still couldn't follow a single episode. Here's what finally worked."
+  },
+  "sections": [
+    {
+      "key": "start",
+      "emoji": "🚀",
+      "title": { "vi": "Bắt đầu", "en": "Start here" }
+    },
+    {
+      "key": "skills",
+      "emoji": "🎯",
+      "title": { "vi": "Kỹ năng", "en": "Skills" }
+    },
+    {
+      "key": "tools",
+      "emoji": "🛠️",
+      "title": { "vi": "Công cụ", "en": "Tools" }
+    },
+    {
+      "key": "resources",
+      "emoji": "📚",
+      "title": { "vi": "Tài nguyên", "en": "Resources" }
+    }
+  ]
+}

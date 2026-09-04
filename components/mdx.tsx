@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { ComponentProps, ReactNode } from 'react'
 import type { MDXComponents } from 'mdx/types'
 import { slugify } from '@/lib/content'
+import { DEFAULT_LOCALE, localePrefix, t, type Locale } from '@/lib/i18n'
 
 function toText(node: ReactNode): string {
   if (node === null || node === undefined || typeof node === 'boolean') return ''
@@ -14,23 +15,28 @@ function toText(node: ReactNode): string {
 }
 
 const CALLOUTS = {
-  tip: { label: 'Mẹo', icon: '💡', ring: 'bg-[oklch(0.56_0.115_154)]/12' },
-  warning: { label: 'Lưu ý', icon: '⚠️', ring: 'bg-accent-400/25' },
-  danger: { label: 'Cẩn thận', icon: '🛑', ring: 'bg-[oklch(0.56_0.15_21)]/15' },
-  info: { label: 'Thông tin', icon: 'ℹ️', ring: 'bg-brand-500/12' },
-  story: { label: 'Chuyện của mình', icon: '📖', ring: 'bg-brand-500/12' },
+  tip: { icon: '💡', label: 'callout.tip', ring: 'bg-[oklch(0.56_0.115_154)]/12' },
+  warning: { icon: '⚠️', label: 'callout.warning', ring: 'bg-accent-400/25' },
+  danger: { icon: '🛑', label: 'callout.danger', ring: 'bg-[oklch(0.56_0.15_21)]/15' },
+  info: { icon: 'ℹ️', label: 'callout.info', ring: 'bg-brand-500/12' },
+  story: { icon: '📖', label: 'callout.story', ring: 'bg-brand-500/12' },
 } as const
+
+type CalloutType = keyof typeof CALLOUTS
 
 export function Callout({
   type = 'info',
   title,
+  locale = DEFAULT_LOCALE,
   children,
 }: {
-  type?: keyof typeof CALLOUTS
+  type?: CalloutType
   title?: string
+  locale?: Locale
   children: ReactNode
 }) {
   const style = CALLOUTS[type] ?? CALLOUTS.info
+  const label = title ?? t(locale, style.label)
 
   // Personal asides read as a quiet aside rather than a boxed warning.
   if (type === 'story') {
@@ -38,7 +44,7 @@ export function Callout({
       <aside className="my-7 border-l-4 border-accent-500 bg-accent-400/10 py-2 pl-5">
         <p className="mb-1 flex items-center gap-2 label-retro not-prose muted">
           <span aria-hidden>{style.icon}</span>
-          {title ?? style.label}
+          {label}
         </p>
         <div className="[&>:last-child]:mb-0 [&>p]:my-1.5">{children}</div>
       </aside>
@@ -49,7 +55,7 @@ export function Callout({
     <div className={`retro-shadow my-6 rounded-retro border-2 p-4 ${style.ring}`}>
       <p className="mb-1 flex items-center gap-2 font-display text-sm not-prose">
         <span aria-hidden>{style.icon}</span>
-        {title ?? style.label}
+        {label}
       </p>
       <div className="[&>:last-child]:mb-0 [&>p]:my-1.5">{children}</div>
     </div>
@@ -71,11 +77,13 @@ export function Card({
   title,
   href,
   emoji,
+  locale = DEFAULT_LOCALE,
   children,
 }: {
   title: string
   href?: string
   emoji?: string
+  locale?: Locale
   children?: ReactNode
 }) {
   const inner = (
@@ -88,12 +96,16 @@ export function Card({
     </>
   )
 
-  return href ? (
-    <Link href={href} className="surface retro-lift p-4">
+  if (!href) return <div className="surface p-4">{inner}</div>
+
+  return /^https?:\/\//.test(href) ? (
+    <a href={href} target="_blank" rel="noreferrer noopener" className="surface retro-lift p-4">
+      {inner}
+    </a>
+  ) : (
+    <Link href={`${localePrefix(locale)}${href}`} className="surface retro-lift p-4">
       {inner}
     </Link>
-  ) : (
-    <div className="surface p-4">{inner}</div>
   )
 }
 
@@ -105,10 +117,7 @@ function heading(level: 2 | 3 | 4) {
       <Tag id={id} {...props} className="group scroll-mt-24">
         <a href={`#${id}`} className="text-inherit no-underline hover:no-underline">
           {children}
-          <span
-            aria-hidden
-            className="ml-2 opacity-0 transition-opacity group-hover:opacity-40"
-          >
+          <span aria-hidden className="ml-2 opacity-0 transition-opacity group-hover:opacity-40">
             #
           </span>
         </a>
@@ -117,27 +126,40 @@ function heading(level: 2 | 3 | 4) {
   }
 }
 
-export const mdxComponents: MDXComponents = {
-  h2: heading(2),
-  h3: heading(3),
-  h4: heading(4),
-  a: ({ href = '', children, ...props }: ComponentProps<'a'>) => {
-    const external = /^https?:\/\//.test(href)
-    return external ? (
-      <a href={href} target="_blank" rel="noreferrer noopener" {...props}>
-        {children}
-      </a>
-    ) : (
-      <Link href={href}>{children}</Link>
-    )
-  },
-  table: (props: ComponentProps<'table'>) => (
-    <div className="my-6 overflow-x-auto rounded-retro border-2">
-      <table {...props} className="my-0" />
-    </div>
-  ),
-  Callout,
-  Cards,
-  Card,
-  Steps,
+/**
+ * MDX authors write locale-independent links (`/english/reading/`), the same keys
+ * the route tree uses. The prefix for the current locale is added here so a
+ * translated page never leaks back into the default locale.
+ *
+ * `textLocale` differs from `locale` on an untranslated page: the prose is still
+ * in the default locale, so component labels should match it, while links must
+ * keep the reader inside the locale they are browsing.
+ */
+export function mdxComponents(locale: Locale, textLocale: Locale = locale): MDXComponents {
+  return {
+    h2: heading(2),
+    h3: heading(3),
+    h4: heading(4),
+    a: ({ href = '', children, ...props }: ComponentProps<'a'>) => {
+      if (/^https?:\/\//.test(href)) {
+        return (
+          <a href={href} target="_blank" rel="noreferrer noopener" {...props}>
+            {children}
+          </a>
+        )
+      }
+      if (href.startsWith('#')) return <a href={href} {...props}>{children}</a>
+
+      return <Link href={`${localePrefix(locale)}${href}`}>{children}</Link>
+    },
+    table: (props: ComponentProps<'table'>) => (
+      <div className="my-6 overflow-x-auto rounded-retro border-2">
+        <table {...props} className="my-0" />
+      </div>
+    ),
+    Callout: (props: ComponentProps<typeof Callout>) => <Callout locale={textLocale} {...props} />,
+    Cards,
+    Card: (props: ComponentProps<typeof Card>) => <Card locale={locale} {...props} />,
+    Steps,
+  }
 }

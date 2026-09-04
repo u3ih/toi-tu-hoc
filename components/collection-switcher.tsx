@@ -3,13 +3,16 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import type { Collection } from '@/lib/content'
+import { t, type Locale } from '@/lib/i18n'
 
 export function CollectionSwitcher({
   collections,
   current,
+  locale,
 }: {
   collections: Collection[]
   current?: Collection
+  locale: Locale
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -42,7 +45,7 @@ export function CollectionSwitcher({
       >
         <span aria-hidden>{current?.emoji ?? '📚'}</span>
         <span className="hidden max-w-32 truncate sm:inline">
-          {current?.shortTitle ?? 'Chủ đề'}
+          {current?.shortTitle ?? t(locale, 'nav.topics')}
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +68,7 @@ export function CollectionSwitcher({
           {collections.map((c) => (
             <Link
               key={c.slug}
-              href={`/${c.slug}/`}
+              href={c.href}
               role="menuitem"
               onClick={() => setOpen(false)}
               data-accent={c.accent}
@@ -84,7 +87,7 @@ export function CollectionSwitcher({
                   {c.title}
                   {c.status === 'wip' && (
                     <span className="rounded-retro border-2 border-brand-900 bg-accent-400 px-1.5 py-0.5 label-retro text-brand-900">
-                      đang viết
+                      {t(locale, 'collection.wip')}
                     </span>
                   )}
                 </span>

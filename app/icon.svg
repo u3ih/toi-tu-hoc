@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Tôi Tự Học">
+  <title>Tôi Tự Học</title>
+  <!-- Hard offset shadow, matching the retro cards used across the site. -->
+  <rect x="10" y="10" width="50" height="50" rx="8" fill="#0a2347" />
+  <rect x="4" y="4" width="50" height="50" rx="8" fill="#f4bf36" stroke="#0a2347" stroke-width="4" />
+  <!-- Slab-serif "T": crossbar, stem, and two foot serifs. -->
+  <rect x="14" y="15" width="30" height="8" fill="#0a2347" />
+  <rect x="25" y="15" width="8" height="28" fill="#0a2347" />
+  <rect x="19" y="36" width="20" height="7" fill="#0a2347" />
+</svg>

@@ -4,18 +4,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { Collection, NavGroup } from '@/lib/content'
+import { path, t, type Locale } from '@/lib/i18n'
 import { SidebarNav } from './sidebar'
 import { Search } from './search'
 import { ThemeToggle } from './theme-toggle'
 import { CollectionSwitcher } from './collection-switcher'
+import { LocaleSwitcher } from './locale-switcher'
 
 export function Header({
   siteName,
+  locale,
   collections,
   collection,
   nav = [],
 }: {
   siteName: string
+  locale: Locale
   collections: Collection[]
   collection?: Collection
   nav?: NavGroup[]
@@ -45,7 +49,7 @@ export function Header({
           {hasNav && (
             <button
               type="button"
-              aria-label="Mở menu"
+              aria-label={t(locale, drawerOpen ? 'nav.close' : 'nav.menu')}
               aria-expanded={drawerOpen}
               onClick={() => setDrawerOpen((v) => !v)}
               className="retro-shadow-sm grid h-9 w-9 shrink-0 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 lg:hidden"
@@ -64,7 +68,11 @@ export function Header({
             </button>
           )}
 
-          <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+          <Link
+            href={path(locale)}
+            aria-label={t(locale, 'nav.home')}
+            className="group flex shrink-0 items-center gap-2.5"
+          >
             <span className="retro-shadow-sm grid h-9 w-9 place-items-center rounded-retro border-2 border-brand-900 bg-accent-400 font-display text-base text-brand-900 transition-transform group-hover:-translate-y-0.5">
               {siteName.charAt(0)}
             </span>
@@ -72,9 +80,14 @@ export function Header({
           </Link>
 
           <div className="ml-auto flex items-center gap-2">
-            <Search collections={collections} currentCollection={collection?.slug} />
-            <CollectionSwitcher collections={collections} current={collection} />
-            <ThemeToggle />
+            <Search
+              locale={locale}
+              collections={collections}
+              currentCollection={collection?.slug}
+            />
+            <CollectionSwitcher locale={locale} collections={collections} current={collection} />
+            <LocaleSwitcher locale={locale} />
+            <ThemeToggle locale={locale} />
           </div>
         </div>
       </header>

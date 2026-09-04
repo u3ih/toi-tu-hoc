@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Collection } from '@/lib/content'
+import { t, type Locale } from '@/lib/i18n'
 
 type IndexEntry = {
+  locale: Locale
   collection: string
   collectionTitle: string
   accent: string
@@ -65,9 +67,11 @@ function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
 }
 
 export function Search({
+  locale,
   collections,
   currentCollection,
 }: {
+  locale: Locale
   collections: Collection[]
   currentCollection?: string
 }) {
@@ -79,9 +83,11 @@ export function Search({
   const [cursor, setCursor] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // One index file serves every locale, so drop the other locales' entries first.
+  const localized = useMemo(() => index.filter((e) => e.locale === locale), [index, locale])
   const scoped = useMemo(
-    () => (scope === 'all' ? index : index.filter((e) => e.collection === scope)),
-    [index, scope],
+    () => (scope === 'all' ? localized : localized.filter((e) => e.collection === scope)),
+    [localized, scope],
   )
   const hits = useMemo(
     () => search(scoped, query, scope === 'all' ? currentCollection : undefined),
@@ -134,7 +140,7 @@ export function Search({
         className="retro-shadow-sm flex items-center gap-2 rounded-retro border-2 px-2.5 py-1.5 text-sm muted transition-colors hover:bg-accent-400 hover:text-brand-900 sm:w-52"
       >
         <SearchIcon />
-        <span className="hidden sm:inline">Tìm kiếm…</span>
+        <span className="hidden sm:inline">{t(locale, 'search.open')}</span>
         <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">⌘K</kbd>
       </button>
 
@@ -142,7 +148,7 @@ export function Search({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Tìm kiếm nội dung"
+          aria-label={t(locale, 'search.dialog')}
           className="fixed inset-0 z-50 flex items-start justify-center bg-brand-900/60 p-4 pt-[12vh] backdrop-blur-sm"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false)
@@ -166,7 +172,7 @@ export function Search({
                   }
                   if (e.key === 'Enter' && hits[cursor]) go(hits[cursor])
                 }}
-                placeholder="Tìm bài viết, chủ đề…"
+                placeholder={t(locale, 'search.placeholder')}
                 className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:opacity-60"
               />
             </div>
@@ -174,7 +180,7 @@ export function Search({
             {collections.length > 1 && (
               <div className="flex flex-wrap gap-1.5 border-b-2 px-3 py-2">
                 <ScopeChip active={scope === 'all'} onClick={() => setScope('all')}>
-                  Tất cả
+                  {t(locale, 'search.all')}
                 </ScopeChip>
                 {collections.map((c) => (
                   <ScopeChip key={c.slug} active={scope === c.slug} onClick={() => setScope(c.slug)}>
@@ -206,11 +212,11 @@ export function Search({
                 </li>
               ))}
               {query.trim().length >= 2 && hits.length === 0 && (
-                <li className="px-3 py-6 text-center text-sm muted">Không tìm thấy kết quả nào.</li>
+                <li className="px-3 py-6 text-center text-sm muted">{t(locale, 'search.empty')}</li>
               )}
               {query.trim().length < 2 && (
                 <li className="px-3 py-6 text-center text-sm muted">
-                  Nhập ít nhất 2 ký tự. Dùng ↑ ↓ để chọn, Enter để mở.
+                  {t(locale, 'search.hint')}
                 </li>
               )}
             </ul>

@@ -1,0 +1,30 @@
+{
+  "emoji": "💻",
+  "accent": "emerald",
+  "order": 2,
+  "status": "wip",
+  "title": {
+    "vi": "Lập trình",
+    "en": "Programming"
+  },
+  "shortTitle": {
+    "vi": "Lập trình",
+    "en": "Programming"
+  },
+  "description": {
+    "vi": "Hai năm đầu mình học sai gần hết. Ghi lại thứ tự học mà mình ước có ai nói sớm hơn.",
+    "en": "I got the first two years almost entirely wrong. This is the order I wish someone had given me."
+  },
+  "sections": [
+    {
+      "key": "foundations",
+      "emoji": "🧱",
+      "title": { "vi": "Nền tảng", "en": "Foundations" }
+    },
+    {
+      "key": "practice",
+      "emoji": "⚒️",
+      "title": { "vi": "Thực hành", "en": "Practice" }
+    }
+  ]
+}

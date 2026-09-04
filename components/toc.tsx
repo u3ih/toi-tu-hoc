@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import type { Heading } from '@/lib/content'
+import { t, type Locale } from '@/lib/i18n'
 
-export function Toc({ headings }: { headings: Heading[] }) {
+export function Toc({ headings, locale }: { headings: Heading[]; locale: Locale }) {
   const [activeId, setActiveId] = useState<string>('')
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export function Toc({ headings }: { headings: Heading[] }) {
 
   return (
     <aside className="sticky top-24 hidden h-fit max-h-[calc(100dvh-8rem)] w-56 shrink-0 overflow-y-auto py-8 xl:block">
-      <p className="mb-3 label-retro muted">Trong bài này</p>
+      <p className="mb-3 label-retro muted">{t(locale, 'doc.toc')}</p>
       <ul className="space-y-1 border-l-2 text-sm">
         {headings.map((h) => (
           <li key={h.id}>

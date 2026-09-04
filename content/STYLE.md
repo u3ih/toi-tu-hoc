@@ -76,3 +76,17 @@ người đọc kiểm chứng được — và phân biệt được rõ hai lo
 Các bài hiện có dùng mốc thời gian và con số mang tính minh họa. Trước khi đưa trang cho người khác
 đọc, hãy rà lại và thay bằng trải nghiệm thật của bạn — đó chính là thứ làm trang này khác với các
 trang tổng hợp khác.
+
+## Bản dịch tiếng Anh
+
+Bản dịch nằm cạnh bản gốc: `reading.mdx` là tiếng Việt, `reading.en.mdx` là tiếng Anh. Tạo bằng
+`pnpm new <collection> <slug> --locale en`.
+
+- **Dịch giọng, đừng dịch chữ.** Bản tiếng Anh vẫn phải là "I", vẫn kể chuyện thật, vẫn thừa nhận chỗ
+  mình từng sai. Một bản dịch nghe như tài liệu hướng dẫn là dịch hỏng.
+- **Giữ nguyên link nội bộ.** Chúng viết không kèm tiền tố ngôn ngữ (`/english/faq/`) và được thêm
+  tiền tố lúc render.
+- **Frontmatter chỉ cần `title` và `description`.** `section` và `order` luôn lấy từ file tiếng Việt,
+  nên thứ tự sidebar không lệch giữa hai ngôn ngữ.
+- **Chưa dịch cũng không sao.** Trang tiếng Anh sẽ hiện bản tiếng Việt kèm một dòng báo. Thà để vậy
+  còn hơn đăng một bản dịch máy.
