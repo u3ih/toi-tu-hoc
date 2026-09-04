@@ -1,13 +1,11 @@
 import Link from 'next/link'
-import { getCollections } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
-import { getSite } from '@/lib/site'
-import { Header } from '@/components/header'
+import { SiteHeader } from '@/components/site-header'
 
 export function NotFoundPage({ locale }: { locale: Locale }) {
   return (
     <>
-      <Header siteName={getSite(locale).name} locale={locale} collections={getCollections(locale)} />
+      <SiteHeader locale={locale} />
       <main id="main" className="mx-auto grid max-w-xl place-items-center px-6 py-32 text-center">
         <p className="retro-shadow rounded-retro border-2 border-brand-900 bg-accent-400 px-6 py-2 font-display text-6xl text-brand-900">
           404

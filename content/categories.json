@@ -1,0 +1,44 @@
+{
+  "categories": [
+    {
+      "key": "skills",
+      "emoji": "🧠",
+      "order": 1,
+      "title": { "vi": "Kỹ năng", "en": "Skills" },
+      "description": {
+        "vi": "Những thứ mình phải học từ đầu, không ai dạy.",
+        "en": "The things I had to learn from scratch, with nobody teaching me."
+      }
+    },
+    {
+      "key": "health",
+      "emoji": "💪",
+      "order": 2,
+      "title": { "vi": "Sức khỏe", "en": "Health" },
+      "description": {
+        "vi": "Ngủ, ăn, tập — thứ mình bỏ qua suốt mười năm rồi phải trả giá.",
+        "en": "Sleep, food, training — what I ignored for ten years and then paid for."
+      }
+    },
+    {
+      "key": "life",
+      "emoji": "🌱",
+      "order": 3,
+      "title": { "vi": "Cuộc sống", "en": "Life" },
+      "description": {
+        "vi": "Tiền, thói quen, thời gian. Những quyết định mình từng làm bừa.",
+        "en": "Money, habits, time. The decisions I used to make carelessly."
+      }
+    },
+    {
+      "key": "mind",
+      "emoji": "🧭",
+      "order": 4,
+      "title": { "vi": "Tâm trí", "en": "Mind" },
+      "description": {
+        "vi": "Cách mình học, cách mình tập trung, cách mình thôi bỏ dở.",
+        "en": "How I learn, how I focus, how I stopped quitting halfway."
+      }
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { getCollection, getCollections, getNav } from '@/lib/content'
+import { getCollection, getNav } from '@/lib/content'
+import { paletteVars } from '@/lib/accent'
 import type { Locale } from '@/lib/i18n'
-import { getSite } from '@/lib/site'
-import { Header } from '@/components/header'
+import { SiteHeader } from '@/components/site-header'
 
 /** Header + accent scope shared by a collection's index and all of its articles. */
 export function CollectionShell({
@@ -19,16 +19,11 @@ export function CollectionShell({
   if (!collection) notFound()
 
   return (
-    // data-accent re-points the --color-brand-* variables, so every brand-*
-    // utility below this node picks up the collection's palette.
-    <div data-accent={collection.accent} className="contents">
-      <Header
-        siteName={getSite(locale).name}
-        locale={locale}
-        collections={getCollections(locale)}
-        collection={collection}
-        nav={getNav(locale, slug)}
-      />
+    // The palette variables re-point --color-brand-*, so every brand-* utility
+    // below this node picks up the collection's colour. `display: contents` keeps
+    // the wrapper out of the layout while still carrying the inherited variables.
+    <div data-accent={collection.accent} style={paletteVars(collection.palette)} className="contents">
+      <SiteHeader locale={locale} collection={collection} nav={getNav(locale, slug)} />
       {children}
     </div>
   )

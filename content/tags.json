@@ -1,0 +1,14 @@
+{
+  "labels": {
+    "input": { "vi": "Đầu vào", "en": "Input" },
+    "listening": { "vi": "Nghe", "en": "Listening" },
+    "reading": { "vi": "Đọc", "en": "Reading" },
+    "speaking": { "vi": "Nói", "en": "Speaking" },
+    "writing": { "vi": "Viết", "en": "Writing" },
+    "vocabulary": { "vi": "Từ vựng", "en": "Vocabulary" },
+    "memory": { "vi": "Ghi nhớ", "en": "Memory" },
+    "habit": { "vi": "Thói quen", "en": "Habits" },
+    "mindset": { "vi": "Tư duy", "en": "Mindset" },
+    "tools": { "vi": "Công cụ", "en": "Tools" }
+  }
+}

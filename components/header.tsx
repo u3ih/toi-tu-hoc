@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import type { Collection, NavGroup } from '@/lib/content'
+import type { CategoryGroup, Collection, NavGroup } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
 import { SidebarNav } from './sidebar'
 import { Search } from './search'
@@ -15,12 +15,15 @@ export function Header({
   siteName,
   locale,
   collections,
+  groups = [],
   collection,
   nav = [],
 }: {
   siteName: string
   locale: Locale
   collections: Collection[]
+  /** Collections grouped by category, so the switcher can stay legible at scale. */
+  groups?: CategoryGroup[]
   collection?: Collection
   nav?: NavGroup[]
 }) {
@@ -83,9 +86,15 @@ export function Header({
             <Search
               locale={locale}
               collections={collections}
+              groups={groups}
               currentCollection={collection?.slug}
             />
-            <CollectionSwitcher locale={locale} collections={collections} current={collection} />
+            <CollectionSwitcher
+              locale={locale}
+              collections={collections}
+              groups={groups}
+              current={collection}
+            />
             <LocaleSwitcher locale={locale} />
             <ThemeToggle locale={locale} />
           </div>

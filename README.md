@@ -17,8 +17,10 @@ code khi thêm chủ đề mới.
 
 ```
 content/
+  categories.json           ← nhóm chủ đề (Kỹ năng, Sức khỏe, Cuộc sống…) — tuỳ chọn
+  tags.json                 ← nhãn hiển thị cho thẻ — tuỳ chọn
   english/
-    collection.json         ← tên, mô tả, emoji, màu, các section (mỗi thứ một bản/ngôn ngữ)
+    collection.json         ← tên, mô tả, emoji, màu, nhóm, các section (mỗi thứ một bản/ngôn ngữ)
     introduction.mdx        ← bản tiếng Việt (locale mặc định)
     introduction.en.mdx     ← bản tiếng Anh
     faq.mdx
@@ -30,6 +32,17 @@ content/
 Từ đó tự sinh ra: route `/english/`, `/english/faq/`, `/en/english/faq/`, sidebar, mục lục,
 prev/next, breadcrumb, thẻ trên trang chủ, dropdown chuyển chủ đề, chỉ mục tìm kiếm, `sitemap.xml`,
 `robots.txt`, canonical + hreflang và JSON-LD.
+
+Có ba tầng, để site chịu được vài chục chủ đề chứ không chỉ hai:
+
+| Tầng | Là gì | Khai báo ở |
+| --- | --- | --- |
+| **Category** | Nhóm các collection lại (`Kỹ năng` gồm `english` + `programming`) | `content/categories.json` |
+| **Collection** | Một thư mục nội dung, một route gốc | `content/<slug>/collection.json` |
+| **Tag** | Sợi chỉ **xuyên** collection (`habit` có mặt ở cả `english` và `health`) | `tags:` trong frontmatter |
+
+Category quyết định trang chủ và `/topics/` xếp thế nào. Tag sinh ra `/tags/` và `/tags/<tag>/`, và
+là thứ tạo ra khối "Đọc tiếp" ở cuối mỗi bài — chỗ duy nhất người đọc nhảy được sang chủ đề khác.
 
 ## Đa ngôn ngữ
 
@@ -98,6 +111,28 @@ Rồi sửa nội dung. Hết. Không đụng vào `app/` hay `components/`.
 Tên collection, slug và section key phải là **key tiếng Anh viết thường** (`a-z`, `0-9`, `-`);
 script từ chối nếu không đúng.
 
+### Nhóm chủ đề — `content/categories.json`
+
+```json
+{
+  "categories": [
+    {
+      "key": "health",
+      "emoji": "💪",
+      "order": 2,
+      "title": { "vi": "Sức khỏe", "en": "Health" },
+      "description": { "vi": "Mô tả nhóm.", "en": "Group description." }
+    }
+  ]
+}
+```
+
+Collection trỏ vào nhóm bằng `"category": "health"`. Nhóm nào chưa có collection nào thì không hiện
+ra — file này khai báo được trước hướng đi của site mà trang chủ không bày kệ trống. Collection
+không khai `category` rơi vào nhóm "Khác" ở cuối.
+
+File này **không bắt buộc**: bỏ nó đi thì trang chủ về lại một lưới thẻ phẳng.
+
 ### `collection.json`
 
 Trường nào hiển thị ra màn hình thì nhận một chuỗi (dùng chung mọi ngôn ngữ) hoặc một object theo
@@ -107,6 +142,7 @@ ngôn ngữ.
 {
   "emoji": "🇬🇧",
   "accent": "indigo",
+  "category": "skills",
   "order": 1,
   "status": "active",
   "title": { "vi": "Tiếng Anh", "en": "English" },
@@ -121,7 +157,9 @@ ngôn ngữ.
 
 | Trường | Ý nghĩa |
 | --- | --- |
-| `accent` | Màu nhấn riêng cho cả bộ: `indigo`, `violet`, `sky`, `emerald`, `amber`, `rose` |
+| `accent` | Màu nhấn riêng cho cả bộ: `indigo`, `violet`, `sky`, `teal`, `emerald`, `lime`, `amber`, `clay`, `rose`, `plum` |
+| `hue` | Thay cho `accent` khi mười màu trên đã dùng hết: một số `0`–`359`, ramp tự sinh (xem [Màu nhấn](#màu-nhấn-hoạt-động-thế-nào)) |
+| `category` | Key của nhóm trong `content/categories.json` |
 | `order` | Thứ tự hiển thị giữa các bộ |
 | `status` | `active` · `wip` (gắn nhãn "đang viết") · `hidden` (ẩn khỏi mọi danh sách và sitemap, link trực tiếp vẫn vào được) |
 | `sections[].key` | Định danh dùng trong frontmatter `section:` — tiếng Anh, không đổi theo ngôn ngữ |
@@ -137,6 +175,7 @@ title: Câu hỏi thường gặp
 description: Mô tả ngắn, hiện dưới tiêu đề và trong kết quả tìm kiếm.
 section: resources
 order: 3
+tags: [habit, mindset]  # tuỳ chọn — sinh ra /tags/<tag>/ và khối "Đọc tiếp"
 date: 2026-02-14        # tuỳ chọn — vào JSON-LD
 updated: 2026-08-01     # tuỳ chọn — vào JSON-LD và <lastmod> của sitemap
 ---
@@ -144,6 +183,23 @@ updated: 2026-08-01     # tuỳ chọn — vào JSON-LD và <lastmod> của site
 
 `section` (key tiếng Anh) quyết định bài nằm nhóm nào trong sidebar, `order` quyết định thứ tự trong
 nhóm đó.
+
+### Thẻ — `tags:`
+
+Thẻ là **key tiếng Anh viết thường**, giống `section` và slug, vì chúng nằm trong URL. Nhãn hiển thị
+là tuỳ chọn, khai trong `content/tags.json`:
+
+```json
+{
+  "labels": {
+    "habit": { "vi": "Thói quen", "en": "Habits" }
+  }
+}
+```
+
+Thẻ chưa có nhãn thì hiện chính key (gạch ngang đổi thành khoảng trắng). Thẻ chỉ khai trong file
+locale mặc định (`bai.mdx`) — bản dịch không cần lặp lại, để thứ tự và nhóm không bao giờ lệch nhau
+giữa các ngôn ngữ.
 
 ### Giọng viết
 
@@ -187,12 +243,21 @@ biến này từ `actions/configure-pages`, nên khi deploy thật canonical s�
 
 ## Màu nhấn hoạt động thế nào
 
-Tailwind biên dịch `bg-brand-600` thành `var(--color-brand-600)`. Layout của mỗi collection đặt
-`data-accent="<accent>"` lên phần tử bọc, và CSS trong [`app/globals.css`](app/globals.css) ghi đè
-đúng bộ biến đó. Nên đổi màu cả một bộ nội dung = sửa **một dòng JSON**, không đụng tới class nào.
+Tailwind biên dịch `bg-brand-600` thành `var(--color-brand-600)`. Layout của mỗi collection đặt cả
+bộ biến `--color-brand-*` làm inline style lên phần tử bọc, nên mọi class `brand-*` bên dưới đổi màu
+theo. Đổi màu cả một bộ nội dung = sửa **một dòng JSON**, không đụng tới class nào.
 
-Thêm bảng màu mới: thêm một block `[data-accent='ten-mau']` trong `globals.css` và thêm tên vào
-`ACCENTS` trong [`lib/content.ts`](lib/content.ts).
+Ramp được **sinh ra**, không viết tay: [`lib/accent.ts`](lib/accent.ts) giữ cố định đường cong độ
+sáng và độ bão hoà — đó là thứ làm mọi collection trông như in cùng một máy — nên một bảng màu chỉ
+còn là một góc màu.
+
+```json
+{ "accent": "teal" }                      // một trong mười tên có sẵn
+{ "hue": 320 }                            // góc màu bất kỳ, 0-359
+{ "hue": 82, "hueEnd": 45, "chroma": 0.9 } // ramp trôi màu khi tối dần, như mustard sang cam cháy
+```
+
+Nên thêm chủ đề thứ hai mươi tốn **một con số**, không tốn một block CSS.
 
 ## Đổi tên / mô tả trang
 
@@ -232,11 +297,13 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `i18n.config.json` | Danh sách ngôn ngữ + ngôn ngữ mặc định (dùng chung cho code và script) |
 | `lib/i18n.ts` | Locale, URL theo locale, tra chuỗi (`t`) |
 | `lib/site.ts` | Tên site, tác giả, link repo, domain |
-| `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager |
+| `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager, category, tag, "Đọc tiếp" |
+| `lib/accent.ts` | Sinh ramp `--color-brand-*` từ một góc màu |
 | `lib/metadata.ts` | canonical, hreflang, OpenGraph, Twitter |
 | `lib/schema.ts` | JSON-LD |
 | `app/(vi)/` | Route tiếng Việt (không tiền tố) + root layout `lang="vi"` |
 | `app/(en)/en/` | Route tiếng Anh + root layout `lang="en"` |
+| `app/(vi)/topics/`, `app/(vi)/tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ (mỗi ngôn ngữ một bản) |
 | `app/sitemap.ts`, `app/robots.ts`, `app/icon.svg` | Sitemap, robots, favicon |
 | `components/pages/` | Thân trang dùng chung cho mọi ngôn ngữ |
 | `components/` | Header, sidebar, tìm kiếm, mục lục, đổi ngôn ngữ, MDX components |

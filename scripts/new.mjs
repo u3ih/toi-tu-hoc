@@ -23,6 +23,14 @@ const [collection, slug, section] = positional
 
 const KEY = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
+/** Category keys declared in content/categories.json, for the manifest stub. */
+function categories() {
+  const file = path.join(root, 'content', 'categories.json')
+  if (!fs.existsSync(file)) return []
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'))
+  return (raw.categories ?? []).map((c) => c.key).filter(Boolean)
+}
+
 function fail(message) {
   console.error(message)
   process.exit(1)
@@ -43,6 +51,7 @@ function blankManifest() {
   return {
     emoji: '📘',
     accent: 'indigo',
+    category: categories()[0] ?? 'skills',
     order: 99,
     status: 'wip',
     title: perLocale(collection),
@@ -56,7 +65,8 @@ if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true })
   fs.writeFileSync(manifestPath, JSON.stringify(blankManifest(), null, 2) + '\n')
   console.log(`created content/${collection}/collection.json`)
-  console.log('  → edit title/description per locale, emoji, accent (indigo|violet|sky|emerald|amber|rose)')
+  console.log(`  → edit title/description per locale, emoji, and category (${categories().join('|') || 'see content/categories.json'})`)
+  console.log('  → accent: indigo|violet|sky|teal|emerald|lime|amber|clay|rose|plum, or set "hue": 0-359 for a new one')
 }
 
 if (!slug) process.exit(0)
@@ -111,6 +121,7 @@ title: ${slug}
 description: Mô tả ngắn, hiện dưới tiêu đề và trong kết quả tìm kiếm.
 section: ${targetSection}
 order: ${nextOrder}
+tags: []
 ---
 
 Mở bài bằng chỗ mình từng mắc kẹt, không mở bằng định nghĩa.
@@ -129,4 +140,5 @@ Các bước cụ thể.
 
 console.log(`created content/${collection}/${slug}.mdx (section "${targetSection}", order ${nextOrder})`)
 console.log('  → giọng viết: xưng "mình", kể chuyện thật. Xem content/STYLE.md')
+console.log('  → tags: [] là các khoá tiếng Anh, viết thường — chúng nối bài này với các chủ đề khác')
 console.log(`  → bản dịch: pnpm new ${collection} ${slug} --locale en`)

@@ -2,14 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Collection } from '@/lib/content'
+import { ACCENT_PALETTES, DEFAULT_ACCENT, paletteVars } from '@/lib/accent'
+import type { CategoryGroup, Collection } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
+
+/** Above this many collections the scope chips wrap into a wall; use a select. */
+const SCOPE_SELECT_THRESHOLD = 8
 
 type IndexEntry = {
   locale: Locale
   collection: string
   collectionTitle: string
-  accent: string
   slug: string
   href: string
   title: string
@@ -22,6 +25,9 @@ type IndexEntry = {
 type Hit = IndexEntry & { score: number; snippet: string }
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+/** Used when a hit points at a collection the header does not know about. */
+const DEFAULT_PALETTE = ACCENT_PALETTES[DEFAULT_ACCENT]
 
 /** Strip Vietnamese diacritics so "tu vung" also matches "từ vựng". */
 function fold(s: string): string {
@@ -69,10 +75,12 @@ function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
 export function Search({
   locale,
   collections,
+  groups = [],
   currentCollection,
 }: {
   locale: Locale
   collections: Collection[]
+  groups?: CategoryGroup[]
   currentCollection?: string
 }) {
   const router = useRouter()
@@ -82,6 +90,13 @@ export function Search({
   const [scope, setScope] = useState<string>('all')
   const [cursor, setCursor] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // A hit is coloured by the collection it came from, which the index does not
+  // need to carry — the header already knows every collection's palette.
+  const palettes = useMemo(
+    () => new Map(collections.map((c) => [c.slug, c.palette])),
+    [collections],
+  )
 
   // One index file serves every locale, so drop the other locales' entries first.
   const localized = useMemo(() => index.filter((e) => e.locale === locale), [index, locale])
@@ -177,7 +192,7 @@ export function Search({
               />
             </div>
 
-            {collections.length > 1 && (
+            {collections.length > 1 && collections.length <= SCOPE_SELECT_THRESHOLD && (
               <div className="flex flex-wrap gap-1.5 border-b-2 px-3 py-2">
                 <ScopeChip active={scope === 'all'} onClick={() => setScope('all')}>
                   {t(locale, 'search.all')}
@@ -190,6 +205,34 @@ export function Search({
               </div>
             )}
 
+            {collections.length > SCOPE_SELECT_THRESHOLD && (
+              <div className="border-b-2 px-3 py-2">
+                <select
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                  aria-label={t(locale, 'search.scope')}
+                  className="w-full rounded-retro border-2 bg-transparent px-2 py-1.5 text-sm"
+                >
+                  <option value="all">{t(locale, 'search.all')}</option>
+                  {(groups.length > 0
+                    ? groups
+                    : [{ category: { key: 'all', title: '' }, collections }]
+                  ).map((group) => (
+                    <optgroup
+                      key={group.category.key}
+                      label={group.category.title || t(locale, 'nav.topics')}
+                    >
+                      {group.collections.map((c) => (
+                        <option key={c.slug} value={c.slug}>
+                          {c.emoji} {c.shortTitle}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <ul className="max-h-[50vh] overflow-y-auto p-2">
               {hits.map((hit, i) => (
                 <li key={`${hit.collection}/${hit.slug}`}>
@@ -197,7 +240,7 @@ export function Search({
                     type="button"
                     onMouseEnter={() => setCursor(i)}
                     onClick={() => go(hit)}
-                    data-accent={hit.accent}
+                    style={paletteVars(palettes.get(hit.collection) ?? DEFAULT_PALETTE)}
                     className={[
                       'w-full rounded-retro border-2 px-3 py-2.5 text-left transition-colors',
                       i === cursor ? 'border-[var(--border)] bg-accent-400/30' : 'border-transparent',

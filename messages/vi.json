@@ -10,6 +10,8 @@
     "close": "Đóng menu",
     "theme": "Đổi giao diện sáng/tối",
     "topics": "Chủ đề",
+    "filterTopics": "Lọc chủ đề…",
+    "noTopics": "Không có chủ đề nào khớp.",
     "language": "Đổi ngôn ngữ",
     "breadcrumb": "Đường dẫn",
     "skip": "Tới nội dung chính",
@@ -21,6 +23,7 @@
     "dialog": "Tìm kiếm nội dung",
     "placeholder": "Tìm bài viết, chủ đề…",
     "all": "Tất cả",
+    "scope": "Giới hạn trong chủ đề",
     "empty": "Không tìm thấy kết quả nào.",
     "hint": "Nhập ít nhất 2 ký tự. Dùng ↑ ↓ để chọn, Enter để mở."
   },
@@ -29,7 +32,30 @@
     "badge": "Miễn phí · Cập nhật liên tục",
     "collections": "Các bộ nội dung",
     "pick": "Chọn một chủ đề để bắt đầu",
+    "browseAll": "Xem tất cả chủ đề",
+    "categoryCount": "{count} bộ",
+    "andMore": "Còn {count} bộ nữa",
+    "more": "Khác",
     "empty": "Chưa có bộ nội dung nào. Tạo một thư mục trong content/ để bắt đầu."
+  },
+
+  "topics": {
+    "title": "Tất cả chủ đề",
+    "description": "Mọi thứ mình đang ghi lại, xếp theo nhóm. Chọn cái đang làm bạn mắc kẹt.",
+    "tags": "Thẻ",
+    "tagsHint": "Thẻ đi xuyên các bộ nội dung — cùng một vấn đề, nhìn từ nhiều chủ đề khác nhau."
+  },
+
+  "tags": {
+    "title": "Thẻ",
+    "description": "Những sợi chỉ nối các bài viết nằm ở nhiều chủ đề khác nhau.",
+    "empty": "Chưa có thẻ nào. Thêm tags: vào frontmatter của bài viết."
+  },
+
+  "tag": {
+    "title": "Thẻ: {tag}",
+    "description": "Mọi bài mình gắn thẻ \"{tag}\", ở tất cả các chủ đề.",
+    "count": "{count} bài"
   },
 
   "collection": {
@@ -43,6 +69,8 @@
     "toc": "Trong bài này",
     "prev": "← Bài trước",
     "next": "Bài tiếp →",
+    "related": "Đọc tiếp",
+    "tags": "Thẻ",
     "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}.",
     "edit": "Sửa bài này trên GitHub"
   },

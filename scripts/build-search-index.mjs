@@ -101,7 +101,6 @@ for (const collection of collections) {
         locale,
         collection,
         collectionTitle: pick(manifest.title, locale) ?? collection,
-        accent: manifest.accent ?? 'indigo',
         slug,
         href: `${localePrefix(locale)}/${collection}/${slug}/`,
         title: text.data.title ?? slug,
