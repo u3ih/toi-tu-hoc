@@ -51,7 +51,9 @@ export function CollectionPage({ locale, slug }: { locale: Locale; slug: string 
           <h1 className="mt-6 font-display text-4xl leading-[1.1] text-balance sm:text-5xl">
             {collection.title}
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg muted text-pretty">{collection.description}</p>
+          <p className="mx-auto mt-5 max-w-xl text-lg muted text-pretty">
+            {collection.description}
+          </p>
 
           {first && (
             <Link

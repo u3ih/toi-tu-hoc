@@ -85,7 +85,9 @@ export function TopicsPage({ locale }: { locale: Locale }) {
             </div>
           ))}
 
-          {collections.length === 0 && <p className="text-center muted">{t(locale, 'home.empty')}</p>}
+          {collections.length === 0 && (
+            <p className="text-center muted">{t(locale, 'home.empty')}</p>
+          )}
 
           {tags.length > 0 && (
             <div>

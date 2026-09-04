@@ -64,11 +64,19 @@ function loadDisplayFont(): Promise<ArrayBuffer | null> {
  * from message catalogs and titles that do contain emoji, so strip them here.
  */
 function stripEmoji(text: string): string {
+  // Alternation rather than one character class: a class cannot express an
+  // emoji plus its skin-tone modifier as a single match.
   return text
-    .replace(/[\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}\u{FE0F}\u{200D}]/gu, '')
+    .replace(
+      /\p{Extended_Pictographic}(\u{FE0F}|[\u{1F3FB}-\u{1F3FF}])?(\u{200D}\p{Extended_Pictographic}(\u{FE0F}|[\u{1F3FB}-\u{1F3FF}])?)*/gu,
+      '',
+    )
     .replace(/\s+/g, ' ')
     .replace(/^[\s·-]+|[\s·-]+$/g, '')
 }
+
+/** The barber-pole rule, drawn as blocks because satori has no gradients. */
+const STRIPES = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 
 /** Long titles get smaller type rather than a clipped third line. */
 function titleSize(title: string): number {
@@ -103,119 +111,119 @@ export async function ogImage({
   const site = getSite(locale)
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        background: PAPER,
+        color: INK,
+        fontFamily: font ? 'Display' : 'sans-serif',
+        position: 'relative',
+      }}
+      lang={LOCALE_META[locale].htmlLang}
+    >
+      {/* Spine in the collection's colour — the one part that changes per topic. */}
+      <div style={{ width: 28, height: '100%', background: brand, display: 'flex' }} />
+
+      {/* Printed swatch cresting the top-right corner. */}
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          position: 'absolute',
+          top: -110,
+          right: -110,
+          width: 300,
+          height: 300,
+          background: MUSTARD,
+          border: `4px solid ${INK}`,
+          transform: 'rotate(45deg)',
           display: 'flex',
-          background: PAPER,
-          color: INK,
-          fontFamily: font ? 'Display' : 'sans-serif',
-          position: 'relative',
         }}
-        lang={LOCALE_META[locale].htmlLang}
+      />
+
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '64px 72px',
+          justifyContent: 'space-between',
+        }}
       >
-        {/* Spine in the collection's colour — the one part that changes per topic. */}
-        <div style={{ width: 28, height: '100%', background: brand, display: 'flex' }} />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div
+            style={{
+              display: 'flex',
+              fontSize: 24,
+              letterSpacing: 3,
+              textTransform: 'uppercase',
+              color: INK_MUTED,
+              maxWidth: 820,
+            }}
+          >
+            {safeEyebrow}
+          </div>
 
-        {/* Printed swatch cresting the top-right corner. */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -110,
-            right: -110,
-            width: 300,
-            height: 300,
-            background: MUSTARD,
-            border: `4px solid ${INK}`,
-            transform: 'rotate(45deg)',
-            display: 'flex',
-          }}
-        />
+          <div
+            style={{
+              display: 'flex',
+              marginTop: 28,
+              fontSize: titleSize(safeTitle),
+              lineHeight: 1.12,
+              maxWidth: 900,
+            }}
+          >
+            {safeTitle}
+          </div>
 
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '64px 72px',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {description && (
             <div
               style={{
                 display: 'flex',
-                fontSize: 24,
-                letterSpacing: 3,
-                textTransform: 'uppercase',
+                marginTop: 26,
+                fontSize: 28,
+                lineHeight: 1.4,
                 color: INK_MUTED,
-                maxWidth: 820,
+                maxWidth: 860,
               }}
             >
-              {safeEyebrow}
+              {description.length > 150 ? `${description.slice(0, 147)}…` : description}
             </div>
+          )}
+        </div>
 
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {STRIPES.map((stripe) => (
+                <div
+                  key={stripe}
+                  style={{ width: 22, height: 12, background: MUSTARD, display: 'flex' }}
+                />
+              ))}
+            </div>
+            <div style={{ display: 'flex', marginTop: 18, fontSize: 30 }}>{site.name}</div>
+          </div>
+
+          {safeMeta && (
             <div
               style={{
                 display: 'flex',
-                marginTop: 28,
-                fontSize: titleSize(safeTitle),
-                lineHeight: 1.12,
-                maxWidth: 900,
+                fontSize: 22,
+                letterSpacing: 2,
+                textTransform: 'uppercase',
+                color: INK,
+                background: MUSTARD,
+                border: `3px solid ${INK}`,
+                padding: '8px 16px',
               }}
             >
-              {safeTitle}
+              {safeMeta}
             </div>
-
-            {description && (
-              <div
-                style={{
-                  display: 'flex',
-                  marginTop: 26,
-                  fontSize: 28,
-                  lineHeight: 1.4,
-                  color: INK_MUTED,
-                  maxWidth: 860,
-                }}
-              >
-                {description.length > 150 ? description.slice(0, 147) + '…' : description}
-              </div>
-            )}
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {/* Barber-pole rule, drawn as blocks because satori has no gradients. */}
-              <div style={{ display: 'flex', gap: 6 }}>
-                {Array.from({ length: 7 }, (_, i) => (
-                  <div key={i} style={{ width: 22, height: 12, background: MUSTARD, display: 'flex' }} />
-                ))}
-              </div>
-              <div style={{ display: 'flex', marginTop: 18, fontSize: 30 }}>{site.name}</div>
-            </div>
-
-            {safeMeta && (
-              <div
-                style={{
-                  display: 'flex',
-                  fontSize: 22,
-                  letterSpacing: 2,
-                  textTransform: 'uppercase',
-                  color: INK,
-                  background: MUSTARD,
-                  border: `3px solid ${INK}`,
-                  padding: '8px 16px',
-                }}
-              >
-                {safeMeta}
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
-    ),
+    </div>,
     {
       ...OG_SIZE,
       ...(font ? { fonts: [{ name: 'Display', data: font, style: 'normal', weight: 400 }] } : {}),

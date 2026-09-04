@@ -109,7 +109,7 @@ export function paletteVars(palette: Palette): CSSProperties {
 
 /** Travel the short way round the colour wheel, so 350 → 10 is +20, not -340. */
 function shortestDelta(from: number, to: number): number {
-  const delta = (to - from + 540) % 360 - 180
+  const delta = ((to - from + 540) % 360) - 180
   return delta
 }
 

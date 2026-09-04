@@ -336,11 +336,7 @@ function toAbout(value: unknown): About[] {
 
 /** Frontmatter lists are hand-written, so accept a YAML list or a comma-separated string. */
 function toKeys(value: unknown): string[] {
-  const raw = Array.isArray(value)
-    ? value
-    : typeof value === 'string'
-      ? value.split(',')
-      : []
+  const raw = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : []
 
   return [...new Set(raw.map((item) => slugify(String(item))).filter(Boolean))]
 }

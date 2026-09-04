@@ -44,8 +44,7 @@ export function editUrl(collection: string, slug: string, locale: Locale, transl
   if (!site.repoUrl) return ''
 
   // An untranslated page renders the default-locale file, so that is the file to edit.
-  const file =
-    translated && locale !== DEFAULT_LOCALE ? `${slug}.${locale}.mdx` : `${slug}.mdx`
+  const file = translated && locale !== DEFAULT_LOCALE ? `${slug}.${locale}.mdx` : `${slug}.mdx`
 
   return `${site.repoUrl}/edit/${site.repoBranch}/content/${collection}/${file}`
 }

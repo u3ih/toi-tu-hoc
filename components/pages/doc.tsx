@@ -67,7 +67,10 @@ export function DocPage({
                 className="flex flex-wrap items-center gap-1.5 label-retro muted"
                 aria-label={t(locale, 'nav.breadcrumb')}
               >
-                <Link href={path(locale)} className="hover:text-brand-600 dark:hover:text-accent-400">
+                <Link
+                  href={path(locale)}
+                  className="hover:text-brand-600 dark:hover:text-accent-400"
+                >
                   {t(locale, 'nav.home')}
                 </Link>
                 <span aria-hidden>/</span>

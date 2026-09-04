@@ -30,10 +30,7 @@ export function Pager({
         <span />
       )}
       {next && (
-        <Link
-          href={next.href}
-          className="surface retro-lift group p-4 text-right sm:col-start-2"
-        >
+        <Link href={next.href} className="surface retro-lift group p-4 text-right sm:col-start-2">
           <p className="label-retro muted">{t(locale, 'doc.next')}</p>
           <p className="mt-1.5 font-semibold group-hover:text-brand-700 dark:group-hover:text-accent-400">
             {next.title}

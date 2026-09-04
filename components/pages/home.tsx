@@ -46,7 +46,10 @@ export function HomePage({ locale }: { locale: Locale }) {
             </h1>
 
             {/* Barber-pole rule under the title. */}
-            <div aria-hidden className="retro-stripes mx-auto mt-8 h-3 w-40 rounded-retro border-2" />
+            <div
+              aria-hidden
+              className="retro-stripes mx-auto mt-8 h-3 w-40 rounded-retro border-2"
+            />
 
             <p className="mx-auto mt-8 max-w-2xl text-lg muted text-pretty">{site.description}</p>
           </div>

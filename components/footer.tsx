@@ -16,11 +16,17 @@ export function Footer({ locale }: { locale: Locale }) {
         <Link href={path(locale)} className="hover:text-brand-600 dark:hover:text-accent-400">
           {t(locale, 'nav.home')}
         </Link>
-        <Link href={path(locale, 'topics')} className="hover:text-brand-600 dark:hover:text-accent-400">
+        <Link
+          href={path(locale, 'topics')}
+          className="hover:text-brand-600 dark:hover:text-accent-400"
+        >
           {t(locale, 'topics.title')}
         </Link>
         {hasTags && (
-          <Link href={path(locale, 'tags')} className="hover:text-brand-600 dark:hover:text-accent-400">
+          <Link
+            href={path(locale, 'tags')}
+            className="hover:text-brand-600 dark:hover:text-accent-400"
+          >
             {t(locale, 'tags.title')}
           </Link>
         )}

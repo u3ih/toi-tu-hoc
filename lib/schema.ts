@@ -60,7 +60,7 @@ export function homeSchema(
     ...baseNodes(locale),
     {
       '@type': 'CollectionPage',
-      '@id': siteUrl(`${localePrefix(locale)}/`) + '#page',
+      '@id': `${siteUrl(`${localePrefix(locale)}/`)}#page`,
       url: siteUrl(`${localePrefix(locale)}/`),
       name: `${s.name} — ${s.tagline}`,
       description: s.description,
@@ -108,13 +108,13 @@ export function topicsSchema(locale: Locale, groups: CategoryGroup[]): Node {
 
   return graph([
     ...baseNodes(locale),
-    breadcrumb(locale, [
+    breadcrumb([
       { name: s.name, href: `${localePrefix(locale)}/` },
       { name: t(locale, 'topics.title'), href: path(locale, 'topics') },
     ]),
     {
       '@type': 'CollectionPage',
-      '@id': siteUrl(path(locale, 'topics')) + '#page',
+      '@id': `${siteUrl(path(locale, 'topics'))}#page`,
       url: siteUrl(path(locale, 'topics')),
       name: t(locale, 'topics.title'),
       description: t(locale, 'topics.description'),
@@ -132,13 +132,13 @@ export function tagsSchema(locale: Locale, tags: Tag[]): Node {
 
   return graph([
     ...baseNodes(locale),
-    breadcrumb(locale, [
+    breadcrumb([
       { name: s.name, href: `${localePrefix(locale)}/` },
       { name: t(locale, 'tags.title'), href: path(locale, 'tags') },
     ]),
     {
       '@type': 'CollectionPage',
-      '@id': siteUrl(path(locale, 'tags')) + '#page',
+      '@id': `${siteUrl(path(locale, 'tags'))}#page`,
       url: siteUrl(path(locale, 'tags')),
       name: t(locale, 'tags.title'),
       description: t(locale, 'tags.description'),
@@ -157,14 +157,14 @@ export function tagSchema(locale: Locale, key: string, label: string, docs: DocM
 
   return graph([
     ...baseNodes(locale),
-    breadcrumb(locale, [
+    breadcrumb([
       { name: s.name, href: `${localePrefix(locale)}/` },
       { name: t(locale, 'tags.title'), href: path(locale, 'tags') },
       { name: label, href },
     ]),
     {
       '@type': 'CollectionPage',
-      '@id': siteUrl(href) + '#page',
+      '@id': `${siteUrl(href)}#page`,
       url: siteUrl(href),
       name: t(locale, 'tag.title', { tag: label }),
       description: t(locale, 'tag.description', { tag: label }),
@@ -178,7 +178,7 @@ export function tagSchema(locale: Locale, key: string, label: string, docs: DocM
   ])
 }
 
-function breadcrumb(locale: Locale, trail: { name: string; href: string }[]): Node {
+function breadcrumb(trail: { name: string; href: string }[]): Node {
   return {
     '@type': 'BreadcrumbList',
     itemListElement: trail.map((step, i) => ({
@@ -195,13 +195,13 @@ export function collectionSchema(locale: Locale, collection: Collection, docs: D
 
   return graph([
     ...baseNodes(locale),
-    breadcrumb(locale, [
+    breadcrumb([
       { name: s.name, href: `${localePrefix(locale)}/` },
       { name: collection.title, href: collection.href },
     ]),
     {
       '@type': 'Blog',
-      '@id': siteUrl(collection.href) + '#blog',
+      '@id': `${siteUrl(collection.href)}#blog`,
       url: siteUrl(collection.href),
       name: collection.title,
       description: collection.description,
@@ -233,14 +233,14 @@ function faqNode(locale: Locale, doc: Doc): Node | null {
 
   return {
     '@type': 'FAQPage',
-    '@id': siteUrl(doc.href) + '#faq',
+    '@id': `${siteUrl(doc.href)}#faq`,
     url: siteUrl(doc.href),
     name: doc.title,
     inLanguage: LOCALE_META[locale].htmlLang,
     mainEntity: blocks.map((block) => ({
       '@type': 'Question',
       name: block.heading,
-      url: siteUrl(doc.href) + `#${block.id}`,
+      url: `${siteUrl(doc.href)}#${block.id}`,
       acceptedAnswer: { '@type': 'Answer', text: block.text },
     })),
   }
@@ -255,7 +255,7 @@ function howToNode(locale: Locale, doc: Doc): Node | null {
 
   return {
     '@type': 'HowTo',
-    '@id': siteUrl(doc.href) + '#howto',
+    '@id': `${siteUrl(doc.href)}#howto`,
     url: siteUrl(doc.href),
     name: doc.title,
     description: doc.description,
@@ -265,7 +265,7 @@ function howToNode(locale: Locale, doc: Doc): Node | null {
       '@type': 'HowToStep',
       position: i + 1,
       name: block.heading,
-      url: siteUrl(doc.href) + `#${block.id}`,
+      url: `${siteUrl(doc.href)}#${block.id}`,
       text: block.text.slice(0, 1200),
     })),
   }
@@ -302,7 +302,12 @@ function fold(text: string): string {
     .trim()
 }
 
-export function docSchema(locale: Locale, collection: Collection, doc: Doc, sectionTitle: string): Node {
+export function docSchema(
+  locale: Locale,
+  collection: Collection,
+  doc: Doc,
+  sectionTitle: string,
+): Node {
   const s = getSite(locale)
   const extra =
     doc.schemaType === 'faq'
@@ -314,14 +319,14 @@ export function docSchema(locale: Locale, collection: Collection, doc: Doc, sect
 
   return graph([
     ...baseNodes(locale),
-    breadcrumb(locale, [
+    breadcrumb([
       { name: s.name, href: `${localePrefix(locale)}/` },
       { name: collection.title, href: collection.href },
       { name: doc.title, href: doc.href },
     ]),
     {
       '@type': 'BlogPosting',
-      '@id': siteUrl(doc.href) + '#article',
+      '@id': `${siteUrl(doc.href)}#article`,
       mainEntityOfPage: { '@type': 'WebPage', '@id': siteUrl(doc.href) },
       url: siteUrl(doc.href),
       headline: doc.title,
@@ -330,7 +335,7 @@ export function docSchema(locale: Locale, collection: Collection, doc: Doc, sect
       inLanguage: LOCALE_META[locale].htmlLang,
       wordCount: plainText(doc.body).split(/\s+/).filter(Boolean).length,
       timeRequired: `PT${doc.readingTime}M`,
-      isPartOf: { '@id': siteUrl(collection.href) + '#blog' },
+      isPartOf: { '@id': `${siteUrl(collection.href)}#blog` },
       author: { '@id': siteUrl('/') + AUTHOR_ID },
       publisher: { '@id': siteUrl('/') + AUTHOR_ID },
       ...(doc.tags.length ? { keywords: doc.tags.join(', ') } : {}),

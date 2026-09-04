@@ -32,7 +32,10 @@ export default function Page() {
 
       {/* Before that fires, send the reader to whichever language they actually
           read, remembering the choice for next time. */}
+      {/* A static script with no user input, and the only way to redirect before
+          paint on a host that cannot serve a 302. */}
       <script
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static redirect script
         dangerouslySetInnerHTML={{
           __html: `(function(){
   var known = ${JSON.stringify(LOCALES)};

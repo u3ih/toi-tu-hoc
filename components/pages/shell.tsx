@@ -22,7 +22,12 @@ export function Shell({ locale, children }: { locale: Locale; children: ReactNod
         />
       </head>
       <body className="flex min-h-dvh flex-col font-sans">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
           <Footer locale={locale} />
         </ThemeProvider>

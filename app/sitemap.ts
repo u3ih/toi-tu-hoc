@@ -8,7 +8,10 @@ export const dynamic = 'force-static'
 /** hreflang alternates for one locale-independent path. */
 function languages(bare: string) {
   return Object.fromEntries(
-    LOCALES.map((locale) => [LOCALE_META[locale].htmlLang, siteUrl(`${localePrefix(locale)}${bare}`)]),
+    LOCALES.map((locale) => [
+      LOCALE_META[locale].htmlLang,
+      siteUrl(`${localePrefix(locale)}${bare}`),
+    ]),
   )
 }
 

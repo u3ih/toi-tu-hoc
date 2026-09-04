@@ -51,7 +51,9 @@ export function renderFeed(locale: Locale): string {
   const self = siteUrl(`${localePrefix(locale)}/feed.xml`)
   const home = siteUrl(`${localePrefix(locale)}/`)
   const docs = feedDocs(locale)
-  const latest = docs.find((doc) => doc.updated ?? doc.date)
+  const lastBuild = docs
+    .map((doc) => doc.updated ?? doc.date)
+    .find((date): date is string => !!date)
 
   const items = docs
     .map((doc) => {
@@ -84,7 +86,7 @@ export function renderFeed(locale: Locale): string {
     <language>${LOCALE_META[locale].htmlLang}</language>
     <managingEditor>${escapeXml(site.author)}</managingEditor>
     <webMaster>${escapeXml(site.author)}</webMaster>
-${latest ? `    <lastBuildDate>${rfc822(latest.updated ?? latest.date!)}</lastBuildDate>\n` : ''}${items}
+${lastBuild ? `    <lastBuildDate>${rfc822(lastBuild)}</lastBuildDate>\n` : ''}${items}
   </channel>
 </rss>
 `

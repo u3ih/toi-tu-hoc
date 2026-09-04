@@ -18,7 +18,8 @@ const DEFAULT_LOCALE = config.defaultLocale
 const argv = process.argv.slice(2)
 const localeFlag = argv.indexOf('--locale')
 const locale = localeFlag === -1 ? DEFAULT_LOCALE : argv[localeFlag + 1]
-const positional = localeFlag === -1 ? argv : [...argv.slice(0, localeFlag), ...argv.slice(localeFlag + 2)]
+const positional =
+  localeFlag === -1 ? argv : [...argv.slice(0, localeFlag), ...argv.slice(localeFlag + 2)]
 const [collection, slug, section] = positional
 
 const KEY = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -38,8 +39,10 @@ function fail(message) {
 
 if (!collection) fail('Usage: pnpm new <collection> [slug] [sectionKey] [--locale <code>]')
 if (!LOCALES.includes(locale)) fail(`Unknown locale "${locale}". Known: ${LOCALES.join(', ')}`)
-if (!KEY.test(collection)) fail(`Collection "${collection}" must be a lowercase English key, e.g. "english".`)
-if (slug && !KEY.test(slug)) fail(`Slug "${slug}" must be a lowercase English key, e.g. "how-many-words".`)
+if (!KEY.test(collection))
+  fail(`Collection "${collection}" must be a lowercase English key, e.g. "english".`)
+if (slug && !KEY.test(slug))
+  fail(`Slug "${slug}" must be a lowercase English key, e.g. "how-many-words".`)
 
 const dir = path.join(root, 'content', collection)
 const manifestPath = path.join(dir, 'collection.json')
@@ -63,10 +66,14 @@ function blankManifest() {
 
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true })
-  fs.writeFileSync(manifestPath, JSON.stringify(blankManifest(), null, 2) + '\n')
+  fs.writeFileSync(manifestPath, `${JSON.stringify(blankManifest(), null, 2)}\n`)
   console.log(`created content/${collection}/collection.json`)
-  console.log(`  → edit title/description per locale, emoji, and category (${categories().join('|') || 'see content/categories.json'})`)
-  console.log('  → accent: indigo|violet|sky|teal|emerald|lime|amber|clay|rose|plum, or set "hue": 0-359 for a new one')
+  console.log(
+    `  → edit title/description per locale, emoji, and category (${categories().join('|') || 'see content/categories.json'})`,
+  )
+  console.log(
+    '  → accent: indigo|violet|sky|teal|emerald|lime|amber|clay|rose|plum, or set "hue": 0-359 for a new one',
+  )
 }
 
 if (!slug) process.exit(0)
@@ -76,7 +83,9 @@ const sectionKeys = (manifest.sections ?? []).map((s) => s.key)
 const targetSection = section ?? sectionKeys[0] ?? 'start'
 
 if (section && !sectionKeys.includes(section)) {
-  fail(`Section "${section}" is not in collection.json. Known: ${sectionKeys.join(', ') || '(none)'}`)
+  fail(
+    `Section "${section}" is not in collection.json. Known: ${sectionKeys.join(', ') || '(none)'}`,
+  )
 }
 
 const sourceFile = path.join(dir, `${slug}.mdx`)
@@ -88,7 +97,9 @@ if (fs.existsSync(file)) fail(`content/${collection}/${path.basename(file)} alre
 
 if (locale !== DEFAULT_LOCALE) {
   if (!fs.existsSync(sourceFile)) {
-    fail(`content/${collection}/${slug}.mdx does not exist — write the ${DEFAULT_LOCALE} page first.`)
+    fail(
+      `content/${collection}/${slug}.mdx does not exist — write the ${DEFAULT_LOCALE} page first.`,
+    )
   }
 
   const source = matter(fs.readFileSync(sourceFile, 'utf8'))
@@ -138,7 +149,11 @@ Các bước cụ thể.
 `,
 )
 
-console.log(`created content/${collection}/${slug}.mdx (section "${targetSection}", order ${nextOrder})`)
+console.log(
+  `created content/${collection}/${slug}.mdx (section "${targetSection}", order ${nextOrder})`,
+)
 console.log('  → giọng viết: xưng "mình", kể chuyện thật. Xem content/STYLE.md')
-console.log('  → tags: [] là các khoá tiếng Anh, viết thường — chúng nối bài này với các chủ đề khác')
+console.log(
+  '  → tags: [] là các khoá tiếng Anh, viết thường — chúng nối bài này với các chủ đề khác',
+)
 console.log(`  → bản dịch: pnpm new ${collection} ${slug} --locale en`)

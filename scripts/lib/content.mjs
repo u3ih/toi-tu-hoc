@@ -15,7 +15,9 @@ const config = JSON.parse(fs.readFileSync(path.join(root, 'i18n.config.json'), '
 
 export const LOCALES = config.locales.map((l) => l.code)
 export const DEFAULT_LOCALE = config.defaultLocale
-export const LOCALE_META = Object.fromEntries(config.locales.map(({ code, ...meta }) => [code, meta]))
+export const LOCALE_META = Object.fromEntries(
+  config.locales.map(({ code, ...meta }) => [code, meta]),
+)
 
 /** Top-level route names the site owns; mirrors RESERVED_COLLECTIONS in lib/content.ts. */
 const RESERVED = new Set(['topics', 'tags', 'search', 'feed', 'api', 'sitemap'])

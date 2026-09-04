@@ -23,7 +23,10 @@ export function Takeaways({ locale, items }: { locale: Locale; items: string[] }
       <ul className="mt-3 space-y-2 text-[0.95rem] leading-relaxed">
         {items.map((item) => (
           <li key={item} className="flex gap-2.5">
-            <span aria-hidden className="mt-px shrink-0 font-bold text-brand-600 dark:text-accent-400">
+            <span
+              aria-hidden
+              className="mt-px shrink-0 font-bold text-brand-600 dark:text-accent-400"
+            >
               →
             </span>
             <span>{item}</span>

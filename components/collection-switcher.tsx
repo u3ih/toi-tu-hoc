@@ -60,7 +60,12 @@ export function CollectionSwitcher({
     const source: CategoryGroup[] =
       groups.length > 0
         ? groups
-        : [{ category: { key: 'all', title: '', description: '', emoji: '', order: 0 }, collections }]
+        : [
+            {
+              category: { key: 'all', title: '', description: '', emoji: '', order: 0 },
+              collections,
+            },
+          ]
 
     const q = fold(query.trim())
     if (!q) return source
@@ -91,6 +96,7 @@ export function CollectionSwitcher({
           {current?.shortTitle ?? t(locale, 'nav.topics')}
         </span>
         <svg
+          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -110,8 +116,10 @@ export function CollectionSwitcher({
         >
           {filterable && (
             <div className="border-b-2 px-3 py-2">
-              {/* eslint-disable-next-line jsx-a11y/no-autofocus -- the menu just opened */}
+              {/* The reader opened this menu a keystroke ago; focus landing
+                  anywhere else would be the surprise. */}
               <input
+                // biome-ignore lint/a11y/noAutofocus: focus follows the reader's own click
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

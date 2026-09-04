@@ -69,7 +69,9 @@ function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
 
       const at = text.indexOf(terms[0])
       const snippet =
-        at === -1 ? entry.description : `…${entry.text.slice(Math.max(0, at - 60), at + 100).trim()}…`
+        at === -1
+          ? entry.description
+          : `…${entry.text.slice(Math.max(0, at - 60), at + 100).trim()}…`
 
       return { ...entry, score, snippet }
     })
@@ -115,6 +117,9 @@ export function Search({
     [scoped, query, scope, currentCollection],
   )
 
+  // Reset the highlighted row whenever the result set changes underneath it,
+  // or Enter opens whatever now happens to sit at the old index.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run on input change
   useEffect(() => setCursor(0), [query, scope])
 
   // Cmd/Ctrl+K opens, Escape closes.
@@ -162,10 +167,15 @@ export function Search({
       >
         <SearchIcon />
         <span className="hidden sm:inline">{t(locale, 'search.open')}</span>
-        <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">⌘K</kbd>
+        <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">
+          ⌘K
+        </kbd>
       </button>
 
       {open && (
+        // The click is the backdrop shortcut; Escape closes the dialog from the
+        // keyboard, wired in the effect above.
+        // biome-ignore lint/a11y/useKeyWithClickEvents: Escape is the keyboard path
         <div
           role="dialog"
           aria-modal="true"
@@ -204,7 +214,11 @@ export function Search({
                   {t(locale, 'search.all')}
                 </ScopeChip>
                 {collections.map((c) => (
-                  <ScopeChip key={c.slug} active={scope === c.slug} onClick={() => setScope(c.slug)}>
+                  <ScopeChip
+                    key={c.slug}
+                    active={scope === c.slug}
+                    onClick={() => setScope(c.slug)}
+                  >
                     <span aria-hidden>{c.emoji}</span> {c.shortTitle}
                   </ScopeChip>
                 ))}
@@ -249,7 +263,9 @@ export function Search({
                     style={paletteVars(palettes.get(hit.collection) ?? DEFAULT_PALETTE)}
                     className={[
                       'w-full rounded-retro border-2 px-3 py-2.5 text-left transition-colors',
-                      i === cursor ? 'border-[var(--border)] bg-accent-400/30' : 'border-transparent',
+                      i === cursor
+                        ? 'border-[var(--border)] bg-accent-400/30'
+                        : 'border-transparent',
                     ].join(' ')}
                   >
                     <p className="label-retro muted">
@@ -264,9 +280,7 @@ export function Search({
                 <li className="px-3 py-6 text-center text-sm muted">{t(locale, 'search.empty')}</li>
               )}
               {query.trim().length < 2 && (
-                <li className="px-3 py-6 text-center text-sm muted">
-                  {t(locale, 'search.hint')}
-                </li>
+                <li className="px-3 py-6 text-center text-sm muted">{t(locale, 'search.hint')}</li>
               )}
             </ul>
           </div>
@@ -304,6 +318,7 @@ function ScopeChip({
 function SearchIcon({ className = '' }: { className?: string }) {
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"

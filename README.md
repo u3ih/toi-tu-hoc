@@ -10,6 +10,36 @@ pnpm install
 pnpm dev           # http://localhost:3000
 ```
 
+| Lệnh | Làm gì |
+| --- | --- |
+| `pnpm dev` | Chạy dev server |
+| `pnpm build` | Build tĩnh ra `out/` (kèm ảnh social, RSS, `llms.txt`) |
+| `pnpm lint` | Biome: format + lint, chỉ báo lỗi |
+| `pnpm lint:fix` | Biome: sửa được gì thì sửa |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm check:i18n` | So bộ key giữa các `messages/<locale>.json` |
+| `pnpm new` | Tạo collection / bài mới (xem [Thêm một chủ đề mới](#thêm-một-chủ-đề-mới)) |
+
+Lint và typecheck chạy trong CI trước khi build, nên một lỗi format không lọt lên production chỉ vì
+build vẫn thành công.
+
+### Biome
+
+Một công cụ làm cả format và lint, nên repo này **không** có Prettier hay ESLint. Cấu hình:
+[`biome.jsonc`](biome.jsonc) — file `.jsonc` để giải thích được từng lựa chọn ngay tại chỗ.
+
+Hai điểm cần biết:
+
+- **`app/globals.css` bị loại khỏi Biome.** Các at-rule của Tailwind v4 (`@theme`, `@utility`,
+  `@custom-variant`, `@plugin`) chưa có trong parser CSS của Biome, nên nó đọc file thành lỗi cú pháp.
+- **`biome check --write --unsafe` có thể làm sai logic.** Nó từng xoá `[pathname]` khỏi một
+  `useEffect` (drawer thôi không tự đóng khi chuyển trang), xoá `[query, scope]` khỏi một cái khác
+  (con trỏ kết quả tìm kiếm trỏ vào dòng cũ), và xoá `autoFocus` khỏi ô lọc chủ đề. Những chỗ đó giờ
+  có `biome-ignore` kèm lý do. Đọc diff trước khi commit `--unsafe`.
+
+Suppression phải nằm **ngay dòng trên** dòng bị báo — với thuộc tính JSX là bên trong danh sách
+thuộc tính, không phải trên thẻ.
+
 ## Kiến trúc: mọi thứ là "collection"
 
 Một collection = **một thư mục trong `content/`**. Không có file đăng ký tập trung, không phải sửa
@@ -381,6 +411,7 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `i18n.config.json` | Danh sách ngôn ngữ + ngôn ngữ mặc định (dùng chung cho code và script) |
 | `lib/i18n.ts` | Locale, URL theo locale, tra chuỗi (`t`) |
 | `lib/site.ts` | Tên site, tác giả, link repo, domain |
+| `biome.jsonc` | Format + lint (thay cho Prettier và ESLint) |
 | `lib/content.ts` | Khám phá collection, đọc MDX, gộp bản dịch, dựng sidebar/TOC/pager, category, tag, "Đọc tiếp" |
 | `lib/accent.ts` | Sinh ramp `--color-brand-*` từ một góc màu |
 | `lib/metadata.ts` | canonical, hreflang, OpenGraph, Twitter |

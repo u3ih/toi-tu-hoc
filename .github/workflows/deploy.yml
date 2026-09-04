@@ -34,6 +34,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Cheap and fast, and a formatting or lint regression should not reach
+      # production just because the build happens to still succeed.
+      - name: Lint and format check
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
       - name: Build static site
         # A project page is served from /<repo>, a user/org page from /.
         # base_path comes back empty for the latter, which is what we want.
