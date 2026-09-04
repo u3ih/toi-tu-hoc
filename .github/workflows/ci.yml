@@ -1,0 +1,49 @@
+name: CI
+
+# Deploys are handled by Vercel's own GitHub integration, which also posts the
+# preview URL on each pull request. This workflow only gates the code.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to the same branch makes the in-flight run pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version comes from the "packageManager" field in package.json.
+      - uses: pnpm/action-setup@v6
+
+      # pnpm 11 needs Node >= 22.13 (it imports node:sqlite).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Cheap and fast, and a formatting or lint regression should not reach
+      # production just because the build happens to still succeed.
+      - name: Lint and format check
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      # Vercel serves from the domain root, so no base path. Catches build
+      # breaks here rather than in Vercel's queue.
+      - name: Build
+        env:
+          NEXT_PUBLIC_GTM_ID: ${{ vars.GTM_ID }}
+        run: pnpm run build
