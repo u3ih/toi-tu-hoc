@@ -49,6 +49,22 @@ Mỗi bài nên có **một tới hai** cái. Nhiều hơn thì mất tác dụn
 - **Bảng và danh sách** thay cho đoạn văn dài liệt kê nhiều thứ.
 - Tránh chữ Hán Việt nặng nề khi có từ thuần Việt tương đương.
 
+## Luôn dẫn nguồn
+
+Con số hoặc khẳng định nào không phải trải nghiệm cá nhân thì **phải có link tới nguồn gốc**.
+
+- **Dẫn ngay tại chỗ** khi con số xuất hiện: `[nghiên cứu của Hu và Nation (2000)](url) cho thấy...`
+- **Và gom lại cuối bài** trong mục `## Nguồn cho bài này`, mỗi dòng ghi rõ *nguồn đó cho ra con số
+  nào*. Danh sách link suông không có giá trị.
+- **Ưu tiên link đọc được miễn phí** — bản PDF của tác giả, kho lưu trữ mở. Đừng dẫn tới trang chỉ
+  hiện tóm tắt rồi bắt trả tiền.
+- **Nói rõ chỗ nào là của mình.** Nếu một phần trong bài là kinh nghiệm riêng chứ không có nghiên cứu
+  nào chống lưng, ghi thẳng ra: *"phần này mình tự tổng kết, không lấy từ nghiên cứu nào"*.
+- **Kiểm tra link còn sống** trước khi publish.
+
+Lý do: phần lớn nội dung ở đây là trải nghiệm cá nhân, nên chỗ nào có bằng chứng thật thì phải cho
+người đọc kiểm chứng được — và phân biệt được rõ hai loại.
+
 ## Những gì cần tránh
 
 - Giọng khẳng định như chân lý ("phương pháp duy nhất đúng là...").
