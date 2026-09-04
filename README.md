@@ -220,6 +220,7 @@ description: Mô tả ngắn, hiện dưới tiêu đề và trong kết quả t
 section: resources
 order: 3
 tags: [habit, mindset]  # tuỳ chọn — sinh ra /tags/<tag>/ và khối "Đọc tiếp"
+level: beginner         # tuỳ chọn — beginner | intermediate | advanced
 schema: faq             # tuỳ chọn — faq | howto, xem phần SEO
 date: 2026-02-14        # tuỳ chọn — vào JSON-LD và <pubDate> của RSS
 updated: 2026-08-01     # tuỳ chọn — vào JSON-LD và <lastmod> của sitemap
@@ -271,6 +272,27 @@ bài mới.
 
 Link nội bộ trong MDX viết **không kèm tiền tố ngôn ngữ** (`/english/faq/`). Tiền tố được thêm lúc
 render, nên cùng một file dùng lại được cho mọi ngôn ngữ.
+
+### `level:` — bài này giả định người đọc biết trước những gì
+
+```mdx
+---
+level: intermediate   # beginner | intermediate | advanced
+---
+```
+
+Hiện thành một badge ba vạch cạnh thời gian đọc, và đi vào `educationalLevel` trong JSON-LD. Lý do
+có nó: cách phổ biến nhất để một người bỏ trang tự học là mở đúng bài sai đầu tiên.
+
+## Mục lục trong bài
+
+Màn hình rộng (`xl` trở lên) có thanh anchor bên phải. Màn hình hẹp hơn — tức là điện thoại và phần
+lớn tablet — trước đây **không có gì**; giờ có một thanh dính ngay dưới header: lúc gập lại nó hiện
+tên mục đang đọc (kiêm luôn chỉ báo vị trí), bấm vào thì mở ra cả danh sách.
+
+Cả hai dùng chung hook `useActiveHeading` trong [`components/toc.tsx`](components/toc.tsx). Nó đo
+theo scroll chứ không dùng `IntersectionObserver`, vì câu hỏi không phải "cái gì đang hiện" mà là
+"mình vừa đi qua mục nào" — một mục dài đã trôi tiêu đề khỏi màn hình thì vẫn là mục đang đọc.
 
 ## Tiến độ đọc
 

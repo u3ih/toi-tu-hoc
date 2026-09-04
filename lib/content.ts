@@ -81,6 +81,19 @@ export type Heading = { id: string; text: string; level: 2 | 3 }
 export type SchemaType = 'faq' | 'howto'
 
 /**
+ * How much a page assumes, set with `level:` in frontmatter.
+ *
+ * Shown as a badge because the commonest way to bounce off a self-study site is
+ * to open the wrong article first; also emitted as `educationalLevel`.
+ */
+export const LEVELS = ['beginner', 'intermediate', 'advanced'] as const
+export type Level = (typeof LEVELS)[number]
+
+function toLevel(value: unknown): Level | undefined {
+  return (LEVELS as readonly string[]).includes(value as string) ? (value as Level) : undefined
+}
+
+/**
  * One `##` block of a page. `text` is the prose with markup removed; `raw` keeps
  * the markdown, which is what link extraction needs.
  */
@@ -123,6 +136,8 @@ export type DocMeta = {
   takeaways: string[]
   /** Entities the page is about, linked to Wikipedia/Wikidata where given. */
   about: About[]
+  /** How much the page assumes, when the author said. */
+  level?: Level
 }
 
 export type Doc = DocMeta & { headings: Heading[]; body: string }
@@ -271,6 +286,7 @@ type RawDoc = {
   schemaType?: SchemaType
   takeaways: string[]
   about: About[]
+  level?: Level
   date?: string
   updated?: string
   headings: Heading[]
@@ -355,6 +371,7 @@ function readDoc(file: string): RawDoc {
     schemaType: data.schema === 'faq' || data.schema === 'howto' ? data.schema : undefined,
     takeaways: toLines(data.takeaways),
     about: toAbout(data.about),
+    level: toLevel(data.level),
     date: toIsoDate(data.date),
     updated: toIsoDate(data.updated),
     headings: extractHeadings(content),
@@ -451,6 +468,7 @@ function toDoc(
     schemaType: base.schemaType,
     takeaways: text.takeaways.length ? text.takeaways : base.takeaways,
     about: base.about,
+    level: base.level,
     date: base.date,
     updated: text.updated ?? base.updated ?? base.date,
     translated: translation !== undefined,

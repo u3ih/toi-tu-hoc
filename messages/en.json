@@ -34,6 +34,7 @@
     "badge": "Free · Updated regularly",
     "collections": "Collections",
     "pick": "Pick a topic to start",
+    "startHere": "Start here",
     "browseAll": "Browse every topic",
     "categoryCount": "{count} collections",
     "andMore": "{count} more",
@@ -77,6 +78,13 @@
     "tags": "Tags",
     "untranslated": "This page has no {language} version yet. You are reading the {fallback} original.",
     "edit": "Edit this page on GitHub"
+  },
+
+  "level": {
+    "label": "Level",
+    "beginner": "Starting out",
+    "intermediate": "Some way in",
+    "advanced": "Fairly solid"
   },
 
   "progress": {

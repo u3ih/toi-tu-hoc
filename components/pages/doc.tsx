@@ -11,13 +11,14 @@ import { docSchema } from '@/lib/schema'
 import { mdxComponents } from '@/components/mdx'
 import { JsonLd } from '@/components/json-ld'
 import { Sidebar } from '@/components/sidebar'
-import { Toc } from '@/components/toc'
+import { Toc, TocMenu } from '@/components/toc'
 import { Pager } from '@/components/pager'
 import { ReadingProgress } from '@/components/progress-bar'
 import { Related } from '@/components/related'
 import { Takeaways } from '@/components/takeaways'
 import { DoneToggle } from '@/components/progress/done-toggle'
 import { TagPill } from '@/components/tag-pill'
+import { LevelBadge } from '@/components/level-badge'
 
 export function docMetadata(locale: Locale, collection: string, slug: string): Metadata {
   const doc = getDoc(locale, collection, slug)
@@ -95,6 +96,7 @@ export function DocPage({
                 <p className="retro-shadow-sm inline-block rounded-retro border-2 border-brand-900 bg-accent-400 px-2.5 py-1 label-retro text-brand-900">
                   {t(locale, 'doc.readingTime', { minutes: doc.readingTime })}
                 </p>
+                <LevelBadge locale={locale} level={doc.level} />
                 {doc.tags.map((tag) => (
                   <TagPill
                     key={tag}
@@ -119,6 +121,10 @@ export function DocPage({
                 </p>
               )}
             </header>
+
+            {/* On a narrow screen the anchor rail has nowhere to sit, so the
+                same anchors ride along under the header instead. */}
+            <TocMenu headings={doc.headings} locale={locale} />
 
             <Takeaways locale={locale} items={doc.takeaways} />
 

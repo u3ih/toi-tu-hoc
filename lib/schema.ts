@@ -339,6 +339,7 @@ export function docSchema(
       author: { '@id': siteUrl('/') + AUTHOR_ID },
       publisher: { '@id': siteUrl('/') + AUTHOR_ID },
       ...(doc.tags.length ? { keywords: doc.tags.join(', ') } : {}),
+      ...(doc.level ? { educationalLevel: doc.level } : {}),
       ...(doc.takeaways.length
         ? {
             abstract: doc.takeaways.join(' '),

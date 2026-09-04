@@ -1,5 +1,11 @@
 import Link from 'next/link'
-import { getCategories, getCollections, getDocs, type CategoryGroup } from '@/lib/content'
+import {
+  getCategories,
+  getCollections,
+  getDocs,
+  getFlatNav,
+  type CategoryGroup,
+} from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
 import { homeSchema } from '@/lib/schema'
 import { getSite } from '@/lib/site'
@@ -14,6 +20,11 @@ export function HomePage({ locale }: { locale: Locale }) {
   const site = getSite(locale)
   const collections = getCollections(locale)
   const groups = getCategories(locale)
+
+  // The hero used to end on a paragraph, which left a reader who was already
+  // convinced with nothing to press. This is the first page of the first
+  // collection — the one answer to "so where do I start".
+  const start = collections.length ? getFlatNav(locale, collections[0].slug)[0] : undefined
 
   // With one category there is nothing to distinguish, so the heading would be
   // noise. Grouping only earns its keep once the site spans several areas.
@@ -52,6 +63,23 @@ export function HomePage({ locale }: { locale: Locale }) {
             />
 
             <p className="mx-auto mt-8 max-w-2xl text-lg muted text-pretty">{site.description}</p>
+
+            {start && (
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                <Link
+                  href={start.href}
+                  className="retro-lift retro-shadow rounded-retro border-2 bg-brand-600 px-6 py-3 font-semibold text-white"
+                >
+                  {t(locale, 'home.startHere')} →
+                </Link>
+                <Link
+                  href={path(locale, 'topics')}
+                  className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+                >
+                  {t(locale, 'home.browseAll')}
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 

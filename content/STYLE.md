@@ -47,6 +47,15 @@ takeaways:
 Bốn dòng này hiện thành hộp **Ý chính** ở đầu bài, và đi vào `abstract` + `speakable` trong JSON-LD —
 tức là đúng đoạn mà ChatGPT, Perplexity hay AI Overviews sẽ trích khi trả lời câu hỏi của người ta.
 
+## Khai `level:`
+
+Mỗi bài khai `level: beginner | intermediate | advanced`. Tiêu chí là **bài này giả định người đọc đã
+biết gì**, không phải bài khó hay dễ:
+
+- `beginner` — không giả định gì ngoài việc người đọc quan tâm chủ đề.
+- `intermediate` — giả định người đọc đã làm theo mấy bài `beginner` và đang mắc ở tầng sau.
+- `advanced` — giả định người đọc đã đi được một đoạn dài và đang tinh chỉnh.
+
 ## Đặt tiêu đề `##` thành câu hỏi
 
 Chỗ nào một mục thật sự trả lời một câu hỏi thì viết heading thành câu hỏi đó, đúng cách người ta gõ

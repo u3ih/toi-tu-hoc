@@ -34,6 +34,7 @@
     "badge": "Miễn phí · Cập nhật liên tục",
     "collections": "Các bộ nội dung",
     "pick": "Chọn một chủ đề để bắt đầu",
+    "startHere": "Bắt đầu từ đây",
     "browseAll": "Xem tất cả chủ đề",
     "categoryCount": "{count} bộ",
     "andMore": "Còn {count} bộ nữa",
@@ -77,6 +78,13 @@
     "tags": "Thẻ",
     "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}.",
     "edit": "Sửa bài này trên GitHub"
+  },
+
+  "level": {
+    "label": "Trình độ",
+    "beginner": "Mới bắt đầu",
+    "intermediate": "Đã đi được một đoạn",
+    "advanced": "Đã khá vững"
   },
 
   "progress": {
