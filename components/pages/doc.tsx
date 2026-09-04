@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm'
 import { getCollection, getDoc, getFlatNav, getNav } from '@/lib/content'
 import { barePath, DEFAULT_LOCALE, LOCALE_META, t, type Locale } from '@/lib/i18n'
 import { pageMetadata } from '@/lib/metadata'
+import { editUrl } from '@/lib/site'
 import { docSchema } from '@/lib/schema'
 import { mdxComponents } from '@/components/mdx'
 import { JsonLd } from '@/components/json-ld'
@@ -44,6 +45,7 @@ export function DocPage({
   if (!collection || !doc) notFound()
 
   const section = collection.sections.find((s) => s.key === doc.section)
+  const edit = editUrl(collectionSlug, doc.slug, locale, doc.translated)
 
   return (
     <>
@@ -122,6 +124,19 @@ export function DocPage({
                 options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
               />
             </div>
+
+            {edit && (
+              <p className="mt-12 text-sm">
+                <a
+                  href={edit}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline decoration-2 underline-offset-4 muted hover:text-brand-600 dark:hover:text-accent-400"
+                >
+                  ✏️ {t(locale, 'doc.edit')} →
+                </a>
+              </p>
+            )}
 
             <Pager flatNav={getFlatNav(locale, collectionSlug)} slug={doc.slug} locale={locale} />
           </article>

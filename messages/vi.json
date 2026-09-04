@@ -43,7 +43,8 @@
     "toc": "Trong bài này",
     "prev": "← Bài trước",
     "next": "Bài tiếp →",
-    "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}."
+    "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}.",
+    "edit": "Sửa bài này trên GitHub"
   },
 
   "callout": {

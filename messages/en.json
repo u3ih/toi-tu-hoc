@@ -43,7 +43,8 @@
     "toc": "On this page",
     "prev": "← Previous",
     "next": "Next →",
-    "untranslated": "This page has no {language} version yet. You are reading the {fallback} original."
+    "untranslated": "This page has no {language} version yet. You are reading the {fallback} original.",
+    "edit": "Edit this page on GitHub"
   },
 
   "callout": {

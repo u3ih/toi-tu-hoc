@@ -196,8 +196,15 @@ Thêm bảng màu mới: thêm một block `[data-accent='ten-mau']` trong `glob
 
 ## Đổi tên / mô tả trang
 
-Tên site, tác giả, link repo, domain: [`lib/site.ts`](lib/site.ts).
+Tên site, tác giả, link repo (`repoUrl` + `repoBranch`, dùng cho link footer và nút "sửa bài này
+trên GitHub"), domain: [`lib/site.ts`](lib/site.ts).
 Tagline, mô tả, keywords (dịch được): `site.*` trong `messages/<locale>.json`.
+
+## Đóng góp
+
+Sửa lỗi chính tả, cập nhật số liệu, hay viết thêm bài — cứ mở pull request. Cách nhanh nhất là bấm
+**✏️ Sửa bài này trên GitHub** ở cuối mỗi bài: GitHub tự fork repo và đưa bạn thẳng tới form pull
+request. Các bước chi tiết (cả cách fork rồi làm ở máy) nằm ở [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Deploy lên GitHub Pages
 
@@ -220,6 +227,7 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | --- | --- |
 | `content/<collection>/` | Toàn bộ nội dung — chỗ duy nhất bạn cần đụng tới khi viết bài |
 | `content/STYLE.md` | Quy ước giọng viết cho mọi bài |
+| `CONTRIBUTING.md` | Cách mở pull request để góp bài hoặc sửa lỗi |
 | `messages/<locale>.json` | Chuỗi giao diện của từng ngôn ngữ |
 | `i18n.config.json` | Danh sách ngôn ngữ + ngôn ngữ mặc định (dùng chung cho code và script) |
 | `lib/i18n.ts` | Locale, URL theo locale, tra chuỗi (`t`) |
