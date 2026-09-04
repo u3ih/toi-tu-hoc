@@ -1,4 +1,4 @@
-import { blocksOf, getCollections, plainText } from './content'
+import { blocksOf, getCollections, linksIn, plainText } from './content'
 import type { CategoryGroup, Collection, Doc, DocMeta, Tag } from './content'
 import { LOCALE_META, localePrefix, path, t, type Locale } from './i18n'
 import { siteUrl } from './metadata'
@@ -271,6 +271,37 @@ function howToNode(locale: Locale, doc: Doc): Node | null {
   }
 }
 
+/**
+ * The links under the page's own "sources" heading, as `citation`.
+ *
+ * Pulled out of the prose rather than asked for again in frontmatter: the style
+ * guide already requires every borrowed number to be linked at the point it is
+ * used and gathered under that heading, so the list exists. Duplicating it in
+ * frontmatter would only create a second copy to forget to update.
+ */
+function citationsOf(locale: Locale, doc: Doc): Node[] {
+  const wanted = fold(t(locale, 'doc.sourcesHeading'))
+  const block = blocksOf(doc.body, 2).find((candidate) => fold(candidate.heading) === wanted)
+  if (!block) return []
+
+  return linksIn(block.raw).map((link) => ({
+    '@type': 'CreativeWork',
+    name: link.text,
+    url: link.url,
+  }))
+}
+
+/** Compare headings without tripping over case, diacritics or stray punctuation. */
+function fold(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
 export function docSchema(locale: Locale, collection: Collection, doc: Doc, sectionTitle: string): Node {
   const s = getSite(locale)
   const extra =
@@ -279,6 +310,7 @@ export function docSchema(locale: Locale, collection: Collection, doc: Doc, sect
       : doc.schemaType === 'howto'
         ? howToNode(locale, doc)
         : null
+  const citations = citationsOf(locale, doc)
 
   return graph([
     ...baseNodes(locale),
@@ -302,6 +334,27 @@ export function docSchema(locale: Locale, collection: Collection, doc: Doc, sect
       author: { '@id': siteUrl('/') + AUTHOR_ID },
       publisher: { '@id': siteUrl('/') + AUTHOR_ID },
       ...(doc.tags.length ? { keywords: doc.tags.join(', ') } : {}),
+      ...(doc.takeaways.length
+        ? {
+            abstract: doc.takeaways.join(' '),
+            // Points a voice or answer surface at the summary the author wrote,
+            // rather than letting it pick the first paragraph it finds.
+            speakable: {
+              '@type': 'SpeakableSpecification',
+              cssSelector: ['[data-takeaways]'],
+            },
+          }
+        : {}),
+      ...(doc.about.length
+        ? {
+            about: doc.about.map((entity) => ({
+              '@type': 'Thing',
+              name: entity.name,
+              ...(entity.sameAs ? { sameAs: entity.sameAs } : {}),
+            })),
+          }
+        : {}),
+      ...(citations.length ? { citation: citations } : {}),
       ...(extra ? { mainEntity: { '@id': extra['@id'] } } : {}),
       ...(doc.date ? { datePublished: doc.date } : {}),
       ...(doc.updated ? { dateModified: doc.updated } : {}),

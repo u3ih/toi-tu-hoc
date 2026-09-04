@@ -72,6 +72,8 @@
     "prev": "← Bài trước",
     "next": "Bài tiếp →",
     "related": "Đọc tiếp",
+    "takeaways": "Ý chính",
+    "sourcesHeading": "Nguồn cho bài này",
     "tags": "Thẻ",
     "untranslated": "Bài này chưa có bản {language}. Bạn đang đọc bản {fallback}.",
     "edit": "Sửa bài này trên GitHub"

@@ -79,8 +79,14 @@ export type Heading = { id: string; text: string; level: 2 | 3 }
  */
 export type SchemaType = 'faq' | 'howto'
 
-/** One `##` block of a page: its heading and the prose under it, as plain text. */
-export type Block = { heading: string; id: string; text: string }
+/**
+ * One `##` block of a page. `text` is the prose with markup removed; `raw` keeps
+ * the markdown, which is what link extraction needs.
+ */
+export type Block = { heading: string; id: string; text: string; raw: string }
+
+/** An entity a page is about, linked to a public identifier so engines can ground it. */
+export type About = { name: string; sameAs?: string }
 
 export type DocMeta = {
   collection: string
@@ -105,6 +111,17 @@ export type DocMeta = {
   translated: boolean
   /** Structured-data shape beyond BlogPosting, when the author declared one. */
   schemaType?: SchemaType
+  /**
+   * The page in three or four lines, from the `takeaways:` frontmatter.
+   *
+   * Shown as a box above the article and emitted as `abstract` + `speakable`.
+   * An answer engine quotes a short, self-contained claim far more readily than
+   * it paraphrases six paragraphs, and a reader deciding whether to read at all
+   * wants the same thing.
+   */
+  takeaways: string[]
+  /** Entities the page is about, linked to Wikipedia/Wikidata where given. */
+  about: About[]
 }
 
 export type Doc = DocMeta & { headings: Heading[]; body: string }
@@ -201,11 +218,26 @@ export function blocksOf(body: string, level: 2 | 3 = 2): Block[] {
 }
 
 function finish(current: { heading: string; lines: string[] }): Block {
+  const raw = current.lines.join('\n')
+
   return {
     heading: current.heading,
     id: slugify(current.heading),
-    text: plainText(current.lines.join('\n')),
+    text: plainText(raw),
+    raw,
   }
+}
+
+/** External links in some markdown, in order, deduplicated. */
+export function linksIn(markdown: string): { text: string; url: string }[] {
+  const found = new Map<string, string>()
+
+  for (const match of markdown.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g)) {
+    const [, text, url] = match
+    if (!found.has(url)) found.set(url, plainText(text))
+  }
+
+  return [...found.entries()].map(([url, text]) => ({ text, url }))
 }
 
 /* --- Discovery ------------------------------------------------------------ */
@@ -236,6 +268,8 @@ type RawDoc = {
   readingTime: number
   tags: string[]
   schemaType?: SchemaType
+  takeaways: string[]
+  about: About[]
   date?: string
   updated?: string
   headings: Heading[]
@@ -273,6 +307,32 @@ function toIsoDate(value: unknown): string | undefined {
   return undefined
 }
 
+/** A YAML list of strings, tolerating a single string and dropping blanks. */
+function toLines(value: unknown): string[] {
+  const raw = Array.isArray(value) ? value : typeof value === 'string' ? [value] : []
+  return raw.map((item) => String(item).trim()).filter(Boolean)
+}
+
+/**
+ * `about:` accepts either a bare name or `{ name, sameAs }`, so a page can name
+ * its subject before anyone has looked up a Wikidata id for it.
+ */
+function toAbout(value: unknown): About[] {
+  return (Array.isArray(value) ? value : value ? [value] : [])
+    .map((item) => {
+      if (typeof item === 'string') return { name: item.trim() }
+      if (item && typeof item === 'object' && 'name' in item) {
+        const { name, sameAs } = item as { name?: unknown; sameAs?: unknown }
+        return {
+          name: String(name ?? '').trim(),
+          ...(typeof sameAs === 'string' && sameAs ? { sameAs } : {}),
+        }
+      }
+      return { name: '' }
+    })
+    .filter((entry) => entry.name.length > 0)
+}
+
 /** Frontmatter lists are hand-written, so accept a YAML list or a comma-separated string. */
 function toKeys(value: unknown): string[] {
   const raw = Array.isArray(value)
@@ -296,6 +356,8 @@ function readDoc(file: string): RawDoc {
     readingTime: Math.max(1, Math.ceil(words / 200)),
     tags: toKeys(data.tags),
     schemaType: data.schema === 'faq' || data.schema === 'howto' ? data.schema : undefined,
+    takeaways: toLines(data.takeaways),
+    about: toAbout(data.about),
     date: toIsoDate(data.date),
     updated: toIsoDate(data.updated),
     headings: extractHeadings(content),
@@ -390,6 +452,8 @@ function toDoc(
     readingTime: text.readingTime,
     tags: base.tags,
     schemaType: base.schemaType,
+    takeaways: text.takeaways.length ? text.takeaways : base.takeaways,
+    about: base.about,
     date: base.date,
     updated: text.updated ?? base.updated ?? base.date,
     translated: translation !== undefined,

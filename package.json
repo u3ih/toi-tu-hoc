@@ -7,7 +7,7 @@
     "predev": "node scripts/check-messages.mjs && node scripts/build-search-index.mjs",
     "dev": "next dev",
     "prebuild": "node scripts/check-messages.mjs && node scripts/build-search-index.mjs",
-    "build": "next build",
+    "build": "next build && node scripts/build-llms.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "check:i18n": "node scripts/check-messages.mjs",

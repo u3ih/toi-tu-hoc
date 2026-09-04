@@ -15,6 +15,7 @@ import { Toc } from '@/components/toc'
 import { Pager } from '@/components/pager'
 import { ReadingProgress } from '@/components/progress-bar'
 import { Related } from '@/components/related'
+import { Takeaways } from '@/components/takeaways'
 import { TagPill } from '@/components/tag-pill'
 
 export function docMetadata(locale: Locale, collection: string, slug: string): Metadata {
@@ -114,6 +115,8 @@ export function DocPage({
                 </p>
               )}
             </header>
+
+            <Takeaways locale={locale} items={doc.takeaways} />
 
             <div
               className="prose prose-neutral max-w-none dark:prose-invert

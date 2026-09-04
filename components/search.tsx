@@ -18,6 +18,7 @@ type IndexEntry = {
   title: string
   description: string
   section: string
+  tags: string[]
   headings: string[]
   text: string
 }
@@ -47,16 +48,21 @@ function search(index: IndexEntry[], query: string, boost?: string): Hit[] {
     .map((entry) => {
       const title = fold(entry.title)
       const headings = fold(entry.headings.join(' '))
+      const tags = fold(entry.tags.join(' '))
       const text = fold(entry.text)
 
       let score = 0
       for (const term of terms) {
         if (title.includes(term)) score += 10
         if (headings.includes(term)) score += 4
+        // A tag is a deliberate label, so matching one beats matching prose.
+        if (tags.includes(term)) score += 3
         if (text.includes(term)) score += 1
       }
       // Require every term to appear somewhere in the document.
-      const all = terms.every((t) => title.includes(t) || headings.includes(t) || text.includes(t))
+      const all = terms.every(
+        (t) => title.includes(t) || headings.includes(t) || tags.includes(t) || text.includes(t),
+      )
       if (!all) score = 0
       // Nudge the collection the reader is already in to the top.
       if (score > 0 && entry.collection === boost) score += 3

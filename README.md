@@ -262,6 +262,43 @@ vẹn**; cùng đoạn văn đó trong một bài viết thường thì máy ph�
 
 Không khai `schema:` thì bài vẫn là `BlogPosting` như cũ — chỉ là không có phần thêm.
 
+### GEO — tối ưu cho máy trả lời
+
+SEO là để người ta tìm ra trang. GEO là để máy trả lời (ChatGPT, Perplexity, AI Overviews) **trích
+đúng** thứ trang này nói. Bốn thứ dưới đây làm việc đó, và ba trong bốn là tự động.
+
+| Thứ | Ở đâu | Cần tay không |
+| --- | --- | --- |
+| `/llms.txt` — mục lục toàn site, mỗi bài một dòng kèm URL | [`scripts/build-llms.mjs`](scripts/build-llms.mjs) | Không |
+| `/llms-full.txt` — toàn bộ nội dung trong một file | cùng script | Không |
+| `/<đường-dẫn>/index.md` — bản markdown của **từng** bài | cùng script | Không |
+| `citation` trong JSON-LD | lấy từ mục `## Nguồn cho bài này` sẵn có | Không |
+| `abstract` + `speakable` | `takeaways:` trong frontmatter | **Có** |
+| `about` — nối chủ đề tới Wikipedia/Wikidata | `about:` trong frontmatter | **Có** |
+
+```mdx
+---
+takeaways:
+  - Mục tiêu tháng đầu không phải giỏi lên, mà là dựng được thói quen.
+  - Chọn một nguồn nghe và một nguồn đọc rồi thôi không tìm nữa.
+about:
+  - name: Comprehensible input
+    sameAs: https://en.wikipedia.org/wiki/Input_hypothesis
+  - name: Stephen Krashen        # chỉ có name cũng được
+---
+```
+
+`takeaways` hiện thành hộp **Ý chính** ở đầu bài — cùng một thứ vừa giúp người đọc quyết định có đọc
+tiếp không, vừa cho máy một đoạn ngắn tự đứng được để trích. Quy ước viết nằm ở
+[`content/STYLE.md`](content/STYLE.md).
+
+`citation` **không** cần khai thêm: script tìm mục `## Nguồn cho bài này` (tiếng Anh:
+`## Sources for this page`) và lấy link trong đó. Tên mục lấy từ `doc.sourcesHeading` trong
+`messages/<locale>.json`, nên đổi cách gọi mục thì sửa ở đó.
+
+Bản mirror `.md` sinh ra sau `next build`, ghi thẳng vào `out/`. Chạy `pnpm build` là có; `pnpm dev`
+thì không, vì chúng là thứ dành cho crawler chứ không phải cho người.
+
 ### Ảnh social
 
 Mọi trang có một ảnh 1200×630 sinh sẵn lúc build: màu spine lấy theo collection, nên chia sẻ một
@@ -336,6 +373,8 @@ NEXT_PUBLIC_BASE_PATH=/<repo> pnpm build && npx serve out
 | `lib/schema.ts` | JSON-LD (kèm `FAQPage`, `HowTo`) |
 | `lib/og.tsx` | Ảnh social sinh lúc build |
 | `lib/feed.ts` | RSS |
+| `scripts/lib/content.mjs` | Bản đọc content tree dùng chung cho mọi build script |
+| `scripts/build-llms.mjs` | `llms.txt`, `llms-full.txt`, mirror `.md` từng bài |
 | `app/(vi)/` | Route tiếng Việt (không tiền tố) + root layout `lang="vi"` |
 | `app/(en)/en/` | Route tiếng Anh + root layout `lang="en"` |
 | `app/(vi)/topics/`, `app/(vi)/tags/` | Trang hub: toàn bộ chủ đề, toàn bộ thẻ (mỗi ngôn ngữ một bản) |
