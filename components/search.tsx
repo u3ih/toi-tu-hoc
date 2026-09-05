@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ACCENT_PALETTES, DEFAULT_ACCENT, paletteVars } from '@/lib/accent'
 import type { CategoryGroup, Collection } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
-import { Overlay } from '@/lib/ui'
+import { Button, Overlay } from '@/lib/ui'
 
 /** Above this many collections the scope chips wrap into a wall; use a select. */
 const SCOPE_SELECT_THRESHOLD = 8
@@ -160,17 +160,23 @@ export function Search({
 
   return (
     <>
-      <button
-        type="button"
+      <Button
+        label={t(locale, 'search.open')}
+        // Text only from `sm` up: on a phone this is the magnifier alone, and
+        // an unnamed magnifier announces as "button".
+        textHidden="sm"
+        icon={<SearchIcon />}
+        trailing={
+          <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">
+            ⌘K
+          </kbd>
+        }
         onClick={() => setOpen(true)}
-        className="retro-shadow-sm flex h-10 w-10 items-center justify-center gap-2 rounded-retro border-2 text-sm muted transition-colors hover:bg-accent-400 hover:text-brand-900 sm:h-9 sm:w-52 sm:justify-start sm:px-2.5"
-      >
-        <SearchIcon />
-        <span className="hidden sm:inline">{t(locale, 'search.open')}</span>
-        <kbd className="ml-auto hidden rounded-retro border-2 px-1.5 py-0.5 font-mono text-[10px] sm:inline">
-          ⌘K
-        </kbd>
-      </button>
+        aria-keyshortcuts="Meta+K Control+K"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className="w-10 justify-center muted sm:w-52 sm:justify-start"
+      />
 
       {open && (
         <Overlay label={t(locale, 'search.dialog')} onClose={() => setOpen(false)}>
@@ -245,24 +251,19 @@ export function Search({
             <ul className="max-h-[50vh] overflow-y-auto p-2">
               {hits.map((hit, i) => (
                 <li key={`${hit.collection}/${hit.slug}`}>
-                  <button
-                    type="button"
+                  <Button
+                    variant="row"
+                    active={i === cursor}
                     onMouseEnter={() => setCursor(i)}
                     onClick={() => go(hit)}
                     style={paletteVars(palettes.get(hit.collection) ?? DEFAULT_PALETTE)}
-                    className={[
-                      'w-full rounded-retro border-2 px-3 py-2.5 text-left transition-colors',
-                      i === cursor
-                        ? 'border-[var(--border)] bg-accent-400/30'
-                        : 'border-transparent',
-                    ].join(' ')}
                   >
-                    <p className="label-retro muted">
+                    <span className="block label-retro muted">
                       {hit.collectionTitle} · {hit.section}
-                    </p>
-                    <p className="mt-0.5 text-sm font-semibold">{hit.title}</p>
-                    <p className="line-clamp-2 text-xs muted">{hit.snippet}</p>
-                  </button>
+                    </span>
+                    <span className="mt-0.5 block text-sm font-semibold">{hit.title}</span>
+                    <span className="line-clamp-2 text-xs muted">{hit.snippet}</span>
+                  </Button>
                 </li>
               ))}
               {query.trim().length >= 2 && hits.length === 0 && (
@@ -289,18 +290,9 @@ function ScopeChip({
   children: React.ReactNode
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={[
-        'rounded-full border-2 px-2.5 py-1 text-xs transition-colors',
-        active
-          ? 'border-brand-900 bg-accent-400 font-semibold text-brand-900'
-          : 'border-transparent muted hover:border-[var(--border)] hover:bg-brand-500/10',
-      ].join(' ')}
-    >
+    <Button variant="chip" active={active} aria-pressed={active} onClick={onClick}>
       {children}
-    </button>
+    </Button>
   )
 }
 

@@ -12,6 +12,7 @@
     "close": "Close menu",
     "theme": "Toggle light and dark theme",
     "topics": "Topics",
+    "switchTopic": "Switch topic",
     "filterTopics": "Filter topics…",
     "noTopics": "No topics match.",
     "language": "Change language",

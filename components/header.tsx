@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import type { CategoryGroup, Collection, NavGroup } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
 import { SidebarNav } from './sidebar'
@@ -10,7 +10,7 @@ import { ThemeToggle } from './theme-toggle'
 import { CollectionSwitcher } from './collection-switcher'
 import { LocaleSwitcher } from './locale-switcher'
 import { useBodyScrollLock } from '@/lib/hooks'
-import { Link } from '@/lib/ui'
+import { Button, Link } from '@/lib/ui'
 
 export function Header({
   siteName,
@@ -30,6 +30,7 @@ export function Header({
 }) {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const drawerId = useId()
 
   // Close the mobile drawer whenever navigation lands on a new page. The effect
   // body does not read `pathname` — the dependency *is* the point.
@@ -48,30 +49,33 @@ export function Header({
       <header className="sticky top-0 z-40 border-b-2 bg-[var(--bg)] sm:bg-[color-mix(in_oklab,var(--bg)_88%,transparent)] sm:backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[100rem] items-center gap-1.5 px-3 sm:gap-3 sm:px-6">
           {hasNav && (
-            <button
-              type="button"
-              aria-label={t(locale, drawerOpen ? 'nav.close' : 'nav.menu')}
+            <Button
+              size="icon"
+              label={t(locale, drawerOpen ? 'nav.close' : 'nav.menu')}
+              textHidden
               aria-expanded={drawerOpen}
+              aria-controls={drawerId}
               onClick={() => setDrawerOpen((v) => !v)}
-              className="retro-shadow-sm grid h-10 w-10 shrink-0 place-items-center rounded-retro border-2 transition-colors hover:bg-accent-400 sm:h-9 sm:w-9 lg:hidden"
-            >
-              <svg
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                className="h-[18px] w-[18px]"
-              >
-                {drawerOpen ? (
-                  <path d="M18 6 6 18M6 6l12 12" />
-                ) : (
-                  <path d="M3 6h18M3 12h18M3 18h18" />
-                )}
-              </svg>
-            </button>
+              className="shrink-0 lg:hidden"
+              icon={
+                <svg
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className="h-[18px] w-[18px]"
+                >
+                  {drawerOpen ? (
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  ) : (
+                    <path d="M3 6h18M3 12h18M3 18h18" />
+                  )}
+                </svg>
+              }
+            />
           )}
 
           <Link
@@ -109,7 +113,7 @@ export function Header({
       {drawerOpen && hasNav && (
         // Above the header band (z-40) and the article's sticky anchor bar
         // (z-30), which otherwise paints a strip straight across the drawer.
-        <div className="fixed inset-0 top-16 z-50 lg:hidden">
+        <div id={drawerId} className="fixed inset-0 top-16 z-50 lg:hidden">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}

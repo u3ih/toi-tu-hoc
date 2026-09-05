@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { t, type Locale } from '@/lib/i18n'
+import { Button } from '@/lib/ui'
 import { useProgress } from './provider'
 
 /** Clears everything, behind one confirmation — it cannot be undone. */
@@ -13,36 +14,33 @@ export function ResetProgress({ locale }: { locale: Locale }) {
 
   if (!confirming) {
     return (
-      <button
-        type="button"
+      <Button
+        variant="text"
+        label={t(locale, 'progress.reset')}
         onClick={() => setConfirming(true)}
-        className="inline-flex min-h-11 items-center underline decoration-2 underline-offset-4 hover:text-brand-600 dark:hover:text-accent-400"
-      >
-        {t(locale, 'progress.reset')}
-      </button>
+        className="min-h-11"
+      />
     )
   }
 
   return (
     <span className="inline-flex flex-wrap items-center justify-center gap-2">
       <span>{t(locale, 'progress.resetConfirm', { count: total })}</span>
-      <button
-        type="button"
+      <Button
+        size="none"
+        label={t(locale, 'progress.resetYes')}
         onClick={() => {
           reset()
           setConfirming(false)
         }}
-        className="inline-flex min-h-9 items-center rounded-retro border-2 px-2.5 font-semibold hover:bg-accent-400 hover:text-brand-900"
-      >
-        {t(locale, 'progress.resetYes')}
-      </button>
-      <button
-        type="button"
+        className="min-h-9 px-2.5 font-semibold"
+      />
+      <Button
+        variant="text"
+        label={t(locale, 'progress.resetNo')}
         onClick={() => setConfirming(false)}
-        className="inline-flex min-h-9 items-center underline decoration-2 underline-offset-4"
-      >
-        {t(locale, 'progress.resetNo')}
-      </button>
+        className="min-h-9"
+      />
     </span>
   )
 }

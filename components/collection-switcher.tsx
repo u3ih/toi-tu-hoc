@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { paletteVars } from '@/lib/accent'
 import type { CategoryGroup, Collection } from '@/lib/content'
 import { path, t, type Locale } from '@/lib/i18n'
-import { Link } from '@/lib/ui'
+import { Button, Link } from '@/lib/ui'
 
 /** Above this many collections a flat list stops being scannable. */
 const FILTER_THRESHOLD = 8
@@ -32,6 +32,7 @@ export function CollectionSwitcher({
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const ref = useRef<HTMLDivElement>(null)
+  const menuId = useId()
 
   useEffect(() => {
     function onPointerDown(e: PointerEvent) {
@@ -82,36 +83,47 @@ export function CollectionSwitcher({
 
   if (collections.length < 2) return null
 
+  // "Chọn chủ đề" alone is not enough: the trigger also reports the current one,
+  // which on a phone is the only place that name is announced at all.
+  const label = current
+    ? `${t(locale, 'nav.switchTopic')}: ${current.shortTitle}`
+    : t(locale, 'nav.topics')
+
   return (
     <div ref={ref} className="relative">
-      <button
-        type="button"
+      <Button
+        // The title collapses to a bare emoji below `sm`, and the emoji is
+        // decorative — the accessible name has to come from `label`.
+        label={label}
+        text={current?.shortTitle ?? t(locale, 'nav.topics')}
+        textHidden="sm"
+        textClassName="max-w-32 truncate"
+        icon={current?.emoji ?? '📚'}
+        trailing={
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        }
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-controls={menuId}
         onClick={() => setOpen((v) => !v)}
-        className="retro-shadow-sm flex h-10 items-center gap-1.5 rounded-retro border-2 px-2.5 text-sm transition-colors hover:bg-accent-400 hover:text-brand-900 sm:h-9"
-      >
-        <span aria-hidden>{current?.emoji ?? '📚'}</span>
-        <span className="hidden max-w-32 truncate sm:inline">
-          {current?.shortTitle ?? t(locale, 'nav.topics')}
-        </span>
-        <svg
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
+      />
 
       {open && (
         <div
+          id={menuId}
           role="menu"
+          aria-label={label}
           className="surface absolute right-0 z-50 mt-2 w-72 overflow-hidden shadow-[6px_6px_0_var(--shadow-ink)]"
         >
           {filterable && (

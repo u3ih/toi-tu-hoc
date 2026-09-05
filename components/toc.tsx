@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import type { Heading } from '@/lib/content'
 import { t, type Locale } from '@/lib/i18n'
+import { Button } from '@/lib/ui'
 
 /**
  * Which heading the reader is currently under.
@@ -96,6 +97,7 @@ export function Toc({ headings, locale }: { headings: Heading[]; locale: Locale 
 export function TocMenu({ headings, locale }: { headings: Heading[]; locale: Locale }) {
   const activeId = useActiveHeading(headings)
   const [open, setOpen] = useState(false)
+  const panelId = useId()
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -117,30 +119,32 @@ export function TocMenu({ headings, locale }: { headings: Heading[]; locale: Loc
       className="sticky top-[4.375rem] z-30 -mx-4 mb-8 border-b-2 sm:-mx-6 xl:hidden"
       style={{ background: 'var(--bg)' }}
     >
-      <button
-        type="button"
+      <Button
+        variant="bar"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex min-h-11 w-full items-center gap-2 px-4 py-2.5 text-left sm:px-6"
+        aria-controls={panelId}
+        trailing={
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        }
       >
         <span className="label-retro muted">{t(locale, 'doc.toc')}</span>
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{current.text}</span>
-        <svg
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
+      </Button>
 
       {open && (
-        <div className="max-h-[60vh] overflow-y-auto border-t-2 px-4 py-3 sm:px-6">
+        <div id={panelId} className="max-h-[60vh] overflow-y-auto border-t-2 px-4 py-3 sm:px-6">
           <TocList headings={headings} activeId={activeId} onNavigate={() => setOpen(false)} />
         </div>
       )}

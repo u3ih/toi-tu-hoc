@@ -10,6 +10,7 @@
  * Components that know about docs, collections or locales belong in
  * `components/`; behaviour with no markup belongs in `lib/hooks/`.
  */
+export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './button'
 export { Image, type ImageProps } from './image'
 export { isExternalHref, Link, type LinkProps } from './link'
 export { Overlay } from './overlay'

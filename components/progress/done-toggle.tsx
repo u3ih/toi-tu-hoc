@@ -1,6 +1,7 @@
 'use client'
 
 import { t, type Locale } from '@/lib/i18n'
+import { Button } from '@/lib/ui'
 import { useProgress } from './provider'
 import { useAutoDone } from './use-auto-done'
 
@@ -28,20 +29,15 @@ export function DoneToggle({
 
   return (
     <div className="mt-12 flex flex-wrap items-center gap-3 border-t-2 pt-6 not-prose">
-      <button
-        type="button"
-        onClick={() => toggle(collection, slug)}
+      <Button
+        size="md"
+        active={done}
+        label={t(locale, done ? 'progress.done' : 'progress.markDone')}
+        icon={done ? '✓' : '○'}
         aria-pressed={done}
-        className={[
-          'retro-lift flex min-h-11 items-center gap-2 rounded-retro border-2 px-4 py-2 text-sm font-semibold transition-colors',
-          done
-            ? 'retro-shadow border-brand-900 bg-accent-400 text-brand-900'
-            : 'retro-shadow-sm hover:bg-accent-400 hover:text-brand-900',
-        ].join(' ')}
-      >
-        <span aria-hidden>{done ? '✓' : '○'}</span>
-        {t(locale, done ? 'progress.done' : 'progress.markDone')}
-      </button>
+        onClick={() => toggle(collection, slug)}
+        className="retro-lift"
+      />
 
       <p className="text-xs muted">
         {t(locale, auto ? 'progress.autoDone' : 'progress.storedLocally')}
