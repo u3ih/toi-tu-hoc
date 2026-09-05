@@ -1,5 +1,8 @@
 import { DEFAULT_LOCALE, t, type Locale } from './i18n'
 
+/** The canonical public origin this site is deployed under. */
+const PRODUCTION_URL = 'https://u3ih.io.vn'
+
 /**
  * Site-wide settings that are the same in every language.
  *
@@ -24,9 +27,17 @@ export const site = {
   repoBranch: 'main',
   /**
    * Public origin, used for canonical URLs, hreflang, sitemap and JSON-LD.
-   * Set NEXT_PUBLIC_SITE_URL at build time once the site has a real domain.
+   *
+   * A production build defaults to the real domain, so a deploy that forgets to
+   * set NEXT_PUBLIC_SITE_URL still emits real URLs rather than localhost ones
+   * that would poison the sitemap and every canonical tag. `next dev` keeps the
+   * localhost default; NEXT_PUBLIC_SITE_URL overrides either (preview deploys,
+   * forks on a different domain).
    */
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, ''),
+  url: (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.NODE_ENV === 'production' ? PRODUCTION_URL : 'http://localhost:3000')
+  ).replace(/\/$/, ''),
 } as const
 
 /** The contributing guide — where the footer link sends people. */

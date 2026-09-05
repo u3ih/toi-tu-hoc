@@ -147,9 +147,15 @@ export function sortedDocs(entry, locale) {
     )
 }
 
-/** Absolute site URL, matching `siteUrl` in lib/metadata.ts. */
+/**
+ * Absolute site URL, matching `siteUrl` in lib/metadata.ts.
+ *
+ * This only ever runs from `pnpm build`, which is a production build, so the
+ * default is the real domain rather than localhost — keep it in step with
+ * PRODUCTION_URL in lib/site.ts.
+ */
 export function siteUrl(p = '/') {
-  const origin = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL || 'https://u3ih.io.vn').replace(/\/$/, '')
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
   return `${origin}${basePath}${p}`
 }
