@@ -1,3 +1,5 @@
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { ReactNode } from 'react'
 import { fontVariables } from '@/lib/fonts'
 import { LOCALE_META, type Locale } from '@/lib/i18n'
@@ -36,6 +38,18 @@ export function Shell({ locale, children }: { locale: Locale; children: ReactNod
         </ThemeProvider>
         <GoogleTagManager />
         <GtmRouteViews locale={locale} />
+
+        {/* Vercel Web Analytics. No id to configure: the script is served from
+            this deployment's own origin, so it counts only what Vercel is
+            already serving, and Vercel's dashboard is the container. On a
+            `pnpm dev` server the package swaps in its debug build, which logs
+            page views to the console and sends nothing. */}
+        <Analytics />
+
+        {/* Real-user Web Vitals, same deal: no id, served from this origin,
+            reported to Vercel's Speed Insights tab. Samples real visitors, so
+            it measures the site people actually get rather than a lab run. */}
+        <SpeedInsights />
       </body>
     </html>
   )
