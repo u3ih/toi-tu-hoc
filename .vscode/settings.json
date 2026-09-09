@@ -1,0 +1,41 @@
+{
+  // Two formatters on purpose: Biome owns code and JSON, Prettier owns prose.
+  // Biome has no markdown formatter, and prose wrapping is the whole reason
+  // Prettier is here (see .prettierrc.json -> proseWrap: always).
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "biomejs.biome",
+
+  // Ruler sits at the prose wrap width so hand-editing matches what
+  // Prettier does on save.
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [120],
+    "editor.wordWrap": "off"
+  },
+  "[mdx]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [120],
+    "editor.wordWrap": "off"
+  },
+
+  "[javascript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[javascriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[typescript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[typescriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[json]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[jsonc]": { "editor.defaultFormatter": "biomejs.biome" },
+
+  // Biome's safe lint fixes on save. Import sorting stays off to match the
+  // `assist.actions.source.organizeImports` setting in biome.jsonc.
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit"
+  },
+
+  // Matches Biome's lineWidth for code.
+  "editor.rulers": [100],
+
+  // .mdx is not a known language in a bare VS Code install.
+  "files.associations": {
+    "*.mdx": "mdx"
+  }
+}
