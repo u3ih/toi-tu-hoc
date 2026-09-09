@@ -13,29 +13,41 @@
     "en": "English"
   },
   "description": {
-    "vi": "Mình học tiếng Anh 10 năm mà vẫn không xem nổi một tập phim. Đây là thứ cuối cùng đã hiệu quả.",
-    "en": "Ten years of studying English and I still couldn't follow a single episode. Here's what finally worked."
+    "vi": "Sau nhiều năm học tiếng anh, mình vẫn chưa tự xem được 1 bộ phim mà không có sub. Nhưng mình vẫn tiến bộ hơn từng ngày.",
+    "en": "After years of studying English, I still can't watch a film without subtitles. But I get a little better every day."
   },
   "sections": [
     {
       "key": "start",
       "emoji": "🚀",
-      "title": { "vi": "Bắt đầu", "en": "Start here" }
+      "title": {
+        "vi": "Bắt đầu",
+        "en": "Start here"
+      }
     },
     {
       "key": "skills",
       "emoji": "🎯",
-      "title": { "vi": "Kỹ năng", "en": "Skills" }
+      "title": {
+        "vi": "Kỹ năng",
+        "en": "Skills"
+      }
     },
     {
       "key": "tools",
       "emoji": "🛠️",
-      "title": { "vi": "Công cụ", "en": "Tools" }
+      "title": {
+        "vi": "Công cụ",
+        "en": "Tools"
+      }
     },
     {
       "key": "resources",
       "emoji": "📚",
-      "title": { "vi": "Tài nguyên", "en": "Resources" }
+      "title": {
+        "vi": "Tài nguyên",
+        "en": "Resources"
+      }
     }
   ]
 }

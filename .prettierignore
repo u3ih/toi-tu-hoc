@@ -1,0 +1,27 @@
+# Prettier here is ONLY for prose wrapping in content/. Every other file type
+# belongs to Biome (see biome.jsonc), so it is listed out here. Keeping both
+# tools off the same files avoids a format war on save.
+node_modules
+.next
+out
+public
+
+# Biome's territory.
+**/*.ts
+**/*.tsx
+**/*.js
+**/*.jsx
+**/*.mjs
+**/*.cjs
+**/*.json
+**/*.jsonc
+**/*.css
+**/*.yml
+**/*.yaml
+
+# Hand-wrapped docs at the repo root — reflowing these makes a huge diff for
+# no reading benefit. Only content/ articles get wrapped.
+README.md
+CONTRIBUTING.md
+AGENTS.md
+CLAUDE.md

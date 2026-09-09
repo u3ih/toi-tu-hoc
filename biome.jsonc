@@ -1,8 +1,10 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 
-  // Biome does formatting and linting in one pass, which is why there is no
-  // Prettier or ESLint here. `pnpm lint` reports, `pnpm lint:fix` writes.
+  // Biome does formatting and linting for code in one pass, which is why there
+  // is no ESLint here. `pnpm lint` reports, `pnpm lint:fix` writes. Prettier is
+  // installed too, but only for prose in `content/` — Biome has no markdown
+  // formatter and so cannot wrap paragraphs. See .prettierrc.json.
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
 
   "files": {
@@ -73,7 +75,8 @@
 
   "overrides": [
     {
-      // Prose. Formatting markdown reflows hand-wrapped Vietnamese badly.
+      // Prose belongs to Prettier (proseWrap: always). Two formatters on the
+      // same file would fight on every save.
       "includes": ["**/*.md", "**/*.mdx"],
       "formatter": { "enabled": false },
       "linter": { "enabled": false }
